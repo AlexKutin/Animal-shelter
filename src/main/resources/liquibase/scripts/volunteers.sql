@@ -8,6 +8,6 @@ CREATE TABLE volunteers
     volunteer_telegram     VARCHAR(50),
     volunteer_phone        VARCHAR(50)
 );
--- changeset Inna Serebriakova
+-- changeset InnaSerebriakova:2
 INSERT INTO volunteers (volunteer_name, volunteer_telegram, volunteer_phone) VALUES ('Evgeniy', null, null), ('Lisa', null, null);
 

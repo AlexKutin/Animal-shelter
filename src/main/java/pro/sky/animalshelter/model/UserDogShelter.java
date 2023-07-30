@@ -8,7 +8,7 @@ public class UserDogShelter extends UserShelter {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shelter_id")
-    private DogShelter dogShelter;
+    private Shelter dogShelter;
 
     @Override
     public String toString() {

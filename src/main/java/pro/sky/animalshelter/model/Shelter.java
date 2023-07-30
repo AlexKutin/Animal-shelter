@@ -2,16 +2,17 @@ package pro.sky.animalshelter.model;
 
 import javax.persistence.*;
 
-@MappedSuperclass
-public abstract class Shelter {
+@Entity
+@Table(name = "shelters")
+public class Shelter {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "shelter_id")
     protected Integer id;
 
-//    @Column(name = "shelter_type", nullable = false)
-//    @Enumerated(EnumType.STRING)
-//    protected ShelterType shelterType;
+    @Column(name = "shelter_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    protected ShelterType shelterType;
 
     @Column(name = "shelter_name", nullable = false, unique = true, length = 100)
     protected String shelterName;
@@ -38,6 +39,14 @@ public abstract class Shelter {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public ShelterType getShelterType() {
+        return shelterType;
+    }
+
+    public void setShelterType(ShelterType shelterType) {
+        this.shelterType = shelterType;
     }
 
     public String getShelterName() {
