@@ -8,16 +8,16 @@ public class Volunteer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "volunteer_id")
-    protected Integer id;
+    private Integer id;
 
     @Column(name = "volunteer_name", nullable = false)
-    protected String name;
+    private String name;
 
     @Column(name = "volunteer_telegram")
-    protected String telegramAddress;
+    private String telegramAddress;
 
     @Column(name = "volunteer_phone")
-    protected String phone;
+    private String phone;
 
     public Integer getId() {
         return id;

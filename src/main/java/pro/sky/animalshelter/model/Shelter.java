@@ -8,30 +8,32 @@ public class Shelter {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "shelter_id")
-    protected Integer id;
+    private Integer id;
 
     @Column(name = "shelter_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    protected ShelterType shelterType;
+    private ShelterType shelterType;
 
     @Column(name = "shelter_name", nullable = false, unique = true, length = 100)
-    protected String shelterName;
+    private String shelterName;
 
     @Column(name = "shelter_description", nullable = false, length = 1024)
-    protected String shelterDescription;
+    private String shelterDescription;
 
     @Column(name = "shelter_address", nullable = false)
-    protected String shelterAddress;
+    private String shelterAddress;
+
+    // ToDo добавить схему проезда
 
     @Column(name = "shelter_contacts", nullable = false, length = 100)
-    protected String shelterContacts;
+    private String shelterContacts;
 
     @Column(name = "security_contacts", length = 50)
-    protected String securityContacts;
+    private String securityContacts;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "volunteer_id", referencedColumnName = "volunteer_id", nullable = false)
-    protected Volunteer volunteer;
+    private Volunteer volunteer;
 
     public Integer getId() {
         return id;
