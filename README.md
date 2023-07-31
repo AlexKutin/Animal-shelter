@@ -9,9 +9,18 @@ Telegram Bot предназначен для помощи в автоматиз�
 
 ## Используемые технологии  
 - Java 11
-- Spring Boot
+- Spring Boot, Hibernate
 - REST API
 - PostgreSQL
 - Pengrad library (for interacting with Telegram Bot API)
+- Liquibase
 
 ## Наша команда - TeleBotTeam
+
+Участники команды:
+
+- Алексей Кутин - kutinalexeydm@gmail.com (Капитан команды);
+- Бегали Машрапов - begalimasrapov@gmail.com;
+- Инна Серебрякова - serebrakovainna1@gmail.com;
+- Ирек Хайбулин - irek.haibulin@gmail.com;
+- Надежда Дроголова - drogolova1997@mail.ru;

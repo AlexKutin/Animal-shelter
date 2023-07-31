@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import pro.sky.animalshelter.keyBoard.InlineKeyboardMarkupHelper;
+import pro.sky.animalshelter.service.ShelterService;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -23,8 +24,11 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
 
     private final TelegramBot animalShelterBot;
 
-    public AnimalShelterUpdatesListener(TelegramBot animalShelterBot) {
+    private final ShelterService shelterService;
+
+    public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService shelterService) {
         this.animalShelterBot = animalShelterBot;
+        this.shelterService = shelterService;
     }
 
     @PostConstruct
@@ -76,7 +80,14 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
 
                         // Обработка callback-запросов от нажатых кнопок
                         if ("Приют кошек\uD83D\uDC31".equals(data) || "Приют собак\uD83D\uDC36".equals(data)) {
-                            SendMessage response = new SendMessage(chatId, data + " приветствует Вас! Спасибо за выбор! Выберите, что вас интересует:\n" +
+                            String shelterName;
+                            if (data.contains("собак")) {
+                                shelterName = shelterService.getDogShelter().getShelterName();
+                            } else {
+                                shelterName = shelterService.getCatShelter().getShelterName();
+                            }
+                            SendMessage response = new SendMessage(chatId, data + " " + shelterName +
+                                    " приветствует Вас! Спасибо за выбор! Выберите, что вас интересует:\n" +
                                     "1. Информация о приюте\n" +
                                     "2. Как забрать животное\n" +
                                     "3. Отправить отчет о животном\n" +
