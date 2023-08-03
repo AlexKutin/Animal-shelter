@@ -31,6 +31,9 @@ public class Shelter {
     @Column(name = "security_contacts", length = 50)
     private String securityContacts;
 
+    @Column(name = "safety_info")
+    private String safetyInfo;
+
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "volunteer_id", referencedColumnName = "volunteer_id", nullable = false)
     private Volunteer volunteer;
@@ -95,6 +98,14 @@ public class Shelter {
         this.securityContacts = securityContacts;
     }
 
+    public String getSafetyInfo() {
+        return safetyInfo;
+    }
+
+    public void setSafetyInfo(String safetyInfo) {
+        this.safetyInfo = safetyInfo;
+    }
+
     public Volunteer getVolunteer() {
         return volunteer;
     }
@@ -121,6 +132,7 @@ public class Shelter {
                 ", shelterAddress='" + shelterAddress + '\'' +
                 ", shelterContacts='" + shelterContacts + '\'' +
                 ", securityContacts='" + securityContacts + '\'' +
+                ", safetyInfo='" + safetyInfo + '\'' +
                 ", volunteer=" + volunteer +
                 '}';
     }
