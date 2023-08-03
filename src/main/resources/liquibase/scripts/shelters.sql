@@ -45,4 +45,4 @@ ALTER TABLE shelters ADD CONSTRAINT shelters_volunteer_id_fkey FOREIGN KEY (volu
 -- changeset InnaSerebriakova:4
 ALTER TABLE shelters ADD COLUMN id_rules INT NOT NULL;
 ALTER TABLE shelters ADD CONSTRAINT shelters_id_rules_fkey FOREIGN KEY (id_rules) REFERENCES rules(id_rules);
-INSERT INTO shelters (id_rules) VALUES (1, 2);
+INSERT INTO shelters (id_rules) VALUES (1), (2);

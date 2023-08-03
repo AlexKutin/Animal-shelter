@@ -7,3 +7,6 @@ databaseChangeLog:
       file: liquibase/scripts/cat_shelter_users.sql
   - include:
       file: liquibase/scripts/dog_shelter_users.sql
+  - include:
+      file: liquibase/scripts/rules.sql
+
