@@ -28,6 +28,12 @@ public class Rules {
     @Column(name = "rules_gh_for_special_pet", nullable = false, length = 1024)
     private String rulesGHForSpecialPet;
 
+    @Column(name = "advice_from_cynologist", nullable = false, length = 1024)
+    private String adviceFromCynologist;
+
+    @Column(name = "list_cynologist", nullable = false, length = 1024)
+    private String listCynologist;
+
     @Column(name = "reasons_refusal", nullable = false, length = 1024)
     private String reasonsRefusal;
 
@@ -87,6 +93,22 @@ public class Rules {
         this.rulesGHForSpecialPet = rulesGHForSpecialPet;
     }
 
+    public String getAdviceFromCynologist() {
+        return adviceFromCynologist;
+    }
+
+    public void setAdviceFromCynologist(String adviceFromCynologist) {
+        this.adviceFromCynologist = adviceFromCynologist;
+    }
+
+    public String getListCynologist() {
+        return listCynologist;
+    }
+
+    public void setListCynologist(String listCynologist) {
+        this.listCynologist = listCynologist;
+    }
+
     public String getReasonsRefusal() {
         return reasonsRefusal;
     }
@@ -105,6 +127,8 @@ public class Rules {
                 ", rulesGHForAdultPet='" + rulesGHForAdultPet + '\'' +
                 ", rulesGHForChildPet='" + rulesGHForChildPet + '\'' +
                 ", rulesGHForSpecialPet='" + rulesGHForSpecialPet + '\'' +
+                ", adviceFromCynologist='" + adviceFromCynologist + '\'' +
+                ", listCynologist='" + listCynologist + '\'' +
                 ", reasonsRefusal='" + reasonsRefusal + '\'' +
                 '}';
     }
