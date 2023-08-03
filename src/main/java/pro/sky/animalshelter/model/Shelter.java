@@ -35,6 +35,10 @@ public class Shelter {
     @JoinColumn(name = "volunteer_id", referencedColumnName = "volunteer_id", nullable = false)
     private Volunteer volunteer;
 
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_rules", referencedColumnName = "id_rules", nullable = false)
+    private Rules rules;
+
     public Integer getId() {
         return id;
     }
@@ -99,16 +103,26 @@ public class Shelter {
         this.volunteer = volunteer;
     }
 
+    public Rules getRules() {
+        return rules;
+    }
+
+    public void setRules(Rules rules) {
+        this.rules = rules;
+    }
+
     @Override
     public String toString() {
         return "Shelter{" +
                 "id=" + id +
+                ", shelterType=" + shelterType +
                 ", shelterName='" + shelterName + '\'' +
                 ", shelterDescription='" + shelterDescription + '\'' +
                 ", shelterAddress='" + shelterAddress + '\'' +
                 ", shelterContacts='" + shelterContacts + '\'' +
                 ", securityContacts='" + securityContacts + '\'' +
                 ", volunteer=" + volunteer +
+                ", rules=" + rules +
                 '}';
     }
 }
