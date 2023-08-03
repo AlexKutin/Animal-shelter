@@ -11,13 +11,10 @@ CREATE TABLE rules
     rules_gh_for_adult_pet   VARCHAR(1024) NOT NULL,
     rules_gh_for_child_pet   VARCHAR(1024) NOT NULL,
     rules_gh_for_special_pet VARCHAR(1024) NOT NULL,
-    advice_from_cynologist   VARCHAR(1024),
-    list_cynologist          VARCHAR(1024),
     reasons_refusal          VARCHAR(1024) NOT NULL
 );
 INSERT INTO rules (riles_meeting, list_doc_for_take_pet, rules_transportation, rules_gh_for_adult_pet,
-                   rules_gh_for_child_pet, rules_gh_for_special_pet, advice_from_cynologist, list_cynologist,
-                   reasons_refusal)
+                   rules_gh_for_child_pet, rules_gh_for_special_pet, reasons_refusal)
 VALUES ('1. Присядьте на уровень роста животного и назовите его по имени.
 2. Дайте животному обнюхать Вас.
 3. Угостите животное лакомством.
@@ -41,11 +38,6 @@ VALUES ('1. Присядьте на уровень роста животного
         3. Территория дома(квартиры) должна быть огорожена и закрыта, чтоб животное случайно не выбежало на улицу.
         4. В доме должны быть спрятаны все потенциально опасные для животного предметы.
         5. В доме не должно быть открытых люков, лестниц, острых углов.',
-        '1. Дайте животному привыкнуть к Вам.
-        2. Дайте животному обнюхать Вашу руку.
-        3. Говорите с собакой тихо и с дружелюбной интонацией.'
-            '1. Иванов Петр Петрович, тел: +78880008888;
-            2. Мальцева Валентино Ивановна, тел: +78889990000.'
             '1. Случаи жестокого обращения с животными в прошлом
             2. На усмотрение волонтера'),
        ('1. Присядьте на уровень роста животного и назовите его по имени.
@@ -68,3 +60,14 @@ VALUES ('1. Присядьте на уровень роста животного
         4. В доме не должно быть открытых люков, лестниц, острых углов.',
         '1. Случаи жестокого обращения с животными в прошлом
         2. На усмотрение волонтера');
+
+-- changeset InnaSerebriakova:2
+ALTER TABLE rules ADD COLUMN advice_from_cynologist VARCHAR(1024);
+ALTER TABLE rules ADD COLUMN list_cynologist VARCHAR(1024);
+UPDATE rules SET advice_from_cynologist =
+'1. Дайте животному привыкнуть к Вам.
+2. Дайте животному обнюхать Вашу руку.
+3. Говорите с собакой тихо и с дружелюбной интонацией.' WHERE id_rules = 1;
+UPDATE rules SET list_cynologist =
+'1. Иванов Петр Петрович, тел: +78880008888;
+2. Мальцева Валентино Ивановна, тел: +78889990000.' WHERE id_rules = 1;

@@ -28,10 +28,10 @@ public class Rules {
     @Column(name = "rules_gh_for_special_pet", nullable = false, length = 1024)
     private String rulesGHForSpecialPet;
 
-    @Column(name = "advice_from_cynologist", nullable = false, length = 1024)
+    @Column(name = "advice_from_cynologist", length = 1024)
     private String adviceFromCynologist;
 
-    @Column(name = "list_cynologist", nullable = false, length = 1024)
+    @Column(name = "list_cynologist", length = 1024)
     private String listCynologist;
 
     @Column(name = "reasons_refusal", nullable = false, length = 1024)
