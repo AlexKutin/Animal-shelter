@@ -75,3 +75,7 @@ UPDATE shelters SET safety_info = '❌ В приют не допускаются
 - посещать приют со своими животными.'
 WHERE shelter_type = 'CAT_SHELTER';
 
+-- changeset AlexKutin:6
+UPDATE shelters SET security_contacts = '+7-955-000-9922, +7-987-065-4416' WHERE shelter_type = 'DOG_SHELTER';
+UPDATE shelters SET security_contacts = '+7-925-711-5948, +7-995-611-0617' WHERE shelter_type = 'CAT_SHELTER';
+
