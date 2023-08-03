@@ -11,7 +11,7 @@ CREATE TABLE rules
     rules_gh_for_adult_pet   VARCHAR(1024) NOT NULL,
     rules_gh_for_child_pet   VARCHAR(1024) NOT NULL,
     rules_gh_for_special_pet VARCHAR(1024) NOT NULL,
-    reasons_refusal          VARCHAR(1024) NOT NULL,
+    reasons_refusal          VARCHAR(1024) NOT NULL
 );
 INSERT INTO rules (riles_meeting, list_doc_for_take_pet, rules_transportation, rules_gh_for_adult_pet, rules_gh_for_child_pet, rules_gh_for_special_pet, reasons_refusal) VALUES (
 '1. Присядьте на уровень роста животного и назовите его по имени.
@@ -58,4 +58,4 @@ INSERT INTO rules (riles_meeting, list_doc_for_take_pet, rules_transportation, r
  3. В доме должны быть спрятаны все потенциально опасные для животного предметы.
  4. В доме не должно быть открытых люков, лестниц, острых углов.',
  '1. Случаи жестокого обращения с животными в прошлом
- 2. На усмотрение волонтера')
+ 2. На усмотрение волонтера');
