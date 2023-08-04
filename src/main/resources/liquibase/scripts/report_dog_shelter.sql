@@ -1,7 +1,7 @@
 -- liquibase formatted sql
 
 -- changeset InnaSerebriakova:1
-CREATE TABLE report
+CREATE TABLE report_dog_shelter
 (
     id_report   SERIAL PRIMARY KEY,
     user_id     INT           NOT NULL,
@@ -10,5 +10,4 @@ CREATE TABLE report
     date_report DATE
 );
 
--- changeset InnaSerebriakova:2
-DROP TABLE report;
+ALTER TABLE report_dog_shelter ADD CONSTRAINT report_dog_shelter_user_id_fkey FOREIGN KEY (user_id) REFERENCES dog_shelter_users(user_id);

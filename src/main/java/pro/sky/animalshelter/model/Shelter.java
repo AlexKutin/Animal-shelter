@@ -34,7 +34,7 @@ public class Shelter {
     @Column(name = "safety_info")
     private String safetyInfo;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "volunteer_id", referencedColumnName = "volunteer_id", nullable = false)
     private Volunteer volunteer;
 
