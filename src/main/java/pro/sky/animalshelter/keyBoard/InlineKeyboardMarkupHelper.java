@@ -32,7 +32,7 @@ public class InlineKeyboardMarkupHelper {
         // Кнопка "Позвать волонтера"
         rowInline.add(new InlineKeyboardButton("4").callbackData("CallVolunteer"));
         // Кнопка "⬅ Назад"
-        rowInline.add(new InlineKeyboardButton("⬅ Назад").callbackData("BackShelterMenu"));
+        rowInline.add(new InlineKeyboardButton("⬅").callbackData("BackShelterMenu"));
 
         InlineKeyboardButton[] buttonsArray = rowInline.toArray(new InlineKeyboardButton[0]);
         return new InlineKeyboardMarkup(buttonsArray);
@@ -42,10 +42,11 @@ public class InlineKeyboardMarkupHelper {
         List<InlineKeyboardButton> rowInline = new ArrayList<>();
         rowInline.add(new InlineKeyboardButton("1").callbackData("ShelterInfoAbout"));
         rowInline.add(new InlineKeyboardButton("2").callbackData("ShelterInfoAddress"));
-        rowInline.add(new InlineKeyboardButton("3").callbackData("ShelterInfoSecurityContacts"));
-        rowInline.add(new InlineKeyboardButton("4").callbackData("ShelterInfoSafetyTips"));
-        rowInline.add(new InlineKeyboardButton("5").callbackData("ShelterInfoLeaveContacts"));
-        rowInline.add(new InlineKeyboardButton("6").callbackData("ShelterInfoCallVolunteer"));
+        rowInline.add(new InlineKeyboardButton("3").callbackData("ShelterContacts"));
+        rowInline.add(new InlineKeyboardButton("4").callbackData("ShelterInfoSecurityContacts"));
+        rowInline.add(new InlineKeyboardButton("5").callbackData("ShelterInfoSafetyTips"));
+        rowInline.add(new InlineKeyboardButton("6").callbackData("ShelterInfoLeaveContacts"));
+        rowInline.add(new InlineKeyboardButton("7").callbackData("CallVolunteer"));
         rowInline.add(new InlineKeyboardButton("⬅").callbackData("BackMainMenu"));
 
         InlineKeyboardButton[] buttonsArray = rowInline.toArray(new InlineKeyboardButton[0]);
@@ -63,10 +64,17 @@ public class InlineKeyboardMarkupHelper {
         rowInline.add(new InlineKeyboardButton("6").callbackData("AdoptionRulesHouseSetupSpecialNeeds"));
         rowInline.add(new InlineKeyboardButton("7").callbackData("AdoptionRulesRejectionReasons"));
         rowInline.add(new InlineKeyboardButton("8").callbackData("AdoptionRulesLeaveContacts"));
-        rowInline.add(new InlineKeyboardButton("9").callbackData("AdoptionRulesCallVolunteer"));
+        rowInline.add(new InlineKeyboardButton("9").callbackData("CallVolunteer"));
         rowInline.add(new InlineKeyboardButton("⬅").callbackData("BackMainMenu"));
 
         //тут придумать логику работы метода и разделить информацию для кошек и собак. После этого добавить кнопки по советам а также кантактам кинологов для приюта собак
+
+        InlineKeyboardButton[] buttonsArray = rowInline.toArray(new InlineKeyboardButton[0]);
+        return new InlineKeyboardMarkup(buttonsArray);
+    }
+    public static InlineKeyboardMarkup createBackToShelterInfoInlineKeyboard() {
+        List<InlineKeyboardButton> rowInline = new ArrayList<>();
+        rowInline.add(new InlineKeyboardButton("⬅ Назад").callbackData("BackShelterInfo"));
 
         InlineKeyboardButton[] buttonsArray = rowInline.toArray(new InlineKeyboardButton[0]);
         return new InlineKeyboardMarkup(buttonsArray);
