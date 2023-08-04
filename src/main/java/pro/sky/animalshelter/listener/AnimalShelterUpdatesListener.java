@@ -105,10 +105,10 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
                             SendMessage responseInfo = new SendMessage(chatId, "Выберите что вы хотите узнать о прюте:\n" +
                                     "1. О приюте\n" +
                                     "2. Расписание и адрес\n" +
-                                    "3. Контакты приюта\n"+
+                                    "3. Контакты приюта\n" +
                                     "4. Контакты охраны для получения пропуска\n" +
                                     //схема проезда
-                                    "5. Техника безопасности\n" +
+                                    "5. Техника безопасности на территории приюта\n" +
                                     "6. Оставить контакты\n" +
                                     "7. Позвать волонтера\n" +
                                     "⬅ Назад");
@@ -117,7 +117,6 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
                             SendResponse sendResponseInfo = animalShelterBot.execute(responseInfo);
                             logger.info("Message sent status: {}", sendResponseInfo.isOk());
                         } else if ("ShelterInfoAbout".equals(data)) {
-//                            ShelterType shelterType = null;
                             String shelterName;
                             String shelterDescription;
                             if (chosenShelter.equals("Happy dog")) {
@@ -169,6 +168,18 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
                             responseShelterInfoContacts.replyMarkup(BackShelterInfoKeyboard);
                             SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoContacts);
                             logger.info("Message sent status: {}", sendResponse.isOk());
+                        } else if ("ShelterInfoSafetyTips".equals(data)) {
+                            String shelterInfoSafetyTips;
+                            if (chosenShelter.equals("Happy dog")) {
+                                shelterInfoSafetyTips = shelterService.getDogShelter().getSafetyInfo();
+                            } else {
+                                shelterInfoSafetyTips = shelterService.getCatShelter().getSafetyInfo();
+                            }
+                            SendMessage responseShelterInfoContacts = new SendMessage(chatId, shelterInfoSafetyTips);
+                            InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
+                            responseShelterInfoContacts.replyMarkup(BackShelterInfoKeyboard);
+                            SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoContacts);
+                            logger.info("Message sent status: {}", sendResponse.isOk());
                         } else if ("ShelterInfoLeaveContacts".equals(data)) {
                             //Логика для приема контактных данных ТУТ!
                             SendMessage responseShelterInfoLeaveContacts = new SendMessage(chatId, "Оставьте нам свои контакты и мы с вами свяжемся");
@@ -176,7 +187,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
                             responseShelterInfoLeaveContacts.replyMarkup(BackShelterInfoKeyboard);
                             SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoLeaveContacts);
                             logger.info("Message sent status: {}", sendResponse.isOk());
-                        }else if ("AdoptionRules".equals(data)) {
+                        } else if ("AdoptionRules".equals(data)) {
                             SendMessage responseAdoptionRules = new SendMessage(chatId, "Мы рады, что вы заинтересованы помочь нашим пушистым друзьям. Но перед этим ознакомтесь с правилами:\n" +
                                     "1. Правила знакомства с животными \n" +
                                     "2. Список необходимых документов для усыновления\n" +
@@ -224,10 +235,10 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
                             SendMessage responseBackShelterInfo = new SendMessage(chatId, "Выберите что вы хотите узнать о прюте:\n" +
                                     "1. О приюте\n" +
                                     "2. Расписание и адрес\n" +
-                                    "3. Контакты приюта\n"+
+                                    "3. Контакты приюта\n" +
                                     "4. Контакты охраны для получения пропуска\n" +
                                     //схема проезда
-                                    "5. Техника безопасности\n" +
+                                    "5. Техника безопасности на территории приюта\n" +
                                     "6. Оставить контакты\n" +
                                     "7. Позвать волонтера\n" +
                                     "⬅ Назад");
