@@ -2,7 +2,7 @@
 
 -- changeset InnaSerebriakova:1
 
-CREATE TABLE rules
+CREATE TABLE IF NOT EXISTS rules
 (
     id_rules                 SERIAL PRIMARY KEY,
     riles_meeting            VARCHAR(1024) NOT NULL,
