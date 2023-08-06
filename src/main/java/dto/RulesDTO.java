@@ -5,8 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import pro.sky.animalshelter.model.Rules;
 import pro.sky.animalshelter.model.Shelter;
 
-import javax.persistence.Column;
-
 @Schema(description = "рекомендации")
 public class RulesDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import pro.sky.animalshelter.keyBoard.InlineKeyboardMarkupHelper;
+import pro.sky.animalshelter.service.RulesService;
 import pro.sky.animalshelter.service.ShelterService;
 
 import javax.annotation.PostConstruct;
@@ -25,11 +26,13 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     private final TelegramBot animalShelterBot;
 
     private final ShelterService shelterService;
+    private final RulesService rulesService;
     private String chosenShelter;
 
-    public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService shelterService) {
+    public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService shelterService, RulesService rulesService) {
         this.animalShelterBot = animalShelterBot;
         this.shelterService = shelterService;
+        this.rulesService = rulesService;
     }
 
     @PostConstruct
@@ -94,6 +97,30 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             sendShelterLeaveContacts(chatId);
         } else if ("AdoptionRules".equals(data)) {
             sendAdoptionRules(chatId);
+        } else if ("AdoptionRulesIntroduction".equals(data)) {
+            sendAdoptionRulesIntroduction(chatId);
+        } else if ("AdoptionRulesDocuments".equals(data)) {
+            sendListDocForTakePet(chatId);
+        } else if ("AdoptionRulesTransport".equals(data)) {
+            sendRulesTransport(chatId);
+        } else if ("AdoptionRulesHouseSetup".equals(data)) {
+            sendRulesHouseSetup(chatId);
+        } else if ("AdoptionRulesHouseSetupPuppyKitten".equals(data)) {
+            sendRulesHouseSetupForChild(chatId);
+        } else if ("AdoptionRulesHouseSetupAdult".equals(data)) {
+            sendRulesHouseSetupForAdult(chatId);
+        } else if ("AdoptionRulesHouseSetupSpecialNeeds".equals(data)) {
+            sendRulesHouseSetupForSpecial(chatId);
+        } else if ("BackToPetHouseSelection".equals(data)) {
+            sendRulesHouseSetup(chatId);
+        } else if ("AdoptionRulesRejectionReasons".equals(data)) {
+            sendReasonsRefusal(chatId);
+        } else if ("Cynologist".equals(data)) {
+            sendCynologist(chatId);
+        } else if ("AdviceFromCynologist".equals(data)) {
+            sendAdviceFromCynologist(chatId);
+        } else if ("ListCynologist".equals(data)) {
+            sendListCynologist(chatId);
         } else if ("SendReport".equals(data)) {
             sendReportMessage(chatId);
         } else if ("CallVolunteer".equals(data)) {
@@ -101,9 +128,13 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         } else if ("BackShelterMenu".equals(data)) {
             sendMainMenuMessage(chatId);
         } else if ("BackMainMenu".equals(data)) {
-            sendShelterInfoOptions(chatId);
+            backMainMenu(chatId);
         } else if ("BackShelterInfo".equals(data)) {
             sendShelterInfoOptions(chatId);
+        } else if ("BackAdoptionRules".equals(data)) {
+            sendAdoptionRules(chatId);
+        } else if ("BackToCynologist".equals(data)) {
+            sendCynologist(chatId);
         }
     }
 
@@ -246,22 +277,149 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         logger.info("Message sent status: {}", sendResponse.isOk());
     }
 
+    public void backMainMenu(Long chatId) {
+        SendMessage response = new SendMessage(chatId,
+                "Вы вернулись в главное меню приюта. Выберите, что вас интересует:\n" +
+                        "1. Информация о приюте\n" +
+                        "2. Как забрать животное\n" +
+                        "3. Отправить отчет о животном\n" +
+                        "4. Позвать волонтера\n" +
+                        "⬅ Назад");
+        InlineKeyboardMarkup menuKeyboard = InlineKeyboardMarkupHelper.createMainMenuInlineKeyboard();
+        response.replyMarkup(menuKeyboard);
+        SendResponse sendResponse = animalShelterBot.execute(response);
+        logger.info("Message sent status: {}", sendResponse.isOk());
+    }
+
     private void sendAdoptionRules(Long chatId) {
-        SendMessage responseAdoptionRules = new SendMessage(chatId, "Мы рады, что вы заинтересованы помочь нашим пушистым друзьям. Но перед этим ознакомьтесь с правилами:\n" +
-                "1. Правила знакомства с животными \n" +
-                "2. Список необходимых документов для усыновления\n" +
-                "3. Транспортировка животного\n" +
-                "4. Обустройство дома для самых маленьких\n" +
-                "5. Обустройство дома для взрослого животного\n" +
-                "6. Обустройство дома для животных с ограниченными возможностями\n" +
-                "7. Причины отказа\n" +
-                "8. Оставьте нам свои контакты для связи\n" +
-                "9. Позвать волонтера\n" +
+        SendMessage responseAdoptionRules = null;
+        if (chosenShelter.equals("Happy dog")) {
+            responseAdoptionRules = new SendMessage(chatId, "Мы рады, что вы заинтересованы помочь нашим пушистым друзьям. Но перед этим ознакомьтесь с правилами:\n" +
+                    "1. Правила знакомства с животными \n" +
+                    "2. Список необходимых документов для усыновления\n" +
+                    "3. Транспортировка животного\n" +
+                    "4. Обустройство дома для животных\n" +
+                    "5. Причины отказа\n" +
+                    "6. Советы, а также контакты проверенных кинологов\n" +
+                    "7. Позвать волонтера\n" +
+                    "⬅ Назад");
+            InlineKeyboardMarkup adoptionRulesKeyboard = InlineKeyboardMarkupHelper.createAdoptionRulesForDogInlineKeyboard();
+            responseAdoptionRules.replyMarkup(adoptionRulesKeyboard);
+            SendResponse sendResponseAdoptionRules = animalShelterBot.execute(responseAdoptionRules);
+            logger.info("Message sent status: {}", sendResponseAdoptionRules.isOk());
+        } else {
+            responseAdoptionRules = new SendMessage(chatId, "Мы рады, что вы заинтересованы помочь нашим пушистым друзьям. Но перед этим ознакомьтесь с правилами:\n" +
+                    "1. Правила знакомства с животными \n" +
+                    "2. Список необходимых документов для усыновления\n" +
+                    "3. Транспортировка животного\n" +
+                    "4. Обустройство дома для животных\n" +
+                    "5. Причины отказа\n" +
+                    "6. Позвать волонтера\n" +
+                    "⬅ Назад");
+            InlineKeyboardMarkup adoptionRulesKeyboard = InlineKeyboardMarkupHelper.createAdoptionRulesInlineKeyboard();
+            responseAdoptionRules.replyMarkup(adoptionRulesKeyboard);
+            SendResponse sendResponseAdoptionRules = animalShelterBot.execute(responseAdoptionRules);
+            logger.info("Message sent status: {}", sendResponseAdoptionRules.isOk());
+        }
+    }
+
+    private void sendAdoptionRulesIntroduction(Long chatId) {
+        String adoptionRulesIntroduction = rulesService.getAllRules().getRilesMeeting();
+        SendMessage responseAdoptionRulesIntroduction = new SendMessage(chatId, adoptionRulesIntroduction);
+        InlineKeyboardMarkup BackToAdoptionRulesInlineKeyboard = InlineKeyboardMarkupHelper.createBackToAdoptionRulesInlineKeyboard();
+        responseAdoptionRulesIntroduction.replyMarkup(BackToAdoptionRulesInlineKeyboard);
+        SendResponse sendResponse = animalShelterBot.execute(responseAdoptionRulesIntroduction);
+        logger.info("Message sent status: {}", sendResponse.isOk());
+    }
+
+    private void sendListDocForTakePet(Long chatId) {
+        String listDocForTakePet = rulesService.getAllRules().getListDocForTakePet();
+        SendMessage responseListDocForTakePet = new SendMessage(chatId, listDocForTakePet);
+        InlineKeyboardMarkup BackToAdoptionRulesInlineKeyboard = InlineKeyboardMarkupHelper.createBackToAdoptionRulesInlineKeyboard();
+        responseListDocForTakePet.replyMarkup(BackToAdoptionRulesInlineKeyboard);
+        SendResponse sendResponse = animalShelterBot.execute(responseListDocForTakePet);
+        logger.info("Message sent status: {}", sendResponse.isOk());
+    }
+
+    public void sendRulesTransport(Long chatId) {
+        String rulesTransport = rulesService.getAllRules().getRulesTransportation();
+        SendMessage responseRulesTransport = new SendMessage(chatId, rulesTransport);
+        InlineKeyboardMarkup backToAdoptionRulesInlineKeyboard = InlineKeyboardMarkupHelper.createBackToAdoptionRulesInlineKeyboard();
+        responseRulesTransport.replyMarkup(backToAdoptionRulesInlineKeyboard);
+        SendResponse sendResponse = animalShelterBot.execute(responseRulesTransport);
+        logger.info("Message sent status: {}", sendResponse.isOk());
+    }
+
+    public void sendRulesHouseSetup(Long chatId) {
+        SendMessage responseRulesHouseSetup = new SendMessage(chatId, "Выберите обустройство дома какого животного вас интересует:\n" +
+                "1. Обустройство дома котенка или щенка\n" +
+                "2. Обустройство дома взрослого животного\n" +
+                "3. Обустройство дома животного с ограниченными возможностями\n" +
                 "⬅ Назад");
-        InlineKeyboardMarkup adoptionRulesKeyboard = InlineKeyboardMarkupHelper.createAdoptionRulesInlineKeyboard();
-        responseAdoptionRules.replyMarkup(adoptionRulesKeyboard);
-        SendResponse sendResponseAdoptionRules = animalShelterBot.execute(responseAdoptionRules);
-        logger.info("Message sent status: {}", sendResponseAdoptionRules.isOk());
+        InlineKeyboardMarkup petHouseSelectionKeyBoard = InlineKeyboardMarkupHelper.createPetHouseSelectionKeyBoard();
+        responseRulesHouseSetup.replyMarkup(petHouseSelectionKeyBoard);
+        SendResponse sendResponse = animalShelterBot.execute(responseRulesHouseSetup);
+        logger.info("Message sent status: {}", sendResponse.isOk());
+    }
+
+    public void sendRulesHouseSetupForChild(Long chatId) {
+        SendMessage responseRulesHouseSetupPuppyKitten = new SendMessage(chatId, rulesService.getAllRules().getRulesGHForChildPet());
+        InlineKeyboardMarkup backToPetHouseSelectionKeyBoard = InlineKeyboardMarkupHelper.createBackToPetHouseSelectionKeyBoard();
+        responseRulesHouseSetupPuppyKitten.replyMarkup(backToPetHouseSelectionKeyBoard);
+        SendResponse sendResponse = animalShelterBot.execute(responseRulesHouseSetupPuppyKitten);
+        logger.info("Message sent status: {}", sendResponse.isOk());
+    }
+
+    public void sendRulesHouseSetupForAdult(Long chatId) {
+        SendMessage responseRulesHouseSetup = new SendMessage(chatId, rulesService.getAllRules().getRulesGHForAdultPet());
+        InlineKeyboardMarkup backToPetHouseSelectionKeyBoard = InlineKeyboardMarkupHelper.createBackToPetHouseSelectionKeyBoard();
+        responseRulesHouseSetup.replyMarkup(backToPetHouseSelectionKeyBoard);
+        SendResponse sendResponse = animalShelterBot.execute(responseRulesHouseSetup);
+        logger.info("Message sent status: {}", sendResponse.isOk());
+    }
+
+    public void sendRulesHouseSetupForSpecial(Long chatId) {
+        SendMessage responseRulesHouseSetup = new SendMessage(chatId, rulesService.getAllRules().getRulesGHForSpecialPet());
+        InlineKeyboardMarkup backToPetHouseSelectionKeyBoard = InlineKeyboardMarkupHelper.createBackToPetHouseSelectionKeyBoard();
+        responseRulesHouseSetup.replyMarkup(backToPetHouseSelectionKeyBoard);
+        SendResponse sendResponse = animalShelterBot.execute(responseRulesHouseSetup);
+        logger.info("Message sent status: {}", sendResponse.isOk());
+    }
+
+    public void sendCynologist(Long chatId) {
+        SendMessage responseCynologist = new SendMessage(chatId, "Выберите что вы хотите узнать:\n" +
+                "1. Советы кинолога\n" +
+                "2. Контакты провереных кинологов\n" +
+                "⬅ Назад");
+        InlineKeyboardMarkup cynologistKeyBoard = InlineKeyboardMarkupHelper.createCynologistKeyBoard();
+        responseCynologist.replyMarkup(cynologistKeyBoard);
+        SendResponse sendResponse = animalShelterBot.execute(responseCynologist);
+        logger.info("Message sent status: {}", sendResponse.isOk());
+    }
+
+    public void sendAdviceFromCynologist(Long chatId) {
+        SendMessage responseAdviceFromCynologist = new SendMessage(chatId, rulesService.getAllRules().getAdviceFromCynologist());
+        InlineKeyboardMarkup backToCynologist = InlineKeyboardMarkupHelper.createBackToCynologist();
+        responseAdviceFromCynologist.replyMarkup(backToCynologist);
+        SendResponse sendResponse = animalShelterBot.execute(responseAdviceFromCynologist);
+        logger.info("Message sent status: {}", sendResponse.isOk());
+    }
+
+    public void sendListCynologist(Long chatId) {
+        SendMessage responseListCynologist = new SendMessage(chatId, rulesService.getAllRules().getListCynologist());
+        InlineKeyboardMarkup backToCynologist = InlineKeyboardMarkupHelper.createBackToCynologist();
+        responseListCynologist.replyMarkup(backToCynologist);
+        SendResponse sendResponse = animalShelterBot.execute(responseListCynologist);
+        logger.info("Message sent status: {}", sendResponse.isOk());
+    }
+
+    public void sendReasonsRefusal(Long chatId) {
+        String rulesReasonsRefusal = rulesService.getAllRules().getReasonsRefusal();
+        SendMessage responseRulesTransport = new SendMessage(chatId, rulesReasonsRefusal);
+        InlineKeyboardMarkup backToAdoptionRulesInlineKeyboard = InlineKeyboardMarkupHelper.createBackToAdoptionRulesInlineKeyboard();
+        responseRulesTransport.replyMarkup(backToAdoptionRulesInlineKeyboard);
+        SendResponse sendResponse = animalShelterBot.execute(responseRulesTransport);
+        logger.info("Message sent status: {}", sendResponse.isOk());
     }
 
     private void sendReportMessage(Long chatId) {
