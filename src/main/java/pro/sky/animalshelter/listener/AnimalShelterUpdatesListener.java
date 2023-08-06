@@ -164,30 +164,30 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             chosenShelter = shelterName;
             SendMessage response = new SendMessage(chatId, data + " " + shelterName +
                     " приветствует Вас! Спасибо за выбор! Выберите, что вас интересует:\n" +
-                    "1. Информация о приюте\n" +
-                    "2. Как забрать животное\n" +
-                    "3. Отправить отчет о животном\n" +
-                    "4. Позвать волонтера\n" +
+                    "1. \uD83C\uDFE0 Информация о приюте\n" +
+                    "2. \uD83D\uDC3E Как забрать животное\n" +
+                    "3. \uD83D\uDCDD Отправить отчет о животном\n" +
+                    "4. \uD83E\uDDE1 Позвать волонтера\n" +
                     "⬅ Назад");
             InlineKeyboardMarkup menuKeyboard = InlineKeyboardMarkupHelper.createMainMenuInlineKeyboard();
             response.replyMarkup(menuKeyboard);
             SendResponse sendResponse = animalShelterBot.execute(response);
             logger.info("Message sent status: {}", sendResponse.isOk());
         } else {
-            sendMessage(chatId, "Ошибка в выборе приюта.", null);
+            sendMessage(chatId, "\uD83D\uDEAB Ошибка в выборе приюта.", null);
         }
     }
 
     private void sendShelterInfoOptions(Long chatId) {
         SendMessage responseInfo = new SendMessage(chatId, "Выберите что вы хотите узнать о приюте:\n" +
-                "1. О приюте\n" +
-                "2. Расписание и адрес\n" +
-                "3. Контакты приюта\n" +
-                "4. Контакты охраны для получения пропуска\n" +
+                "1. \uD83C\uDFE0 О приюте\n" +
+                "2. \uD83D\uDDD3 Расписание и адрес\n" +
+                "3. \uD83D\uDCDE Контакты приюта\n" +
+                "4. \uD83D\uDC6E Контакты охраны для получения пропуска\n" +
                 //схема проезда
-                "5. Техника безопасности на территории приюта\n" +
-                "6. Оставить контакты\n" +
-                "7. Позвать волонтера\n" +
+                "5. \uD83D\uDEE1 Техника безопасности на территории приюта\n" +
+                "6. \uD83D\uDCDD Оставить контакты\n" +
+                "7. \uD83E\uDDE1 Позвать волонтера\n" +
                 "⬅ Назад");
         InlineKeyboardMarkup shelterInfoKeyboard = InlineKeyboardMarkupHelper.createShelterInfoInlineKeyboard();
         responseInfo.replyMarkup(shelterInfoKeyboard);
@@ -280,10 +280,10 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     public void backMainMenu(Long chatId) {
         SendMessage response = new SendMessage(chatId,
                 "Вы вернулись в главное меню приюта. Выберите, что вас интересует:\n" +
-                        "1. Информация о приюте\n" +
-                        "2. Как забрать животное\n" +
-                        "3. Отправить отчет о животном\n" +
-                        "4. Позвать волонтера\n" +
+                        "1. \uD83C\uDFE0 Информация о приюте\n" +
+                        "2. \uD83D\uDC3E Как забрать животное\n" +
+                        "3. \uD83D\uDCDD Отправить отчет о животном\n" +
+                        "4. \uD83E\uDDE1 Позвать волонтера\n" +
                         "⬅ Назад");
         InlineKeyboardMarkup menuKeyboard = InlineKeyboardMarkupHelper.createMainMenuInlineKeyboard();
         response.replyMarkup(menuKeyboard);
@@ -295,13 +295,13 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         SendMessage responseAdoptionRules = null;
         if (chosenShelter.equals("Happy dog")) {
             responseAdoptionRules = new SendMessage(chatId, "Мы рады, что вы заинтересованы помочь нашим пушистым друзьям. Но перед этим ознакомьтесь с правилами:\n" +
-                    "1. Правила знакомства с животными \n" +
-                    "2. Список необходимых документов для усыновления\n" +
-                    "3. Транспортировка животного\n" +
-                    "4. Обустройство дома для животных\n" +
-                    "5. Причины отказа\n" +
-                    "6. Советы, а также контакты проверенных кинологов\n" +
-                    "7. Позвать волонтера\n" +
+                    "1. ✨ Правила знакомства с животными \n" +
+                    "2. \uD83D\uDCDC Список необходимых документов для усыновления\n" +
+                    "3. \uD83D\uDE9A Транспортировка животного\n" +
+                    "4. \uD83C\uDFE0 Обустройство дома для животных\n" +
+                    "5. ❌ Причины отказа\n" +
+                    "6. \uD83D\uDC3E Советы, а также контакты проверенных кинологов\n" +
+                    "7. \uD83E\uDDE1 Позвать волонтера\n" +
                     "⬅ Назад");
             InlineKeyboardMarkup adoptionRulesKeyboard = InlineKeyboardMarkupHelper.createAdoptionRulesForDogInlineKeyboard();
             responseAdoptionRules.replyMarkup(adoptionRulesKeyboard);
@@ -309,12 +309,12 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             logger.info("Message sent status: {}", sendResponseAdoptionRules.isOk());
         } else {
             responseAdoptionRules = new SendMessage(chatId, "Мы рады, что вы заинтересованы помочь нашим пушистым друзьям. Но перед этим ознакомьтесь с правилами:\n" +
-                    "1. Правила знакомства с животными \n" +
-                    "2. Список необходимых документов для усыновления\n" +
-                    "3. Транспортировка животного\n" +
-                    "4. Обустройство дома для животных\n" +
-                    "5. Причины отказа\n" +
-                    "6. Позвать волонтера\n" +
+                    "1. ✨ Правила знакомства с животными \n" +
+                    "2. \uD83D\uDCDC Список необходимых документов для усыновления\n" +
+                    "3. \uD83D\uDE9A Транспортировка животного\n" +
+                    "4. \uD83C\uDFE0 Обустройство дома для животных\n" +
+                    "5. ❌ Причины отказа\n" +
+                    "6. \uD83E\uDDE1 Позвать волонтера\n" +
                     "⬅ Назад");
             InlineKeyboardMarkup adoptionRulesKeyboard = InlineKeyboardMarkupHelper.createAdoptionRulesInlineKeyboard();
             responseAdoptionRules.replyMarkup(adoptionRulesKeyboard);
@@ -352,9 +352,9 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
 
     public void sendRulesHouseSetup(Long chatId) {
         SendMessage responseRulesHouseSetup = new SendMessage(chatId, "Выберите обустройство дома какого животного вас интересует:\n" +
-                "1. Обустройство дома котенка или щенка\n" +
-                "2. Обустройство дома взрослого животного\n" +
-                "3. Обустройство дома животного с ограниченными возможностями\n" +
+                "1. \uD83D\uDC23 Обустройство дома котенка или щенка\n" +
+                "2. \uD83C\uDFE0 Обустройство дома взрослого животного\n" +
+                "3. ♿ Обустройство дома животного с ограниченными возможностями\n" +
                 "⬅ Назад");
         InlineKeyboardMarkup petHouseSelectionKeyBoard = InlineKeyboardMarkupHelper.createPetHouseSelectionKeyBoard();
         responseRulesHouseSetup.replyMarkup(petHouseSelectionKeyBoard);
@@ -388,8 +388,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
 
     public void sendCynologist(Long chatId) {
         SendMessage responseCynologist = new SendMessage(chatId, "Выберите что вы хотите узнать:\n" +
-                "1. Советы кинолога\n" +
-                "2. Контакты провереных кинологов\n" +
+                "1. \uD83D\uDC3E Советы кинолога\n" +
+                "2. \uD83D\uDCDE Контакты провереных кинологов\n" +
                 "⬅ Назад");
         InlineKeyboardMarkup cynologistKeyBoard = InlineKeyboardMarkupHelper.createCynologistKeyBoard();
         responseCynologist.replyMarkup(cynologistKeyBoard);
