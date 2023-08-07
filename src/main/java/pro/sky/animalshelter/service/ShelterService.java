@@ -1,8 +1,8 @@
 package pro.sky.animalshelter.service;
 
-import dto.ShelterDTO;
-import dto.VolunteerDTO;
 import org.springframework.stereotype.Service;
+import pro.sky.animalshelter.dto.ShelterDTO;
+import pro.sky.animalshelter.dto.VolunteerDTO;
 import pro.sky.animalshelter.exception.ShelterNotFoundException;
 import pro.sky.animalshelter.model.Shelter;
 import pro.sky.animalshelter.model.ShelterType;

@@ -1,6 +1,6 @@
 package pro.sky.animalshelter.service;
 
-import dto.VolunteerDTO;
+import pro.sky.animalshelter.dto.VolunteerDTO;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.exception.VolunteerNotFoundException;

@@ -1,7 +1,7 @@
 package pro.sky.animalshelter.controller;
 
-import dto.ShelterDTO;
-import dto.VolunteerDTO;
+import pro.sky.animalshelter.dto.ShelterDTO;
+import pro.sky.animalshelter.dto.VolunteerDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

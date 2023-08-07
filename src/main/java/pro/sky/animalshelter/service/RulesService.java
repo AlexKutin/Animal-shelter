@@ -1,10 +1,10 @@
 package pro.sky.animalshelter.service;
 
-import dto.RulesDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.exception.ShelterNotFoundException;
 import pro.sky.animalshelter.model.Rules;
+import pro.sky.animalshelter.dto.RulesDTO;
 import pro.sky.animalshelter.repository.RulesRepository;
 
 @Service
