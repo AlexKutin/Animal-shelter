@@ -9,4 +9,8 @@ databaseChangeLog:
       file: liquibase/scripts/cat_shelter_users.sql
   - include:
       file: liquibase/scripts/dog_shelter_users.sql
+  - include:
+      file: liquibase/scripts/report_cat_shelter.sql
+  - include:
+      file: liquibase/scripts/report_dog_shelter.sql
 
