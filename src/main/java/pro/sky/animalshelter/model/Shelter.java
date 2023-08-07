@@ -1,6 +1,7 @@
 package pro.sky.animalshelter.model;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "shelters")
@@ -34,9 +35,8 @@ public class Shelter {
     @Column(name = "safety_info")
     private String safetyInfo;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "volunteer_id", referencedColumnName = "volunteer_id", nullable = false)
-    private Volunteer volunteer;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "shelter")
+    private List<Volunteer> volunteers;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_rules", referencedColumnName = "id_rules", nullable = false)
@@ -106,12 +106,12 @@ public class Shelter {
         this.safetyInfo = safetyInfo;
     }
 
-    public Volunteer getVolunteer() {
-        return volunteer;
+    public List<Volunteer> getVolunteers() {
+        return volunteers;
     }
 
-    public void setVolunteer(Volunteer volunteer) {
-        this.volunteer = volunteer;
+    public void setVolunteers(List<Volunteer> volunteers) {
+        this.volunteers = volunteers;
     }
 
     public Rules getRules() {
@@ -133,7 +133,7 @@ public class Shelter {
                 ", shelterContacts='" + shelterContacts + '\'' +
                 ", securityContacts='" + securityContacts + '\'' +
                 ", safetyInfo='" + safetyInfo + '\'' +
-                ", volunteer=" + volunteer +
+                ", volunteer=" + volunteers +
                 '}';
     }
 }

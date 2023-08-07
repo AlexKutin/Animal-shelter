@@ -1,18 +1,26 @@
 package pro.sky.animalshelter.service;
 
 import dto.ShelterDTO;
+import dto.VolunteerDTO;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.exception.ShelterNotFoundException;
 import pro.sky.animalshelter.model.Shelter;
 import pro.sky.animalshelter.model.ShelterType;
+import pro.sky.animalshelter.model.Volunteer;
 import pro.sky.animalshelter.repository.ShelterRepository;
+import pro.sky.animalshelter.repository.VolunteerRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ShelterService {
     private final ShelterRepository shelterRepository;
+    private final VolunteerRepository volunteerRepository;
 
-    public ShelterService(ShelterRepository shelterRepository) {
+    public ShelterService(ShelterRepository shelterRepository, VolunteerRepository volunteerRepository) {
         this.shelterRepository = shelterRepository;
+        this.volunteerRepository = volunteerRepository;
     }
 
     /**
@@ -74,6 +82,29 @@ public class ShelterService {
 
         Shelter editedShelter = shelterRepository.save(shelter);
         return ShelterDTO.fromShelter(editedShelter);
+    }
+
+    /**
+     * Возвращает список волонтеров для выбранного типа приюта
+     * @param shelterType Тип приюта
+     * @return Список волонтеров выбранного типа приюта
+     */
+    public List<VolunteerDTO> getAllVolunteersByShelterType(ShelterType shelterType) {
+        Shelter shelter = findShelterByShelterType(shelterType);
+        List<Volunteer> volunteers = shelter.getVolunteers();
+        return volunteers.stream().map(VolunteerDTO::fromVolunteer).collect(Collectors.toList());
+    }
+
+    /**
+     * Добавляет волонтера и прикрепряет его к приюту
+     * @param volunteerDTO Информация о новом волонтере
+     * @return Возвращает экземпляр класса <b>VolunteerDTO</b> после сохранения его в БД
+     */
+    public VolunteerDTO addVolunteerToShelter(VolunteerDTO volunteerDTO) {
+        Shelter shelter = findShelterByShelterType(volunteerDTO.getShelterType());
+        Volunteer volunteer = volunteerDTO.toVolunteer(shelter);
+        volunteer = volunteerRepository.save(volunteer);
+        return VolunteerDTO.fromVolunteer(volunteer);
     }
 
     private Shelter findShelterByShelterType(ShelterType shelterType) {
