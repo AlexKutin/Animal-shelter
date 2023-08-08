@@ -17,10 +17,7 @@ import pro.sky.animalshelter.dto.RulesDTO;
 import pro.sky.animalshelter.exception.UserChatIdNotFoundException;
 import pro.sky.animalshelter.keyBoard.InlineKeyboardMarkupHelper;
 import pro.sky.animalshelter.model.ShelterType;
-import pro.sky.animalshelter.service.RulesService;
-import pro.sky.animalshelter.service.ShelterService;
-import pro.sky.animalshelter.service.UserCatShelterService;
-import pro.sky.animalshelter.service.UserDogShelterService;
+import pro.sky.animalshelter.service.*;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
@@ -34,24 +31,20 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     private final Map<Long, String> userContactMap = new HashMap<>();
 
     private final TelegramBot animalShelterBot;
-
     private final ShelterService shelterService;
     private final RulesService rulesService;
-
-    private final UserCatShelterService userCatShelterService;
-
-    private final UserDogShelterService userDogShelterService;
+    private final UserShelterService userShelterService;
     private String chosenShelter;
 
-    private Map<Long, ShelterType> chooseShelterType = new HashMap<>();
+    private final Map<Long, ShelterType> chooseShelterType = new HashMap<>();
 @Autowired
-public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService shelterService, RulesService rulesService, UserDogShelterService userDogShelterService, UserCatShelterService userCatShelterService) {
+public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService shelterService,
+                                    RulesService rulesService, UserShelterService userShelterService) {
         this.animalShelterBot = animalShelterBot;
         this.shelterService = shelterService;
         this.rulesService = rulesService;
-        this.userDogShelterService = userDogShelterService;
-        this.userCatShelterService = userCatShelterService;
-    }
+    this.userShelterService = userShelterService;
+}
 
     @PostConstruct
     public void init() {
@@ -84,19 +77,22 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
 
     private void handleTextMessage(Message message) {
         Long chatId = message.chat().id();
-        String text = message.text();
-        Long telegramId = message.from().id(); // Это telegram_id пользовател
+        String userContacts = message.text();
+        Long telegramId = message.from().id(); // Это telegram_id пользователя
+        String firstName = message.from().firstName();
+        String lastName = message.from().lastName();
 
-        if ("/start".equals(text)) {
+        if ("/start".equals(userContacts)) {
             sendStartMessage(chatId);
         } else if (userContactMap.containsKey(chatId)) {
-            ShelterType chosenShelterType = chooseShelterType.get(chatId);
-            String userContacts = text;
-            if (chosenShelterType == ShelterType.DOG_SHELTER) {
-                userDogShelterService.saveUserContacts(telegramId, userContacts);
-            } else if (chosenShelterType == ShelterType.CAT_SHELTER) {
-                userCatShelterService.saveUserContacts(telegramId, userContacts);
-            }
+            ShelterType chosenShelterType = getShelterTypeByUserChatId(chatId);
+            userShelterService.saveUserContacts(chosenShelterType, telegramId, firstName, lastName, userContacts);
+
+//            if (chosenShelterType == ShelterType.DOG_SHELTER) {
+//                userDogShelterService.saveUserContacts(telegramId, userContacts);
+//            } else if (chosenShelterType == ShelterType.CAT_SHELTER) {
+//                userCatShelterService.saveUserContacts(telegramId, userContacts);
+//            }
             SendMessage response = new SendMessage(chatId, "Спасибо! Ваши контакты сохранены.");
             InlineKeyboardMarkup keyboardMarkup = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
             response.replyMarkup(keyboardMarkup);
@@ -514,4 +510,8 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
         }
         throw new UserChatIdNotFoundException(String.format("Telegram user chatId = %d not found", chatId));
     }
+
+    /*private Shelter getChosenShelter(Long chatId) {
+        return shelterService.g
+    }*/
 }
