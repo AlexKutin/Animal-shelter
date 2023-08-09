@@ -1,4 +1,4 @@
-package dto;
+package pro.sky.animalshelter.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,18 +32,16 @@ public class ShelterDTO {
     @Schema(description = "Техника безопасности на территории приюта")
     private String safetyInfo;
 
-    public ShelterDTO(Integer id, ShelterType shelterType, String shelterName, String shelterDescription, String shelterAddress, String drivingDirection, String shelterContacts, String securityContacts) {
-        this.id = id;
-        this.shelterType = shelterType;
-        this.shelterName = shelterName;
-        this.shelterDescription = shelterDescription;
-        this.shelterAddress = shelterAddress;
-        this.drivingDirection = drivingDirection;
-        this.shelterContacts = shelterContacts;
-        this.securityContacts = securityContacts;
-    }
-
-
+//    public ShelterDTO(Integer id, ShelterType shelterType, String shelterName, String shelterDescription, String shelterAddress, String drivingDirection, String shelterContacts, String securityContacts) {
+//        this.id = id;
+//        this.shelterType = shelterType;
+//        this.shelterName = shelterName;
+//        this.shelterDescription = shelterDescription;
+//        this.shelterAddress = shelterAddress;
+//        this.drivingDirection = drivingDirection;
+//        this.shelterContacts = shelterContacts;
+//        this.securityContacts = securityContacts;
+//    }
 
     public Integer getId() {
         return id;
@@ -117,6 +115,7 @@ public class ShelterDTO {
                 ", shelterName='" + shelterName + '\'' +
                 ", shelterDescription='" + shelterDescription + '\'' +
                 ", shelterAddress='" + shelterAddress + '\'' +
+                ", drivingDirection='" + drivingDirection + '\'' +
                 ", shelterContacts='" + shelterContacts + '\'' +
                 ", securityContacts='" + securityContacts + '\'' +
                 ", safetyInfo='" + safetyInfo + '\'' +
@@ -137,14 +136,6 @@ public class ShelterDTO {
      * @return ShelterDTO, заполненный из значений параметра shelter
      */
     public static ShelterDTO fromShelter(Shelter shelter) {
-        return new ShelterDTO(shelter.getId(),
-                shelter.getShelterType(),
-                shelter.getShelterName(),
-                shelter.getShelterDescription(),
-                shelter.getShelterAddress(),
-                shelter.getDrivingDirection(),
-                shelter.getShelterContacts(),
-                shelter.getSecurityContacts());
         ShelterDTO shelterDTO = new ShelterDTO();
         shelterDTO.setId(shelter.getId());
         shelterDTO.setShelterType(shelter.getShelterType());
@@ -154,6 +145,7 @@ public class ShelterDTO {
         shelterDTO.setShelterContacts(shelter.getShelterContacts());
         shelterDTO.setSecurityContacts(shelter.getSecurityContacts());
         shelterDTO.setSafetyInfo(shelter.getSafetyInfo());
+        shelterDTO.setDrivingDirection(shelterDTO.getDrivingDirection());
 
         return shelterDTO;
     }
@@ -168,6 +160,7 @@ public class ShelterDTO {
         shelter.setShelterContacts(this.getShelterContacts());
         shelter.setSecurityContacts(this.getSecurityContacts());
         shelter.setSafetyInfo(this.getSafetyInfo());
+        shelter.setDrivingDirection(this.getDrivingDirection());
 
         return shelter;
     }

@@ -1,8 +1,8 @@
 package pro.sky.animalshelter.service;
 
-import dto.ShelterDTO;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import pro.sky.animalshelter.dto.ShelterDTO;
+import pro.sky.animalshelter.dto.VolunteerDTO;
 import pro.sky.animalshelter.exception.ShelterNotFoundException;
 import pro.sky.animalshelter.model.Shelter;
 import pro.sky.animalshelter.model.ShelterType;
@@ -12,11 +12,6 @@ import pro.sky.animalshelter.repository.VolunteerRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 @Service
 public class ShelterService {
