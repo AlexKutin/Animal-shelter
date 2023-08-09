@@ -1,5 +1,6 @@
 package pro.sky.animalshelter.model;
 
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -24,7 +25,8 @@ public class Shelter {
     @Column(name = "shelter_address", nullable = false)
     private String shelterAddress;
 
-    // ToDo добавить схему проезда
+    @Column(name = "driving_directions")
+    private String drivingDirection;
 
     @Column(name = "shelter_contacts", nullable = false, length = 100)
     private String shelterContacts;
@@ -120,6 +122,14 @@ public class Shelter {
 
     public void setRules(Rules rules) {
         this.rules = rules;
+    }
+
+    public String getDrivingDirection() {
+        return drivingDirection;
+    }
+
+    public void setDrivingDirection(String drivingDirection) {
+        this.drivingDirection = drivingDirection;
     }
 
     @Override

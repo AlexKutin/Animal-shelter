@@ -79,3 +79,13 @@ WHERE shelter_type = 'CAT_SHELTER';
 UPDATE shelters SET security_contacts = '+7-955-000-9922, +7-987-065-4416' WHERE shelter_type = 'DOG_SHELTER';
 UPDATE shelters SET security_contacts = '+7-925-711-5948, +7-995-611-0617' WHERE shelter_type = 'CAT_SHELTER';
 
+-- changeset DrogolovaNadezhda: 7
+ALTER TABLE shelters ADD COLUMN driving_directions VARCHAR(1024);
+
+-- changeset DrogolovaNadezhda: 8
+UPDATE shelters SET driving_directions =  'src/main/resources/dogshelter.png' WHERE shelter_id = 1;
+UPDATE shelters SET driving_directions =  'src/main/resources/catshelter.png' WHERE shelter_id = 2;
+
+-- changeset DrogolovaNadezhda: 9
+UPDATE shelters SET driving_directions =  null WHERE shelter_id = 1;
+UPDATE shelters SET driving_directions =  null WHERE shelter_id = 2;

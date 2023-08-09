@@ -1,4 +1,4 @@
-package pro.sky.animalshelter.dto;
+package dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,6 +21,9 @@ public class ShelterDTO {
     private String shelterDescription;
     @Schema(description = "Адрес приюта")
     private String shelterAddress;
+
+    @Schema(description = "Схема проезда")
+    private String drivingDirection;
     @Schema(description = "Контакты приюта")
     private String shelterContacts;
     @Schema(description = "Контакты охраны приюта")
@@ -28,6 +31,19 @@ public class ShelterDTO {
 
     @Schema(description = "Техника безопасности на территории приюта")
     private String safetyInfo;
+
+    public ShelterDTO(Integer id, ShelterType shelterType, String shelterName, String shelterDescription, String shelterAddress, String drivingDirection, String shelterContacts, String securityContacts) {
+        this.id = id;
+        this.shelterType = shelterType;
+        this.shelterName = shelterName;
+        this.shelterDescription = shelterDescription;
+        this.shelterAddress = shelterAddress;
+        this.drivingDirection = drivingDirection;
+        this.shelterContacts = shelterContacts;
+        this.securityContacts = securityContacts;
+    }
+
+
 
     public Integer getId() {
         return id;
@@ -107,12 +123,28 @@ public class ShelterDTO {
                 '}';
     }
 
+    public String getDrivingDirection() {
+        return drivingDirection;
+    }
+
+    public void setDrivingDirection(String drivingDirection) {
+        this.drivingDirection = drivingDirection;
+    }
+
     /**
      * Создает объект класса ShelterDTO из объекта класса Shelter
      * @param shelter исходный объект класса Shelter
      * @return ShelterDTO, заполненный из значений параметра shelter
      */
     public static ShelterDTO fromShelter(Shelter shelter) {
+        return new ShelterDTO(shelter.getId(),
+                shelter.getShelterType(),
+                shelter.getShelterName(),
+                shelter.getShelterDescription(),
+                shelter.getShelterAddress(),
+                shelter.getDrivingDirection(),
+                shelter.getShelterContacts(),
+                shelter.getSecurityContacts());
         ShelterDTO shelterDTO = new ShelterDTO();
         shelterDTO.setId(shelter.getId());
         shelterDTO.setShelterType(shelter.getShelterType());
