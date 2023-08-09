@@ -93,6 +93,20 @@ public class ShelterDTO {
         this.safetyInfo = safetyInfo;
     }
 
+    @Override
+    public String toString() {
+        return "ShelterDTO{" +
+                "id=" + id +
+                ", shelterType=" + shelterType +
+                ", shelterName='" + shelterName + '\'' +
+                ", shelterDescription='" + shelterDescription + '\'' +
+                ", shelterAddress='" + shelterAddress + '\'' +
+                ", shelterContacts='" + shelterContacts + '\'' +
+                ", securityContacts='" + securityContacts + '\'' +
+                ", safetyInfo='" + safetyInfo + '\'' +
+                '}';
+    }
+
     /**
      * Создает объект класса ShelterDTO из объекта класса Shelter
      * @param shelter исходный объект класса Shelter
