@@ -108,7 +108,7 @@ public class ShelterService {
         return VolunteerDTO.fromVolunteer(volunteer);
     }
 
-    private Shelter findShelterByShelterType(ShelterType shelterType) {
+    public Shelter findShelterByShelterType(ShelterType shelterType) {
         return shelterRepository.findSheltersByShelterType(shelterType)
                 .stream()
                 .findFirst()
