@@ -89,6 +89,14 @@ public class InlineKeyboardMarkupHelper {
         return new InlineKeyboardMarkup(buttonsArray);
     }
 
+    public static InlineKeyboardMarkup createCancelContactInputInlineKeyboard() {
+        List<InlineKeyboardButton> rowInline = new ArrayList<>();
+        rowInline.add(new InlineKeyboardButton("Отмена").callbackData("CancelContactInput"));
+
+        InlineKeyboardButton[] buttonsArray = rowInline.toArray(new InlineKeyboardButton[0]);
+        return new InlineKeyboardMarkup(buttonsArray);
+    }
+
     public static InlineKeyboardMarkup createBackToAdoptionRulesInlineKeyboard() {
         List<InlineKeyboardButton> rowInline = new ArrayList<>();
         rowInline.add(new InlineKeyboardButton("⬅ Назад").callbackData("BackAdoptionRules"));

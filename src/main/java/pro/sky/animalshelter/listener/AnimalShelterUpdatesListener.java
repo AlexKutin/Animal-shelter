@@ -16,12 +16,17 @@ import pro.sky.animalshelter.service.RulesService;
 import pro.sky.animalshelter.service.ShelterService;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.*;
 
 @Component
 public class AnimalShelterUpdatesListener implements UpdatesListener {
 
     private final Logger logger = LoggerFactory.getLogger(AnimalShelterUpdatesListener.class);
+    private final Map<Long, String> userContactMap = new HashMap<>();
 
     private final TelegramBot animalShelterBot;
 
@@ -66,10 +71,17 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
 
     private void handleTextMessage(Message message) {
         Long chatId = message.chat().id();
+        Long telegramId = message.from().id(); // Это telegram_id пользователя
         String text = message.text();
 
         if ("/start".equals(text)) {
             sendStartMessage(chatId);
+        } else if (userContactMap.containsKey(chatId)) {
+            String chosenShelter = userContactMap.get(chatId);
+            String userContacts = text;
+            saveUserContacts(telegramId, chosenShelter, userContacts);
+            userContactMap.remove(chatId);
+            sendMessage(chatId, "Спасибо! Ваши контакты сохранены.", InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard());
         } else {
             sendInvalidMessage(chatId);
         }
@@ -135,6 +147,9 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             sendAdoptionRules(chatId);
         } else if ("BackToCynologist".equals(data)) {
             sendCynologist(chatId);
+        } else if ("CancelContactInput".equals(data)) {
+            userContactMap.remove(chatId);
+            sendMessage(chatId, "Вы отменили ввод контактов.", null);
         }
     }
 
@@ -271,10 +286,34 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
 
     private void sendShelterLeaveContacts(Long chatId) {
         SendMessage responseShelterInfoLeaveContacts = new SendMessage(chatId, "Оставьте нам свои контакты и мы с вами свяжемся");
-        InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
-        responseShelterInfoLeaveContacts.replyMarkup(BackShelterInfoKeyboard);
+        InlineKeyboardMarkup keyboardMarkupCancelContactInput = InlineKeyboardMarkupHelper.createCancelContactInputInlineKeyboard();
+        responseShelterInfoLeaveContacts.replyMarkup(keyboardMarkupCancelContactInput);
         SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoLeaveContacts);
         logger.info("Message sent status: {}", sendResponse.isOk());
+        userContactMap.put(chatId, chosenShelter);
+    }
+
+    private void saveUserContacts(Long telegramId, String chosenShelter, String userContacts) {
+        try {
+            String url = "jdbc:postgresql://localhost:5432/shelter_db";
+            String username = "shelter_svc";
+            String password = "AnimalShelter";
+
+            Connection connection = DriverManager.getConnection(url, username, password);
+            String tableName = chosenShelter.equals("Happy dog") ? "dog_shelter_users" : "cat_shelter_users";
+            String insertQuery = "INSERT INTO " + tableName + " (telegram_id, user_contacts, shelter_id) VALUES (?, ?, ?)";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
+            preparedStatement.setLong(1, telegramId);
+            preparedStatement.setString(2, userContacts);
+            preparedStatement.setInt(3, chosenShelter.equals("Happy dog") ? 1 : 2);
+
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void backMainMenu(Long chatId) {
@@ -333,6 +372,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     private void sendListDocForTakePet(Long chatId) {
+//        String rules = shelterService.getCatShelter()
         String listDocForTakePet = rulesService.getAllRules().getListDocForTakePet();
         SendMessage responseListDocForTakePet = new SendMessage(chatId, listDocForTakePet);
         InlineKeyboardMarkup BackToAdoptionRulesInlineKeyboard = InlineKeyboardMarkupHelper.createBackToAdoptionRulesInlineKeyboard();
