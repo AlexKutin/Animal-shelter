@@ -1,4 +1,4 @@
-package dto;
+package pro.sky.animalshelter.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,6 +25,9 @@ public class ShelterDTO {
     private String shelterContacts;
     @Schema(description = "Контакты охраны приюта")
     private String securityContacts;
+
+    @Schema(description = "Техника безопасности на территории приюта")
+    private String safetyInfo;
 
     public Integer getId() {
         return id;
@@ -82,6 +85,14 @@ public class ShelterDTO {
         this.securityContacts = securityContacts;
     }
 
+    public String getSafetyInfo() {
+        return safetyInfo;
+    }
+
+    public void setSafetyInfo(String safetyInfo) {
+        this.safetyInfo = safetyInfo;
+    }
+
     /**
      * Создает объект класса ShelterDTO из объекта класса Shelter
      * @param shelter исходный объект класса Shelter
@@ -96,6 +107,7 @@ public class ShelterDTO {
         shelterDTO.setShelterAddress(shelter.getShelterAddress());
         shelterDTO.setShelterContacts(shelter.getShelterContacts());
         shelterDTO.setSecurityContacts(shelter.getSecurityContacts());
+        shelterDTO.setSafetyInfo(shelter.getSafetyInfo());
 
         return shelterDTO;
     }
@@ -109,6 +121,7 @@ public class ShelterDTO {
         shelter.setShelterAddress(this.getShelterAddress());
         shelter.setShelterContacts(this.getShelterContacts());
         shelter.setSecurityContacts(this.getSecurityContacts());
+        shelter.setSafetyInfo(this.getSafetyInfo());
 
         return shelter;
     }
