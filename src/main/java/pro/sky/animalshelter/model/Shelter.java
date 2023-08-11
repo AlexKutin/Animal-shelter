@@ -1,6 +1,8 @@
 package pro.sky.animalshelter.model;
 
+
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "shelters")
@@ -23,7 +25,8 @@ public class Shelter {
     @Column(name = "shelter_address", nullable = false)
     private String shelterAddress;
 
-    // ToDo добавить схему проезда
+    @Column(name = "driving_directions")
+    private String drivingDirection;
 
     @Column(name = "shelter_contacts", nullable = false, length = 100)
     private String shelterContacts;
@@ -31,9 +34,15 @@ public class Shelter {
     @Column(name = "security_contacts", length = 50)
     private String securityContacts;
 
+    @Column(name = "safety_info")
+    private String safetyInfo;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "shelter")
+    private List<Volunteer> volunteers;
+
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "volunteer_id", referencedColumnName = "volunteer_id", nullable = false)
-    private Volunteer volunteer;
+    @JoinColumn(name = "id_rules", referencedColumnName = "id_rules", nullable = false)
+    private Rules rules;
 
     public Integer getId() {
         return id;
@@ -91,24 +100,50 @@ public class Shelter {
         this.securityContacts = securityContacts;
     }
 
-    public Volunteer getVolunteer() {
-        return volunteer;
+    public String getSafetyInfo() {
+        return safetyInfo;
     }
 
-    public void setVolunteer(Volunteer volunteer) {
-        this.volunteer = volunteer;
+    public void setSafetyInfo(String safetyInfo) {
+        this.safetyInfo = safetyInfo;
+    }
+
+    public List<Volunteer> getVolunteers() {
+        return volunteers;
+    }
+
+    public void setVolunteers(List<Volunteer> volunteers) {
+        this.volunteers = volunteers;
+    }
+
+    public Rules getRules() {
+        return rules;
+    }
+
+    public void setRules(Rules rules) {
+        this.rules = rules;
+    }
+
+    public String getDrivingDirection() {
+        return drivingDirection;
+    }
+
+    public void setDrivingDirection(String drivingDirection) {
+        this.drivingDirection = drivingDirection;
     }
 
     @Override
     public String toString() {
         return "Shelter{" +
                 "id=" + id +
+                ", shelterType=" + shelterType +
                 ", shelterName='" + shelterName + '\'' +
                 ", shelterDescription='" + shelterDescription + '\'' +
                 ", shelterAddress='" + shelterAddress + '\'' +
                 ", shelterContacts='" + shelterContacts + '\'' +
                 ", securityContacts='" + securityContacts + '\'' +
-                ", volunteer=" + volunteer +
+                ", safetyInfo='" + safetyInfo + '\'' +
+                ", volunteer=" + volunteers +
                 '}';
     }
 }

@@ -5,6 +5,7 @@ import javax.persistence.*;
 @MappedSuperclass
 public abstract class UserShelter {
     @Id
+    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Integer userId;
 

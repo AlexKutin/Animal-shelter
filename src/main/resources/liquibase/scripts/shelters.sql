@@ -39,10 +39,53 @@ VALUES ('DOG_SHELTER', 'Happy dog', 'Наш приют существует с 2
 
 Адрес: Стрелецкая, 27', '+75550009977', ' ', 2);
 
-DROP TABLE cat_shelter;
-
-DROP TABLE dog_shelter;
-
 -- changeset AlexKutin:3
 ALTER TABLE shelters ADD CONSTRAINT shelters_volunteer_id_fkey FOREIGN KEY (volunteer_id) REFERENCES volunteers(volunteer_id);
 
+-- changeset InnaSerebriakova:4
+ALTER TABLE shelters ADD COLUMN id_rules INT;
+UPDATE shelters SET id_rules =  shelter_id;
+ALTER TABLE shelters ALTER COLUMN id_rules SET NOT NULL;
+ALTER TABLE shelters ADD CONSTRAINT shelters_id_rules_fkey FOREIGN KEY (id_rules) REFERENCES rules(id_rules);
+
+-- changeset AlexKutin:5
+ALTER TABLE shelters ADD COLUMN safety_info VARCHAR(1024);
+
+UPDATE shelters SET safety_info = 'Находясь на территории приюта, пожалуйста, соблюдайте наши правила и технику безопасности!
+Запрещается:
+Самостоятельно открывать выгулы и вольеры без разрешения работника приюта.
+1. Кормить животных. Этим Вы можете спровоцировать драку. Угощения разрешены только постоянным опекунам и волонтерам, во время прогулок с животными на поводке.
+2. Оставлять после себя мусор на территории приюта и прилегающей территории.
+3. Подходить близко к вольерам и гладить собак через сетку на выгулах. Животные могут быть агрессивны!
+4. Кричать, размахивать руками, бегать между будками или вольерами, пугать и дразнить животных.
+5. Посещение приюта для детей дошкольного и младшего школьного возраста без сопровождения взрослых.'
+WHERE shelter_type = 'DOG_SHELTER';
+
+UPDATE shelters SET safety_info = '❌ В приют не допускаются:
+- дети до 14 лет без сопровождения взрослых;
+- лица в состоянии алкогольного или наркотического опьянения;
+- лица в агрессивном или неадекватном состоянии.
+
+❌ Для всех посетителей Приюта запрещается:
+- кормить животных кормами и продуктами;
+- посещать блок карантина и изолятор;
+- давать животным самостоятельно какие-либо ветеринарные или медицинские препараты;
+- осуществлять любые ветеринарные манипуляции с животными;
+- находится без сопровождения сотрудника на территории приюта;
+- посещать приют со своими животными.'
+WHERE shelter_type = 'CAT_SHELTER';
+
+-- changeset AlexKutin:6
+UPDATE shelters SET security_contacts = '+7-955-000-9922, +7-987-065-4416' WHERE shelter_type = 'DOG_SHELTER';
+UPDATE shelters SET security_contacts = '+7-925-711-5948, +7-995-611-0617' WHERE shelter_type = 'CAT_SHELTER';
+
+-- changeset DrogolovaNadezhda: 7
+ALTER TABLE shelters ADD COLUMN driving_directions VARCHAR(1024);
+
+-- changeset DrogolovaNadezhda: 8
+UPDATE shelters SET driving_directions =  'src/main/resources/dogshelter.png' WHERE shelter_id = 1;
+UPDATE shelters SET driving_directions =  'src/main/resources/catshelter.png' WHERE shelter_id = 2;
+
+-- changeset DrogolovaNadezhda: 9
+UPDATE shelters SET driving_directions =  null WHERE shelter_id = 1;
+UPDATE shelters SET driving_directions =  null WHERE shelter_id = 2;
