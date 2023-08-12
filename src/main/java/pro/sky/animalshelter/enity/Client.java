@@ -39,4 +39,5 @@ public class Client {
     public Long getChat_id() {
         return chat_id;
     }
+
 }
