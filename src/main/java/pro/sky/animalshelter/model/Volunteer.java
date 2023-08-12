@@ -1,10 +1,11 @@
 package pro.sky.animalshelter.model;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "volunteers")
-public class Volunteer {
+public class Volunteer implements Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "volunteer_id")
@@ -75,6 +76,11 @@ public class Volunteer {
     }
 
     @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    @Override
     public String toString() {
         return "Volunteer{" +
                 "id=" + id +
@@ -84,5 +90,18 @@ public class Volunteer {
                 ", isActive=" + isActive +
                 ", shelter=" + shelter.getShelterName() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Volunteer volunteer = (Volunteer) o;
+        return isActive == volunteer.isActive && Objects.equals(id, volunteer.id) && Objects.equals(name, volunteer.name) && Objects.equals(telegramAddress, volunteer.telegramAddress) && Objects.equals(phone, volunteer.phone) && Objects.equals(shelter, volunteer.shelter);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, telegramAddress, phone, isActive, shelter);
     }
 }

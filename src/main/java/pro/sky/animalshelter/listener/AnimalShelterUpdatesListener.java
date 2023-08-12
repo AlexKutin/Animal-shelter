@@ -11,12 +11,17 @@ import com.pengrad.telegrambot.response.SendResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import pro.sky.animalshelter.dto.RulesDTO;
+import pro.sky.animalshelter.exception.UserChatIdNotFoundException;
 import pro.sky.animalshelter.keyBoard.InlineKeyboardMarkupHelper;
+import pro.sky.animalshelter.model.ShelterType;
 import pro.sky.animalshelter.service.RulesService;
 import pro.sky.animalshelter.service.ShelterService;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class AnimalShelterUpdatesListener implements UpdatesListener {
@@ -28,6 +33,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     private final ShelterService shelterService;
     private final RulesService rulesService;
     private String chosenShelter;
+
+    private Map<Long, ShelterType> chooseShelterType = new HashMap<>();
 
     public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService shelterService, RulesService rulesService) {
         this.animalShelterBot = animalShelterBot;
@@ -156,8 +163,10 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         String shelterName = null;
         if (data.contains("собак")) {
             shelterName = shelterService.getDogShelter().getShelterName();
+            chooseShelterType.put(chatId, ShelterType.DOG_SHELTER);
         } else if (data.contains("кошек")) {
             shelterName = shelterService.getCatShelter().getShelterName();
+            chooseShelterType.put(chatId, ShelterType.CAT_SHELTER);
         }
 
         if (shelterName != null) {
@@ -363,7 +372,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     public void sendRulesHouseSetupForChild(Long chatId) {
-        SendMessage responseRulesHouseSetupPuppyKitten = new SendMessage(chatId, rulesService.getAllRules().getRulesGHForChildPet());
+        RulesDTO rulesDTO = rulesService.getRulesByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseRulesHouseSetupPuppyKitten = new SendMessage(chatId, rulesDTO.getRulesGHForChildPet());
         InlineKeyboardMarkup backToPetHouseSelectionKeyBoard = InlineKeyboardMarkupHelper.createBackToPetHouseSelectionKeyBoard();
         responseRulesHouseSetupPuppyKitten.replyMarkup(backToPetHouseSelectionKeyBoard);
         SendResponse sendResponse = animalShelterBot.execute(responseRulesHouseSetupPuppyKitten);
@@ -440,5 +450,12 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         response.replyMarkup(menuKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(response);
         logger.info("Message sent status: {}", sendResponse.isOk());
+    }
+
+    private ShelterType getShelterTypeByUserChatId(Long chatId) {
+        if (chooseShelterType.containsKey(chatId)) {
+            return chooseShelterType.get(chatId);
+        }
+        throw new UserChatIdNotFoundException(String.format("Telegram user chatId = %d not found", chatId));
     }
 }

@@ -73,10 +73,11 @@ public class ShelterService {
      */
     public ShelterDTO editShelter(ShelterType shelterType, ShelterDTO shelterDTO) {
         Shelter shelter = findShelterByShelterType(shelterType);
-        // Заполняем только доступные для редактирования поля (исключая id, shelterType и схема проезда (она не реализована))
+        // Заполняем только доступные для редактирования поля (исключая id, shelterType)
         shelter.setShelterName(shelterDTO.getShelterName());
         shelter.setShelterDescription(shelterDTO.getShelterDescription());
         shelter.setShelterAddress(shelterDTO.getShelterAddress());
+        shelter.setDrivingDirection(shelterDTO.getDrivingDirection());
         shelter.setShelterContacts(shelterDTO.getShelterContacts());
         shelter.setSecurityContacts(shelterDTO.getSecurityContacts());
 
@@ -107,7 +108,7 @@ public class ShelterService {
         return VolunteerDTO.fromVolunteer(volunteer);
     }
 
-    private Shelter findShelterByShelterType(ShelterType shelterType) {
+    public Shelter findShelterByShelterType(ShelterType shelterType) {
         return shelterRepository.findSheltersByShelterType(shelterType)
                 .stream()
                 .findFirst()

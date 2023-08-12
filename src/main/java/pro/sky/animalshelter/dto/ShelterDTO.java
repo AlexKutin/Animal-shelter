@@ -21,6 +21,9 @@ public class ShelterDTO {
     private String shelterDescription;
     @Schema(description = "Адрес приюта")
     private String shelterAddress;
+
+    @Schema(description = "Схема проезда")
+    private String drivingDirection;
     @Schema(description = "Контакты приюта")
     private String shelterContacts;
     @Schema(description = "Контакты охраны приюта")
@@ -28,6 +31,17 @@ public class ShelterDTO {
 
     @Schema(description = "Техника безопасности на территории приюта")
     private String safetyInfo;
+
+//    public ShelterDTO(Integer id, ShelterType shelterType, String shelterName, String shelterDescription, String shelterAddress, String drivingDirection, String shelterContacts, String securityContacts) {
+//        this.id = id;
+//        this.shelterType = shelterType;
+//        this.shelterName = shelterName;
+//        this.shelterDescription = shelterDescription;
+//        this.shelterAddress = shelterAddress;
+//        this.drivingDirection = drivingDirection;
+//        this.shelterContacts = shelterContacts;
+//        this.securityContacts = securityContacts;
+//    }
 
     public Integer getId() {
         return id;
@@ -93,6 +107,29 @@ public class ShelterDTO {
         this.safetyInfo = safetyInfo;
     }
 
+    @Override
+    public String toString() {
+        return "ShelterDTO{" +
+                "id=" + id +
+                ", shelterType=" + shelterType +
+                ", shelterName='" + shelterName + '\'' +
+                ", shelterDescription='" + shelterDescription + '\'' +
+                ", shelterAddress='" + shelterAddress + '\'' +
+                ", drivingDirection='" + drivingDirection + '\'' +
+                ", shelterContacts='" + shelterContacts + '\'' +
+                ", securityContacts='" + securityContacts + '\'' +
+                ", safetyInfo='" + safetyInfo + '\'' +
+                '}';
+    }
+
+    public String getDrivingDirection() {
+        return drivingDirection;
+    }
+
+    public void setDrivingDirection(String drivingDirection) {
+        this.drivingDirection = drivingDirection;
+    }
+
     /**
      * Создает объект класса ShelterDTO из объекта класса Shelter
      * @param shelter исходный объект класса Shelter
@@ -108,6 +145,7 @@ public class ShelterDTO {
         shelterDTO.setShelterContacts(shelter.getShelterContacts());
         shelterDTO.setSecurityContacts(shelter.getSecurityContacts());
         shelterDTO.setSafetyInfo(shelter.getSafetyInfo());
+        shelterDTO.setDrivingDirection(shelterDTO.getDrivingDirection());
 
         return shelterDTO;
     }
@@ -122,6 +160,7 @@ public class ShelterDTO {
         shelter.setShelterContacts(this.getShelterContacts());
         shelter.setSecurityContacts(this.getSecurityContacts());
         shelter.setSafetyInfo(this.getSafetyInfo());
+        shelter.setDrivingDirection(this.getDrivingDirection());
 
         return shelter;
     }
