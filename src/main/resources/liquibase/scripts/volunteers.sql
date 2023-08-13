@@ -47,3 +47,8 @@ ALTER TABLE volunteers ADD COLUMN chat_id BIGINT;
 UPDATE volunteers
 SET chat_id = '6484174217'
 WHERE volunteer_name = 'Evgeniy';
+
+-- changeset BegaliMashrapov:8
+UPDATE volunteers
+SET chat_id = '826249875'
+WHERE volunteer_name = 'Lisa';

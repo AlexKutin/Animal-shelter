@@ -476,21 +476,29 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         sendMessage(chatId, reportMessage, null);
         // Add logic for processing the user's message and saving it to the database if needed
     }
-
-    //    private void sendVolunteerMessage(Long chatId) {
-//        String volunteerMessage = "Волонтер в пути! Ожидайте!";
-//        sendMessage(chatId, volunteerMessage, null);
-//        // Add logic for connecting the user with a volunteer if needed
-//    }
     private void sendVolunteerMessage(Long chatId, ShelterType chosenShelterType) {
-        String volunteerMessageToUser = "Волонтер в пути! Ожидайте!";
-        sendMessage(chatId, volunteerMessageToUser, null);
+        String userName = getUserNameByChatId(chatId);
 
-        Collection<Volunteer> volunteers = volunteerService.findVolunteersByShelterType(chosenShelterType);
+        if ("Default Id".equals(userName)) {
+            SendMessage sendMessage = new SendMessage(chatId, "Мы не смогли найти ваш Username в телеграме, пожалуйста, свяжитесь с волонтером самостоятельно и опишите ему вашу проблему:\n"
+                    + volunteerService.findAvailableVolunteerTelegram(chosenShelterType));
+            InlineKeyboardMarkup inlineKeyboardMarkup = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
+            sendMessage.replyMarkup(inlineKeyboardMarkup);
+            SendResponse sendResponse = animalShelterBot.execute(sendMessage);
+            logger.info("Message sent status: {}", sendResponse.isOk());
+        } else {
+            SendMessage sendMessage = new SendMessage(chatId,"Волонтер в пути! Ожидайте!" );
+            InlineKeyboardMarkup inlineKeyboardMarkup = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
+            sendMessage.replyMarkup(inlineKeyboardMarkup);
+            SendResponse response = animalShelterBot.execute(sendMessage);
+            logger.info("Message sent status: {}", response.isOk());
 
-        for (Volunteer volunteer : volunteers) {
-            String volunteerMessage = "Пользователь с id @" + getUserNameByChatId(chatId) + " нуждается в помощи. Свяжитесь с ним через Telegram.";
-            sendMessageToVolunteer(volunteer.getChatId(), volunteerMessage);
+            Collection<Volunteer> volunteers = volunteerService.findVolunteersByShelterType(chosenShelterType);
+
+            for (Volunteer volunteer : volunteers) {
+                String volunteerMessage = "Пользователь с id @" + userName + " нуждается в помощи. Свяжитесь с ним через Telegram.";
+                sendMessageToVolunteer(volunteer.getChatId(), volunteerMessage);
+            }
         }
     }
 
@@ -505,7 +513,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             }
         }
 
-        return "";
+        return "Default Id";
     }
 
     private void sendMessageToVolunteer(Long volunteerChatId, String message) {
