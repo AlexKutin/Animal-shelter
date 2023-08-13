@@ -2,12 +2,12 @@ package pro.sky.animalshelter.listener;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
-import com.pengrad.telegrambot.model.CallbackQuery;
-import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.*;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
+import com.pengrad.telegrambot.request.GetChatMember;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
+import com.pengrad.telegrambot.response.GetChatMemberResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -20,12 +20,14 @@ import pro.sky.animalshelter.dto.ShelterDTO;
 import pro.sky.animalshelter.exception.UserChatIdNotFoundException;
 import pro.sky.animalshelter.keyBoard.InlineKeyboardMarkupHelper;
 import pro.sky.animalshelter.model.ShelterType;
+import pro.sky.animalshelter.model.Volunteer;
 import pro.sky.animalshelter.service.*;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,15 +41,18 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     private final ShelterService shelterService;
     private final RulesService rulesService;
     private final UserShelterService userShelterService;
+    private final VolunteerService volunteerService;
     private final Map<Long, ShelterType> chooseShelterType = new HashMap<>();
-@Autowired
-public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService shelterService,
-                                    RulesService rulesService, UserShelterService userShelterService) {
+
+    @Autowired
+    public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService shelterService,
+                                        RulesService rulesService, UserShelterService userShelterService, VolunteerService volunteerService) {
         this.animalShelterBot = animalShelterBot;
         this.shelterService = shelterService;
         this.rulesService = rulesService;
-    this.userShelterService = userShelterService;
-}
+        this.userShelterService = userShelterService;
+        this.volunteerService = volunteerService;
+    }
 
     @PostConstruct
     public void init() {
@@ -96,6 +101,8 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
             response.replyMarkup(keyboardMarkup);
             SendResponse sendResponse = animalShelterBot.execute(response);
             logger.info("Message sent status: {}", sendResponse.isOk());
+        } else if ("/getchatid".equals(text)) {
+            getChatId(chatId);
         } else {
             sendInvalidMessage(chatId);
         }
@@ -150,7 +157,8 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
         } else if ("SendReport".equals(data)) {
             sendReportMessage(chatId);
         } else if ("CallVolunteer".equals(data)) {
-            sendVolunteerMessage(chatId);
+            ShelterType chosenShelterType = chooseShelterType.get(chatId);
+            sendVolunteerMessage(chatId, chosenShelterType);
         } else if ("BackShelterMenu".equals(data)) {
             sendMainMenuMessage(chatId);
         } else if ("BackMainMenu".equals(data)) {
@@ -225,55 +233,57 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
         SendResponse sendResponseInfo = animalShelterBot.execute(responseInfo);
         logger.info("Message sent status: {}", sendResponseInfo.isOk());
     }
-private void sendShelterInfoAbout(Long chatId) {
-    ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
-    SendMessage responseShelterInfoAbout = new SendMessage(chatId, "Приют называется " + shelterDTO.getShelterName() + ". " + shelterDTO.getShelterDescription());
-    InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
-    responseShelterInfoAbout.replyMarkup(BackShelterInfoKeyboard);
-    SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoAbout);
-    logger.info("Message sent status: {}", sendResponse.isOk());
-}
 
-private void sendShelterInfoAddress(Long chatId) {
-    ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
-    String shelterName = shelterDTO.getShelterName();
-
-    String imageFileName = shelterName.replace(" ", "") + "shelter.png";
-
-    // Получить InputStream из ресурсов
-    InputStream imageInputStream = getClass().getResourceAsStream("/" + imageFileName);
-
-    if (imageInputStream != null) {
-        try {
-            // Создать временный файл
-            File tempImageFile = File.createTempFile("tempImage", ".png");
-            tempImageFile.deleteOnExit();
-
-            // Копировать содержимое InputStream в временный файл
-            FileUtils.copyInputStreamToFile(imageInputStream, tempImageFile);
-
-            // Отправить фото с временного файла
-            SendPhoto sendPhoto = new SendPhoto(chatId, tempImageFile);
-            SendResponse sendPhotoResponse = animalShelterBot.execute(sendPhoto);
-
-            if (sendPhotoResponse.isOk()) {
-                logger.info("Photo sent successfully");
-            } else {
-                logger.error("Failed to send photo: {}", sendPhotoResponse.description());
-            }
-        } catch (IOException e) {
-            logger.error("Error while sending photo: {}", e.getMessage());
-        }
-    } else {
-        logger.error("Image file not found: {}", imageFileName);
+    private void sendShelterInfoAbout(Long chatId) {
+        ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseShelterInfoAbout = new SendMessage(chatId, "Приют называется " + shelterDTO.getShelterName() + ". " + shelterDTO.getShelterDescription());
+        InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
+        responseShelterInfoAbout.replyMarkup(BackShelterInfoKeyboard);
+        SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoAbout);
+        logger.info("Message sent status: {}", sendResponse.isOk());
     }
 
-    SendMessage responseShelterInfoAddress = new SendMessage(chatId, shelterDTO.getShelterAddress() + "\nДля удобного проезда к нам, пожалуйста, используйте представленную выше схему.");
-    InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
-    responseShelterInfoAddress.replyMarkup(BackShelterInfoKeyboard);
-    SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoAddress);
-    logger.info("Message sent status: {}", sendResponse.isOk());
-}
+    private void sendShelterInfoAddress(Long chatId) {
+        ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
+        String shelterName = shelterDTO.getShelterName();
+
+        String imageFileName = shelterName.replace(" ", "") + "shelter.png";
+
+        // Получить InputStream из ресурсов
+        InputStream imageInputStream = getClass().getResourceAsStream("/" + imageFileName);
+
+        if (imageInputStream != null) {
+            try {
+                // Создать временный файл
+                File tempImageFile = File.createTempFile("tempImage", ".png");
+                tempImageFile.deleteOnExit();
+
+                // Копировать содержимое InputStream в временный файл
+                FileUtils.copyInputStreamToFile(imageInputStream, tempImageFile);
+
+                // Отправить фото с временного файла
+                SendPhoto sendPhoto = new SendPhoto(chatId, tempImageFile);
+                SendResponse sendPhotoResponse = animalShelterBot.execute(sendPhoto);
+
+                if (sendPhotoResponse.isOk()) {
+                    logger.info("Photo sent successfully");
+                } else {
+                    logger.error("Failed to send photo: {}", sendPhotoResponse.description());
+                }
+            } catch (IOException e) {
+                logger.error("Error while sending photo: {}", e.getMessage());
+            }
+        } else {
+            logger.error("Image file not found: {}", imageFileName);
+        }
+
+        SendMessage responseShelterInfoAddress = new SendMessage(chatId, shelterDTO.getShelterAddress() + "\nДля удобного проезда к нам, пожалуйста, используйте представленную выше схему.");
+        InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
+        responseShelterInfoAddress.replyMarkup(BackShelterInfoKeyboard);
+        SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoAddress);
+        logger.info("Message sent status: {}", sendResponse.isOk());
+    }
+
     private void sendShelterContacts(Long chatId) {
         ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
         SendMessage responseShelterInfoContacts = new SendMessage(chatId, "Контакты для связи с нами:\nТел:" + shelterDTO.getShelterContacts());
@@ -467,10 +477,40 @@ private void sendShelterInfoAddress(Long chatId) {
         // Add logic for processing the user's message and saving it to the database if needed
     }
 
-    private void sendVolunteerMessage(Long chatId) {
-        String volunteerMessage = "Волонтер в пути! Ожидайте!";
-        sendMessage(chatId, volunteerMessage, null);
-        // Add logic for connecting the user with a volunteer if needed
+    //    private void sendVolunteerMessage(Long chatId) {
+//        String volunteerMessage = "Волонтер в пути! Ожидайте!";
+//        sendMessage(chatId, volunteerMessage, null);
+//        // Add logic for connecting the user with a volunteer if needed
+//    }
+    private void sendVolunteerMessage(Long chatId, ShelterType chosenShelterType) {
+        String volunteerMessageToUser = "Волонтер в пути! Ожидайте!";
+        sendMessage(chatId, volunteerMessageToUser, null);
+
+        Collection<Volunteer> volunteers = volunteerService.findVolunteersByShelterType(chosenShelterType);
+
+        for (Volunteer volunteer : volunteers) {
+            String volunteerMessage = "Пользователь с id @" + getUserNameByChatId(chatId) + " нуждается в помощи. Свяжитесь с ним через Telegram.";
+            sendMessageToVolunteer(volunteer.getChatId(), volunteerMessage);
+        }
+    }
+
+    private String getUserNameByChatId(Long chatId) {
+        GetChatMember getChatMember = new GetChatMember(chatId.toString(), chatId.intValue());
+
+        GetChatMemberResponse response = animalShelterBot.execute(getChatMember);
+        if (response.isOk()) {
+            ChatMember chatMember = response.chatMember();
+            if (chatMember.user() != null && chatMember.user().username() != null) {
+                return chatMember.user().username();
+            }
+        }
+
+        return "";
+    }
+
+    private void sendMessageToVolunteer(Long volunteerChatId, String message) {
+        SendMessage request = new SendMessage(volunteerChatId.toString(), message);
+        animalShelterBot.execute(request);
     }
 
     private void sendMainMenuMessage(Long chatId) {
@@ -479,6 +519,10 @@ private void sendShelterInfoAddress(Long chatId) {
         response.replyMarkup(menuKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(response);
         logger.info("Message sent status: {}", sendResponse.isOk());
+    }
+    private void getChatId(Long chatId) {
+        SendMessage request = new SendMessage(chatId.toString(), "Ваш ChatId: " + chatId);
+        animalShelterBot.execute(request);
     }
 
     private ShelterType getShelterTypeByUserChatId(Long chatId) {

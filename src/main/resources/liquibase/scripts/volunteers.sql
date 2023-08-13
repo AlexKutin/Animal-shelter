@@ -34,3 +34,16 @@ ALTER TABLE volunteers ADD COLUMN volunteer_active BOOLEAN default true;
 UPDATE volunteers SET volunteer_active = true WHERE true;
 
 ALTER TABLE volunteers ALTER COLUMN volunteer_active SET NOT NULL;
+
+-- changeset BegaliMashrapov:5
+UPDATE volunteers
+SET volunteer_telegram = '@begalop'
+WHERE volunteer_name = 'Evgeniy';
+
+-- changeset BegaliMashrapov:6
+ALTER TABLE volunteers ADD COLUMN chat_id BIGINT;
+
+-- changeset BegaliMashrapov:7
+UPDATE volunteers
+SET chat_id = '6484174217'
+WHERE volunteer_name = 'Evgeniy';
