@@ -4,8 +4,11 @@ import pro.sky.animalshelter.dto.VolunteerDTO;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.exception.VolunteerNotFoundException;
+import pro.sky.animalshelter.model.ShelterType;
 import pro.sky.animalshelter.model.Volunteer;
 import pro.sky.animalshelter.repository.VolunteerRepository;
+
+import java.util.Collection;
 
 @Service
 public class VolunteerService {
@@ -30,5 +33,8 @@ public class VolunteerService {
                 .orElseThrow(() -> new VolunteerNotFoundException(volunteerId + " not found in database"));
         volunteer.setActive(isActive);
         return VolunteerDTO.fromVolunteer(volunteerRepository.save(volunteer));
+    }
+    public Collection<Volunteer> findVolunteersByShelterType(ShelterType shelterType) {
+        return volunteerRepository.findVolunteersByShelter_ShelterType(shelterType);
     }
 }
