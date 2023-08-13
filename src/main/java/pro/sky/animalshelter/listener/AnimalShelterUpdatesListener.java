@@ -91,7 +91,7 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
             sendStartMessage(chatId);
         } else if (userContactMap.containsKey(chatId)) {
             ShelterType chosenShelterType = getShelterTypeByUserChatId(chatId);
-            userShelterService.saveUserContacts(chosenShelterType, telegramId, firstName, lastName, userContacts);
+            userShelterService.saveUserContacts(chosenShelterType, telegramId, userName, firstName, lastName, userContacts);
             SendMessage response = new SendMessage(chatId, "Спасибо! Ваши контакты сохранены. Наши волонтеры свяжутся с вами в ближайшее время.");
             InlineKeyboardMarkup keyboardMarkup = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
             response.replyMarkup(keyboardMarkup);
