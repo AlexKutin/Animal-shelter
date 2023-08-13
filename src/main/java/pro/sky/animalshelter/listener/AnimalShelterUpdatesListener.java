@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 import pro.sky.animalshelter.dto.RulesDTO;
+import pro.sky.animalshelter.dto.ShelterDTO;
 import pro.sky.animalshelter.exception.UserChatIdNotFoundException;
 import pro.sky.animalshelter.keyBoard.InlineKeyboardMarkupHelper;
 import pro.sky.animalshelter.model.ShelterType;
@@ -28,13 +29,13 @@ import java.util.Map;
 @ComponentScan(basePackages = {"pro.sky.animalshelter.service", "pro.sky.animalshelter.listener", "pro.sky.animalshelter.repository"})
 public class AnimalShelterUpdatesListener implements UpdatesListener {
     private final Logger logger = LoggerFactory.getLogger(AnimalShelterUpdatesListener.class);
-    private final Map<Long, String> userContactMap = new HashMap<>();
+    private final Map<Long, ShelterType> userContactMap = new HashMap<>();
 
     private final TelegramBot animalShelterBot;
     private final ShelterService shelterService;
     private final RulesService rulesService;
     private final UserShelterService userShelterService;
-    private String chosenShelter;
+//    private String chosenShelter;
 
     private final Map<Long, ShelterType> chooseShelterType = new HashMap<>();
 @Autowired
@@ -77,23 +78,18 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
 
     private void handleTextMessage(Message message) {
         Long chatId = message.chat().id();
+        String text = message.text();
         String userContacts = message.text();
         Long telegramId = message.from().id(); // Это telegram_id пользователя
         String firstName = message.from().firstName();
         String lastName = message.from().lastName();
 
-        if ("/start".equals(userContacts)) {
+        if ("/start".equals(text)) {
             sendStartMessage(chatId);
         } else if (userContactMap.containsKey(chatId)) {
             ShelterType chosenShelterType = getShelterTypeByUserChatId(chatId);
             userShelterService.saveUserContacts(chosenShelterType, telegramId, firstName, lastName, userContacts);
-
-//            if (chosenShelterType == ShelterType.DOG_SHELTER) {
-//                userDogShelterService.saveUserContacts(telegramId, userContacts);
-//            } else if (chosenShelterType == ShelterType.CAT_SHELTER) {
-//                userCatShelterService.saveUserContacts(telegramId, userContacts);
-//            }
-            SendMessage response = new SendMessage(chatId, "Спасибо! Ваши контакты сохранены.");
+            SendMessage response = new SendMessage(chatId, "Спасибо! Ваши контакты сохранены. Наши волонтеры свяжутся с вами в ближайшее время.");
             InlineKeyboardMarkup keyboardMarkup = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
             response.replyMarkup(keyboardMarkup);
             SendResponse sendResponse = animalShelterBot.execute(response);
@@ -194,8 +190,8 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
         }
 
         if (shelterName != null) {
-            chosenShelter = shelterName;
-            SendMessage response = new SendMessage(chatId, data + " " + shelterName +
+            ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
+            SendMessage response = new SendMessage(chatId, data + " " + shelterDTO.getShelterName() +
                     " приветствует Вас! Спасибо за выбор! Выберите, что вас интересует:\n" +
                     "1. \uD83C\uDFE0 Информация о приюте\n" +
                     "2. \uD83D\uDC3E Как забрать животное\n" +
@@ -227,32 +223,19 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
         SendResponse sendResponseInfo = animalShelterBot.execute(responseInfo);
         logger.info("Message sent status: {}", sendResponseInfo.isOk());
     }
+private void sendShelterInfoAbout(Long chatId) {
+    ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
+    SendMessage responseShelterInfoAbout = new SendMessage(chatId, "Приют называется " + shelterDTO.getShelterName() + ". " + shelterDTO.getShelterDescription());
+    InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
+    responseShelterInfoAbout.replyMarkup(BackShelterInfoKeyboard);
+    SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoAbout);
+    logger.info("Message sent status: {}", sendResponse.isOk());
+}
 
-    private void sendShelterInfoAbout(Long chatId) {
-        String shelterName;
-        String shelterDescription;
-        if (chosenShelter.equals("Happy dog")) {
-            shelterName = shelterService.getDogShelter().getShelterName();
-            shelterDescription = shelterService.getDogShelter().getShelterDescription();
-        } else {
-            shelterName = shelterService.getCatShelter().getShelterName();
-            shelterDescription = shelterService.getCatShelter().getShelterDescription();
-        }
-        SendMessage responseShelterInfoAbout = new SendMessage(chatId, "Приют называется " + shelterName + ". " + shelterDescription);
-        InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
-        responseShelterInfoAbout.replyMarkup(BackShelterInfoKeyboard);
-        SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoAbout);
-        logger.info("Message sent status: {}", sendResponse.isOk());
-    }
 
     private void sendShelterInfoAddress(Long chatId) {
-        String shelterAddress;
-        if (chosenShelter.equals("Happy dog")) {
-            shelterAddress = shelterService.getDogShelter().getShelterAddress();
-        } else {
-            shelterAddress = shelterService.getCatShelter().getShelterAddress();
-        }
-        SendMessage responseShelterInfoAddress = new SendMessage(chatId, shelterAddress);
+        ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseShelterInfoAddress = new SendMessage(chatId, shelterDTO.getShelterAddress());
         // Add logic for sending the location map if needed
         InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
         responseShelterInfoAddress.replyMarkup(BackShelterInfoKeyboard);
@@ -261,13 +244,8 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
     }
 
     private void sendShelterContacts(Long chatId) {
-        String shelterContacts;
-        if (chosenShelter.equals("Happy dog")) {
-            shelterContacts = shelterService.getDogShelter().getShelterContacts();
-        } else {
-            shelterContacts = shelterService.getCatShelter().getShelterContacts();
-        }
-        SendMessage responseShelterInfoContacts = new SendMessage(chatId, "Контакты для связи с нами:\nТел:" + shelterContacts);
+        ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseShelterInfoContacts = new SendMessage(chatId, "Контакты для связи с нами:\nТел:" + shelterDTO.getShelterContacts());
         InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
         responseShelterInfoContacts.replyMarkup(BackShelterInfoKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoContacts);
@@ -275,13 +253,8 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
     }
 
     private void sendShelterSecurityContacts(Long chatId) {
-        String shelterInfoSecurityContacts;
-        if (chosenShelter.equals("Happy dog")) {
-            shelterInfoSecurityContacts = shelterService.getDogShelter().getSecurityContacts();
-        } else {
-            shelterInfoSecurityContacts = shelterService.getCatShelter().getSecurityContacts();
-        }
-        SendMessage responseShelterInfoContacts = new SendMessage(chatId, "Контакты охраны для получения пропуска:\nТел:" + shelterInfoSecurityContacts);
+        ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseShelterInfoContacts = new SendMessage(chatId, "Контакты охраны для получения пропуска:\nТел:" + shelterDTO.getSecurityContacts());
         InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
         responseShelterInfoContacts.replyMarkup(BackShelterInfoKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoContacts);
@@ -289,13 +262,8 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
     }
 
     private void sendShelterSafetyTips(Long chatId) {
-        String shelterInfoSafetyTips;
-        if (chosenShelter.equals("Happy dog")) {
-            shelterInfoSafetyTips = shelterService.getDogShelter().getSafetyInfo();
-        } else {
-            shelterInfoSafetyTips = shelterService.getCatShelter().getSafetyInfo();
-        }
-        SendMessage responseShelterInfoContacts = new SendMessage(chatId, shelterInfoSafetyTips);
+        ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseShelterInfoContacts = new SendMessage(chatId, shelterDTO.getSafetyInfo());
         InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
         responseShelterInfoContacts.replyMarkup(BackShelterInfoKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoContacts);
@@ -308,31 +276,9 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
         responseShelterInfoLeaveContacts.replyMarkup(keyboardMarkupCancelContactInput);
         SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoLeaveContacts);
         logger.info("Message sent status: {}", sendResponse.isOk());
-        userContactMap.put(chatId, chosenShelter);
+        ShelterType shelterType = getShelterTypeByUserChatId(chatId);
+        userContactMap.put(chatId, shelterType);
     }
-
-//    private void saveUserContacts(Long telegramId, String chosenShelter, String userContacts) {
-//        try {
-//            String url = "jdbc:postgresql://localhost:5432/shelter_db";
-//            String username = "shelter_svc";
-//            String password = "AnimalShelter";
-//
-//            Connection connection = DriverManager.getConnection(url, username, password);
-//            String tableName = chosenShelter.equals("Happy dog") ? "dog_shelter_users" : "cat_shelter_users";
-//            String insertQuery = "INSERT INTO " + tableName + " (telegram_id, user_contacts, shelter_id) VALUES (?, ?, ?)";
-//
-//            PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
-//            preparedStatement.setLong(1, telegramId);
-//            preparedStatement.setString(2, userContacts);
-//            preparedStatement.setInt(3, chosenShelter.equals("Happy dog") ? 1 : 2);
-//
-//            preparedStatement.executeUpdate();
-//            preparedStatement.close();
-//            connection.close();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     public void backMainMenu(Long chatId) {
         SendMessage response = new SendMessage(chatId,
@@ -349,9 +295,9 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
     }
 
     private void sendAdoptionRules(Long chatId) {
-        SendMessage responseAdoptionRules = null;
-        if (chosenShelter.equals("Happy dog")) {
-            responseAdoptionRules = new SendMessage(chatId, "Мы рады, что вы заинтересованы помочь нашим пушистым друзьям. Но перед этим ознакомьтесь с правилами:\n" +
+        ShelterType shelterType = getShelterTypeByUserChatId(chatId);
+        if (shelterType == ShelterType.DOG_SHELTER) {
+            SendMessage responseAdoptionRules = new SendMessage(chatId, "Мы рады, что вы заинтересованы помочь нашим пушистым друзьям. Но перед этим ознакомьтесь с правилами:\n" +
                     "1. ✨ Правила знакомства с животными \n" +
                     "2. \uD83D\uDCDC Список необходимых документов для усыновления\n" +
                     "3. \uD83D\uDE9A Транспортировка животного\n" +
@@ -364,8 +310,8 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
             responseAdoptionRules.replyMarkup(adoptionRulesKeyboard);
             SendResponse sendResponseAdoptionRules = animalShelterBot.execute(responseAdoptionRules);
             logger.info("Message sent status: {}", sendResponseAdoptionRules.isOk());
-        } else {
-            responseAdoptionRules = new SendMessage(chatId, "Мы рады, что вы заинтересованы помочь нашим пушистым друзьям. Но перед этим ознакомьтесь с правилами:\n" +
+        } else if (shelterType == ShelterType.CAT_SHELTER) {
+            SendMessage responseAdoptionRules = new SendMessage(chatId, "Мы рады, что вы заинтересованы помочь нашим пушистым друзьям. Но перед этим ознакомьтесь с правилами:\n" +
                     "1. ✨ Правила знакомства с животными \n" +
                     "2. \uD83D\uDCDC Список необходимых документов для усыновления\n" +
                     "3. \uD83D\uDE9A Транспортировка животного\n" +
@@ -510,8 +456,4 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
         }
         throw new UserChatIdNotFoundException(String.format("Telegram user chatId = %d not found", chatId));
     }
-
-    /*private Shelter getChosenShelter(Long chatId) {
-        return shelterService.g
-    }*/
 }
