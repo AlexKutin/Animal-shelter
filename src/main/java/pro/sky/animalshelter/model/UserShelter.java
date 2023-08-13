@@ -12,6 +12,9 @@ public abstract class UserShelter {
     @Column(name = "telegram_id", nullable = false, unique = true)
     protected Long telegramId;
 
+    @Column(name = "user_name", length = 50)
+    private String userName;
+
     @Column(name = "first_name", length = 50)
     private String firstName;
 
@@ -28,12 +31,9 @@ public abstract class UserShelter {
     public UserShelter() {
     }
 
-    public UserShelter(Long telegramId, String firstName, String lastName, String userContacts, Shelter shelter) {
+    public UserShelter(Long telegramId, String userName, String firstName, String lastName, String userContacts, Shelter shelter) {
         this.telegramId = telegramId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.userContacts = userContacts;
-        this.shelter = shelter;
+        fillUserInfo(userName, firstName, lastName, userContacts, shelter);
     }
 
     public Integer getUserId() {
@@ -50,6 +50,14 @@ public abstract class UserShelter {
 
     public void setTelegramId(Long telegramId) {
         this.telegramId = telegramId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getFirstName() {
@@ -89,10 +97,19 @@ public abstract class UserShelter {
         return "UserShelter{" +
                 "userId=" + userId +
                 ", telegramId=" + telegramId +
+                ", userName='" + userName + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", userContacts='" + userContacts + '\'' +
                 ", shelter=" + shelter.getShelterName() +
                 '}';
+    }
+
+    public void fillUserInfo(String userName, String firstName, String lastName, String userContacts, Shelter shelter) {
+        this.userName = userName;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.userContacts = userContacts;
+        this.shelter = shelter;
     }
 }

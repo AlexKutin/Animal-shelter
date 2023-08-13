@@ -8,7 +8,7 @@ public class UserCatShelter extends UserShelter {
     public UserCatShelter() {
     }
 
-    public UserCatShelter(Long telegramId, String firstName, String lastName, String userContacts, Shelter shelter) {
-        super(telegramId, firstName, lastName, userContacts, shelter);
+    public UserCatShelter(Long telegramId, String userName, String firstName, String lastName, String userContacts, Shelter shelter) {
+        super(telegramId, userName, firstName, lastName, userContacts, shelter);
     }
 }

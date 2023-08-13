@@ -78,15 +78,16 @@ public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService
     private void handleTextMessage(Message message) {
         Long chatId = message.chat().id();
         String userContacts = message.text();
-        Long telegramId = message.from().id(); // Это telegram_id пользователя
-        String firstName = message.from().firstName();
-        String lastName = message.from().lastName();
+        Long telegramId = message.from().id();          // Это telegram_id пользователя
+        String userName = message.from().username();    // telegram username пользователя
+        String firstName = message.from().firstName();  // telegram firstname пользователя
+        String lastName = message.from().lastName();    // telegram lastname пользователя
 
         if ("/start".equals(userContacts)) {
             sendStartMessage(chatId);
         } else if (userContactMap.containsKey(chatId)) {
             ShelterType chosenShelterType = getShelterTypeByUserChatId(chatId);
-            userShelterService.saveUserContacts(chosenShelterType, telegramId, firstName, lastName, userContacts);
+            userShelterService.saveUserContacts(chosenShelterType, telegramId, userName, firstName, lastName, userContacts);
 
 //            if (chosenShelterType == ShelterType.DOG_SHELTER) {
 //                userDogShelterService.saveUserContacts(telegramId, userContacts);
