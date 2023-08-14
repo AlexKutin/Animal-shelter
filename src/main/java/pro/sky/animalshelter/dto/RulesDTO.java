@@ -137,7 +137,7 @@ public class RulesDTO {
     public Rules toRules() {
         Shelter shelter = new Shelter();
         Rules rules = new Rules();
-        rules.setIdRules(rules.getIdRules());
+        rules.setIdRules(this.getIdRules());
         rules.setAdviceFromCynologist(this.getAdviceFromCynologist());
         rules.setRulesTransportation(this.getRulesTransportation());
         rules.setListCynologist(this.getListCynologist());

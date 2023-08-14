@@ -3,7 +3,7 @@ package pro.sky.animalshelter.model;
 import javax.persistence.*;
 
 @MappedSuperclass
-public abstract class UserShelter {
+public class UserShelter {
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

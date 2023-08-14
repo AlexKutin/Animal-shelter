@@ -13,3 +13,7 @@ CREATE TABLE report_cat_shelter
 ALTER TABLE report_cat_shelter ADD CONSTRAINT report_cat_shelter_user_id_fkey FOREIGN KEY (user_id)
     REFERENCES cat_shelter_users(user_id);
 
+-- changeset InnaSerebriakova:2
+alter table report_cat_shelter
+    alter column date_report type timestamp using date_report::timestamp;
+
