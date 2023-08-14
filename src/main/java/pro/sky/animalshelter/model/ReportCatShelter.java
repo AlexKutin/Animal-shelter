@@ -1,7 +1,6 @@
 package pro.sky.animalshelter.model;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "report_cat_shelter")

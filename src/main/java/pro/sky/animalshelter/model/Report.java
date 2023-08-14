@@ -1,9 +1,7 @@
 package pro.sky.animalshelter.model;
 
-import liquibase.structure.core.Data;
-import org.glassfish.grizzly.http.util.TimeStamp;
-
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @MappedSuperclass
 public class Report {
@@ -15,7 +13,7 @@ public class Report {
     private String description;
     private String photo;
     @Column(name = "date_report")
-    private TimeStamp dateTimeReport;
+    private Timestamp dateTimeReport;
 
     public Integer getIdReport() {
         return idReport;
@@ -41,11 +39,11 @@ public class Report {
         this.photo = photo;
     }
 
-    public TimeStamp getDateTimeReport() {
+    public Timestamp getDateTimeReport() {
         return dateTimeReport;
     }
 
-    public void setDateTimeReport(TimeStamp dateTimeReport) {
+    public void setDateTimeReport(Timestamp dateTimeReport) {
         this.dateTimeReport = dateTimeReport;
     }
 

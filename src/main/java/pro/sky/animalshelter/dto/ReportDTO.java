@@ -2,17 +2,9 @@ package pro.sky.animalshelter.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import liquibase.structure.core.Data;
-import org.glassfish.grizzly.http.util.TimeStamp;
-import org.hibernate.type.descriptor.sql.VarbinaryTypeDescriptor;
 import pro.sky.animalshelter.model.Report;
-import pro.sky.animalshelter.model.UserShelter;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.time.LocalDate;
+import java.sql.Timestamp;
 
 @Schema(name = "отчеты")
 public class ReportDTO {
@@ -25,7 +17,7 @@ public class ReportDTO {
     @Schema(name = "Фото отчета")
     private String photo;
     @Schema(name = "дата и время отчета")
-    private TimeStamp dateTimeReport;
+    private Timestamp dateTimeReport;
 
     public Integer getIdReport() {
         return idReport;
@@ -51,11 +43,11 @@ public class ReportDTO {
         this.photo = photo;
     }
 
-    public TimeStamp getDateTimeReport() {
+    public Timestamp getDateTimeReport() {
         return dateTimeReport;
     }
 
-    public void setDateTimeReport(TimeStamp dateTimeReportReport) {
+    public void setDateTimeReport(Timestamp dateTimeReportReport) {
         this.dateTimeReport = dateTimeReportReport;
     }
 
@@ -70,7 +62,6 @@ public class ReportDTO {
     }
 
     public Report toReport() {
-        UserShelter userShelter = new UserShelter();
         Report report = new Report();
         report.setIdReport(this.getIdReport());
         report.setDescription(this.getDescription());
