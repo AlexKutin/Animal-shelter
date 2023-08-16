@@ -22,6 +22,19 @@ public class Volunteer implements Cloneable {
 
     @Column(name = "volunteer_active")
     private boolean isActive;
+    //Для получения идентификатора чата, волонтер должен отправить команду боту /getchatid,
+    //после это значение необходимо добавить в таблицу в соответствующюю таблицу.
+    // Отправка сообщений волонтерам о помощи реализуется на сновании идентификатора чата волонтера с ботом
+    @Column(name = "chat_id")
+    private Long chatId;
+
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
+    }
 
     @ManyToOne
     @JoinColumn(name = "shelter_id")

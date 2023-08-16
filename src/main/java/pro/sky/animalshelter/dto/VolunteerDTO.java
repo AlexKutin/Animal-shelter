@@ -26,6 +26,9 @@ public class VolunteerDTO {
     @Schema(description = "Тип приюта")
     private ShelterType shelterType;
 
+    @Schema(description = "Идентификатор чата")
+    private Long chatId;
+
     public Integer getId() {
         return id;
     }
@@ -74,6 +77,14 @@ public class VolunteerDTO {
         this.shelterType = shelterType;
     }
 
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
+    }
+
     @Override
     public String toString() {
         return "VolunteerDTO{" +
@@ -94,6 +105,7 @@ public class VolunteerDTO {
         volunteerDTO.setPhone(volunteer.getPhone());
         volunteerDTO.setActive(volunteer.isActive());
         volunteerDTO.setShelterType(volunteer.getShelter().getShelterType());
+        volunteerDTO.setChatId(volunteer.getChatId());
 
         return volunteerDTO;
     }
@@ -106,6 +118,7 @@ public class VolunteerDTO {
         volunteer.setPhone(this.getPhone());
         volunteer.setActive(this.isActive());
         volunteer.setShelter(shelter);
+        volunteer.setChatId(this.chatId);
 
         return volunteer;
     }

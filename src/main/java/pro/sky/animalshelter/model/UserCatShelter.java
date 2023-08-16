@@ -5,18 +5,10 @@ import javax.persistence.*;
 @Entity
 @Table(name = "cat_shelter_users")
 public class UserCatShelter extends UserShelter {
+    public UserCatShelter() {
+    }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shelter_id")
-    private Shelter catShelter;
-
-    @Override
-    public String toString() {
-        return "UserCatShelter{" +
-                "userId=" + userId +
-                ", telegramId=" + telegramId +
-                ", userContacts='" + userContacts + '\'' +
-                ", catShelter=" + catShelter.getShelterName() +
-                '}';
+    public UserCatShelter(Long telegramId, String userName, String firstName, String lastName, String userContacts, Shelter shelter) {
+        super(telegramId, userName, firstName, lastName, userContacts, shelter);
     }
 }
