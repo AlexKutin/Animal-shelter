@@ -1,8 +1,5 @@
 -- liquibase formatted sql
 
--- changeset DrogolovaNadezhda:2
-drop table dogs_list;
-
 -- changeset DrogolovaNadezhda:3
 CREATE TABLE dogs_list
 (
