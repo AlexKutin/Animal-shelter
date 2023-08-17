@@ -2,37 +2,56 @@ package pro.sky.animalshelter.listener;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
-import com.pengrad.telegrambot.model.CallbackQuery;
-import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.*;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
+import com.pengrad.telegrambot.request.GetChatMember;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendPhoto;
+import com.pengrad.telegrambot.response.GetChatMemberResponse;
 import com.pengrad.telegrambot.response.SendResponse;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
+import pro.sky.animalshelter.dto.RulesDTO;
+import pro.sky.animalshelter.dto.ShelterDTO;
+import pro.sky.animalshelter.exception.UserChatIdNotFoundException;
 import pro.sky.animalshelter.keyBoard.InlineKeyboardMarkupHelper;
-import pro.sky.animalshelter.service.RulesService;
-import pro.sky.animalshelter.service.ShelterService;
+import pro.sky.animalshelter.model.ShelterType;
+import pro.sky.animalshelter.model.Volunteer;
+import pro.sky.animalshelter.service.*;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
+@ComponentScan(basePackages = {"pro.sky.animalshelter.service", "pro.sky.animalshelter.listener", "pro.sky.animalshelter.repository"})
 public class AnimalShelterUpdatesListener implements UpdatesListener {
-
     private final Logger logger = LoggerFactory.getLogger(AnimalShelterUpdatesListener.class);
-
+    private final Map<Long, ShelterType> userContactMap = new HashMap<>();
     private final TelegramBot animalShelterBot;
-
     private final ShelterService shelterService;
     private final RulesService rulesService;
-    private String chosenShelter;
+    private final UserShelterService userShelterService;
+    private final VolunteerService volunteerService;
+    private final Map<Long, ShelterType> chooseShelterType = new HashMap<>();
 
-    public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService shelterService, RulesService rulesService) {
+    @Autowired
+    public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService shelterService,
+                                        RulesService rulesService, UserShelterService userShelterService, VolunteerService volunteerService) {
         this.animalShelterBot = animalShelterBot;
         this.shelterService = shelterService;
         this.rulesService = rulesService;
+        this.userShelterService = userShelterService;
+        this.volunteerService = volunteerService;
     }
 
     @PostConstruct
@@ -67,9 +86,24 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     private void handleTextMessage(Message message) {
         Long chatId = message.chat().id();
         String text = message.text();
+        String userContacts = message.text();
+        Long telegramId = message.from().id();          // Это telegram_id пользователя
+        String userName = message.from().username();    // telegram username пользователя
+        String firstName = message.from().firstName();  // telegram firstname пользователя
+        String lastName = message.from().lastName();    // telegram lastname пользователя
 
         if ("/start".equals(text)) {
             sendStartMessage(chatId);
+        } else if (userContactMap.containsKey(chatId)) {
+            ShelterType chosenShelterType = getShelterTypeByUserChatId(chatId);
+            userShelterService.saveUserContacts(chosenShelterType, telegramId, userName, firstName, lastName, userContacts);
+            SendMessage response = new SendMessage(chatId, "Спасибо! Ваши контакты сохранены. Наши волонтеры свяжутся с вами в ближайшее время.");
+            InlineKeyboardMarkup keyboardMarkup = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
+            response.replyMarkup(keyboardMarkup);
+            SendResponse sendResponse = animalShelterBot.execute(response);
+            logger.info("Message sent status: {}", sendResponse.isOk());
+        } else if ("/getchatid".equals(text)) {
+            getChatId(chatId);
         } else {
             sendInvalidMessage(chatId);
         }
@@ -124,7 +158,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         } else if ("SendReport".equals(data)) {
             sendReportMessage(chatId);
         } else if ("CallVolunteer".equals(data)) {
-            sendVolunteerMessage(chatId);
+            ShelterType chosenShelterType = chooseShelterType.get(chatId);
+            sendVolunteerMessage(chatId, chosenShelterType);
         } else if ("BackShelterMenu".equals(data)) {
             sendMainMenuMessage(chatId);
         } else if ("BackMainMenu".equals(data)) {
@@ -135,6 +170,9 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             sendAdoptionRules(chatId);
         } else if ("BackToCynologist".equals(data)) {
             sendCynologist(chatId);
+        } else if ("CancelContactInput".equals(data)) {
+            userContactMap.remove(chatId);
+            sendMessage(chatId, "Вы отменили ввод контактов.", null);
         }
     }
 
@@ -156,13 +194,15 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         String shelterName = null;
         if (data.contains("собак")) {
             shelterName = shelterService.getDogShelter().getShelterName();
+            chooseShelterType.put(chatId, ShelterType.DOG_SHELTER);
         } else if (data.contains("кошек")) {
             shelterName = shelterService.getCatShelter().getShelterName();
+            chooseShelterType.put(chatId, ShelterType.CAT_SHELTER);
         }
 
         if (shelterName != null) {
-            chosenShelter = shelterName;
-            SendMessage response = new SendMessage(chatId, data + " " + shelterName +
+            ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
+            SendMessage response = new SendMessage(chatId, data + " " + shelterDTO.getShelterName() +
                     " приветствует Вас! Спасибо за выбор! Выберите, что вас интересует:\n" +
                     "1. \uD83C\uDFE0 Информация о приюте\n" +
                     "2. \uD83D\uDC3E Как забрать животное\n" +
@@ -196,16 +236,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     private void sendShelterInfoAbout(Long chatId) {
-        String shelterName;
-        String shelterDescription;
-        if (chosenShelter.equals("Happy dog")) {
-            shelterName = shelterService.getDogShelter().getShelterName();
-            shelterDescription = shelterService.getDogShelter().getShelterDescription();
-        } else {
-            shelterName = shelterService.getCatShelter().getShelterName();
-            shelterDescription = shelterService.getCatShelter().getShelterDescription();
-        }
-        SendMessage responseShelterInfoAbout = new SendMessage(chatId, "Приют называется " + shelterName + ". " + shelterDescription);
+        ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseShelterInfoAbout = new SendMessage(chatId, "Приют называется " + shelterDTO.getShelterName() + ". " + shelterDTO.getShelterDescription());
         InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
         responseShelterInfoAbout.replyMarkup(BackShelterInfoKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoAbout);
@@ -213,14 +245,40 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     private void sendShelterInfoAddress(Long chatId) {
-        String shelterAddress;
-        if (chosenShelter.equals("Happy dog")) {
-            shelterAddress = shelterService.getDogShelter().getShelterAddress();
+        ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
+        String shelterName = shelterDTO.getShelterName();
+
+        String imageFileName = shelterName.replace(" ", "") + "shelter.png";
+
+        // Получить InputStream из ресурсов
+        InputStream imageInputStream = getClass().getResourceAsStream("/" + imageFileName);
+
+        if (imageInputStream != null) {
+            try {
+                // Создать временный файл
+                File tempImageFile = File.createTempFile("tempImage", ".png");
+                tempImageFile.deleteOnExit();
+
+                // Копировать содержимое InputStream в временный файл
+                FileUtils.copyInputStreamToFile(imageInputStream, tempImageFile);
+
+                // Отправить фото с временного файла
+                SendPhoto sendPhoto = new SendPhoto(chatId, tempImageFile);
+                SendResponse sendPhotoResponse = animalShelterBot.execute(sendPhoto);
+
+                if (sendPhotoResponse.isOk()) {
+                    logger.info("Photo sent successfully");
+                } else {
+                    logger.error("Failed to send photo: {}", sendPhotoResponse.description());
+                }
+            } catch (IOException e) {
+                logger.error("Error while sending photo: {}", e.getMessage());
+            }
         } else {
-            shelterAddress = shelterService.getCatShelter().getShelterAddress();
+            logger.error("Image file not found: {}", imageFileName);
         }
-        SendMessage responseShelterInfoAddress = new SendMessage(chatId, shelterAddress);
-        // Add logic for sending the location map if needed
+
+        SendMessage responseShelterInfoAddress = new SendMessage(chatId, shelterDTO.getShelterAddress() + "\nДля удобного проезда к нам, пожалуйста, используйте представленную выше схему.");
         InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
         responseShelterInfoAddress.replyMarkup(BackShelterInfoKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoAddress);
@@ -228,13 +286,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     private void sendShelterContacts(Long chatId) {
-        String shelterContacts;
-        if (chosenShelter.equals("Happy dog")) {
-            shelterContacts = shelterService.getDogShelter().getShelterContacts();
-        } else {
-            shelterContacts = shelterService.getCatShelter().getShelterContacts();
-        }
-        SendMessage responseShelterInfoContacts = new SendMessage(chatId, "Контакты для связи с нами:\nТел:" + shelterContacts);
+        ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseShelterInfoContacts = new SendMessage(chatId, "Контакты для связи с нами:\nТел:" + shelterDTO.getShelterContacts());
         InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
         responseShelterInfoContacts.replyMarkup(BackShelterInfoKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoContacts);
@@ -242,13 +295,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     private void sendShelterSecurityContacts(Long chatId) {
-        String shelterInfoSecurityContacts;
-        if (chosenShelter.equals("Happy dog")) {
-            shelterInfoSecurityContacts = shelterService.getDogShelter().getSecurityContacts();
-        } else {
-            shelterInfoSecurityContacts = shelterService.getCatShelter().getSecurityContacts();
-        }
-        SendMessage responseShelterInfoContacts = new SendMessage(chatId, "Контакты охраны для получения пропуска:\nТел:" + shelterInfoSecurityContacts);
+        ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseShelterInfoContacts = new SendMessage(chatId, "Контакты охраны для получения пропуска:\nТел:" + shelterDTO.getSecurityContacts());
         InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
         responseShelterInfoContacts.replyMarkup(BackShelterInfoKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoContacts);
@@ -256,13 +304,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     private void sendShelterSafetyTips(Long chatId) {
-        String shelterInfoSafetyTips;
-        if (chosenShelter.equals("Happy dog")) {
-            shelterInfoSafetyTips = shelterService.getDogShelter().getSafetyInfo();
-        } else {
-            shelterInfoSafetyTips = shelterService.getCatShelter().getSafetyInfo();
-        }
-        SendMessage responseShelterInfoContacts = new SendMessage(chatId, shelterInfoSafetyTips);
+        ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseShelterInfoContacts = new SendMessage(chatId, shelterDTO.getSafetyInfo());
         InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
         responseShelterInfoContacts.replyMarkup(BackShelterInfoKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoContacts);
@@ -271,10 +314,12 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
 
     private void sendShelterLeaveContacts(Long chatId) {
         SendMessage responseShelterInfoLeaveContacts = new SendMessage(chatId, "Оставьте нам свои контакты и мы с вами свяжемся");
-        InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
-        responseShelterInfoLeaveContacts.replyMarkup(BackShelterInfoKeyboard);
+        InlineKeyboardMarkup keyboardMarkupCancelContactInput = InlineKeyboardMarkupHelper.createCancelContactInputInlineKeyboard();
+        responseShelterInfoLeaveContacts.replyMarkup(keyboardMarkupCancelContactInput);
         SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoLeaveContacts);
         logger.info("Message sent status: {}", sendResponse.isOk());
+        ShelterType shelterType = getShelterTypeByUserChatId(chatId);
+        userContactMap.put(chatId, shelterType);
     }
 
     public void backMainMenu(Long chatId) {
@@ -292,9 +337,9 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     private void sendAdoptionRules(Long chatId) {
-        SendMessage responseAdoptionRules = null;
-        if (chosenShelter.equals("Happy dog")) {
-            responseAdoptionRules = new SendMessage(chatId, "Мы рады, что вы заинтересованы помочь нашим пушистым друзьям. Но перед этим ознакомьтесь с правилами:\n" +
+        ShelterType shelterType = getShelterTypeByUserChatId(chatId);
+        if (shelterType == ShelterType.DOG_SHELTER) {
+            SendMessage responseAdoptionRules = new SendMessage(chatId, "Мы рады, что вы заинтересованы помочь нашим пушистым друзьям. Но перед этим ознакомьтесь с правилами:\n" +
                     "1. ✨ Правила знакомства с животными \n" +
                     "2. \uD83D\uDCDC Список необходимых документов для усыновления\n" +
                     "3. \uD83D\uDE9A Транспортировка животного\n" +
@@ -307,8 +352,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             responseAdoptionRules.replyMarkup(adoptionRulesKeyboard);
             SendResponse sendResponseAdoptionRules = animalShelterBot.execute(responseAdoptionRules);
             logger.info("Message sent status: {}", sendResponseAdoptionRules.isOk());
-        } else {
-            responseAdoptionRules = new SendMessage(chatId, "Мы рады, что вы заинтересованы помочь нашим пушистым друзьям. Но перед этим ознакомьтесь с правилами:\n" +
+        } else if (shelterType == ShelterType.CAT_SHELTER) {
+            SendMessage responseAdoptionRules = new SendMessage(chatId, "Мы рады, что вы заинтересованы помочь нашим пушистым друзьям. Но перед этим ознакомьтесь с правилами:\n" +
                     "1. ✨ Правила знакомства с животными \n" +
                     "2. \uD83D\uDCDC Список необходимых документов для усыновления\n" +
                     "3. \uD83D\uDE9A Транспортировка животного\n" +
@@ -324,8 +369,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     private void sendAdoptionRulesIntroduction(Long chatId) {
-        String adoptionRulesIntroduction = rulesService.getAllRules().getRilesMeeting();
-        SendMessage responseAdoptionRulesIntroduction = new SendMessage(chatId, adoptionRulesIntroduction);
+        RulesDTO rulesDTO = rulesService.getRulesByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseAdoptionRulesIntroduction = new SendMessage(chatId, rulesDTO.getRilesMeeting());
         InlineKeyboardMarkup BackToAdoptionRulesInlineKeyboard = InlineKeyboardMarkupHelper.createBackToAdoptionRulesInlineKeyboard();
         responseAdoptionRulesIntroduction.replyMarkup(BackToAdoptionRulesInlineKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(responseAdoptionRulesIntroduction);
@@ -333,8 +378,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     private void sendListDocForTakePet(Long chatId) {
-        String listDocForTakePet = rulesService.getAllRules().getListDocForTakePet();
-        SendMessage responseListDocForTakePet = new SendMessage(chatId, listDocForTakePet);
+        RulesDTO rulesDTO = rulesService.getRulesByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseListDocForTakePet = new SendMessage(chatId, rulesDTO.getListDocForTakePet());
         InlineKeyboardMarkup BackToAdoptionRulesInlineKeyboard = InlineKeyboardMarkupHelper.createBackToAdoptionRulesInlineKeyboard();
         responseListDocForTakePet.replyMarkup(BackToAdoptionRulesInlineKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(responseListDocForTakePet);
@@ -342,8 +387,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     public void sendRulesTransport(Long chatId) {
-        String rulesTransport = rulesService.getAllRules().getRulesTransportation();
-        SendMessage responseRulesTransport = new SendMessage(chatId, rulesTransport);
+        RulesDTO rulesDTO = rulesService.getRulesByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseRulesTransport = new SendMessage(chatId, rulesDTO.getRulesTransportation());
         InlineKeyboardMarkup backToAdoptionRulesInlineKeyboard = InlineKeyboardMarkupHelper.createBackToAdoptionRulesInlineKeyboard();
         responseRulesTransport.replyMarkup(backToAdoptionRulesInlineKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(responseRulesTransport);
@@ -363,7 +408,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     public void sendRulesHouseSetupForChild(Long chatId) {
-        SendMessage responseRulesHouseSetupPuppyKitten = new SendMessage(chatId, rulesService.getAllRules().getRulesGHForChildPet());
+        RulesDTO rulesDTO = rulesService.getRulesByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseRulesHouseSetupPuppyKitten = new SendMessage(chatId, rulesDTO.getRulesGHForChildPet());
         InlineKeyboardMarkup backToPetHouseSelectionKeyBoard = InlineKeyboardMarkupHelper.createBackToPetHouseSelectionKeyBoard();
         responseRulesHouseSetupPuppyKitten.replyMarkup(backToPetHouseSelectionKeyBoard);
         SendResponse sendResponse = animalShelterBot.execute(responseRulesHouseSetupPuppyKitten);
@@ -371,7 +417,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     public void sendRulesHouseSetupForAdult(Long chatId) {
-        SendMessage responseRulesHouseSetup = new SendMessage(chatId, rulesService.getAllRules().getRulesGHForAdultPet());
+        RulesDTO rulesDTO = rulesService.getRulesByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseRulesHouseSetup = new SendMessage(chatId, rulesDTO.getRulesGHForAdultPet());
         InlineKeyboardMarkup backToPetHouseSelectionKeyBoard = InlineKeyboardMarkupHelper.createBackToPetHouseSelectionKeyBoard();
         responseRulesHouseSetup.replyMarkup(backToPetHouseSelectionKeyBoard);
         SendResponse sendResponse = animalShelterBot.execute(responseRulesHouseSetup);
@@ -379,7 +426,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     public void sendRulesHouseSetupForSpecial(Long chatId) {
-        SendMessage responseRulesHouseSetup = new SendMessage(chatId, rulesService.getAllRules().getRulesGHForSpecialPet());
+        RulesDTO rulesDTO = rulesService.getRulesByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseRulesHouseSetup = new SendMessage(chatId, rulesDTO.getRulesGHForSpecialPet());
         InlineKeyboardMarkup backToPetHouseSelectionKeyBoard = InlineKeyboardMarkupHelper.createBackToPetHouseSelectionKeyBoard();
         responseRulesHouseSetup.replyMarkup(backToPetHouseSelectionKeyBoard);
         SendResponse sendResponse = animalShelterBot.execute(responseRulesHouseSetup);
@@ -398,7 +446,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     public void sendAdviceFromCynologist(Long chatId) {
-        SendMessage responseAdviceFromCynologist = new SendMessage(chatId, rulesService.getAllRules().getAdviceFromCynologist());
+        RulesDTO rulesDTO = rulesService.getRulesByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseAdviceFromCynologist = new SendMessage(chatId, rulesDTO.getAdviceFromCynologist());
         InlineKeyboardMarkup backToCynologist = InlineKeyboardMarkupHelper.createBackToCynologist();
         responseAdviceFromCynologist.replyMarkup(backToCynologist);
         SendResponse sendResponse = animalShelterBot.execute(responseAdviceFromCynologist);
@@ -406,7 +455,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     public void sendListCynologist(Long chatId) {
-        SendMessage responseListCynologist = new SendMessage(chatId, rulesService.getAllRules().getListCynologist());
+        RulesDTO rulesDTO = rulesService.getRulesByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseListCynologist = new SendMessage(chatId, rulesDTO.getListCynologist());
         InlineKeyboardMarkup backToCynologist = InlineKeyboardMarkupHelper.createBackToCynologist();
         responseListCynologist.replyMarkup(backToCynologist);
         SendResponse sendResponse = animalShelterBot.execute(responseListCynologist);
@@ -414,8 +464,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     public void sendReasonsRefusal(Long chatId) {
-        String rulesReasonsRefusal = rulesService.getAllRules().getReasonsRefusal();
-        SendMessage responseRulesTransport = new SendMessage(chatId, rulesReasonsRefusal);
+        RulesDTO rulesDTO = rulesService.getRulesByShelterType(getShelterTypeByUserChatId(chatId));
+        SendMessage responseRulesTransport = new SendMessage(chatId, rulesDTO.getReasonsRefusal());
         InlineKeyboardMarkup backToAdoptionRulesInlineKeyboard = InlineKeyboardMarkupHelper.createBackToAdoptionRulesInlineKeyboard();
         responseRulesTransport.replyMarkup(backToAdoptionRulesInlineKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(responseRulesTransport);
@@ -427,11 +477,49 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         sendMessage(chatId, reportMessage, null);
         // Add logic for processing the user's message and saving it to the database if needed
     }
+    private void sendVolunteerMessage(Long chatId, ShelterType chosenShelterType) {
+        String userName = getUserNameByChatId(chatId);
 
-    private void sendVolunteerMessage(Long chatId) {
-        String volunteerMessage = "Волонтер в пути! Ожидайте!";
-        sendMessage(chatId, volunteerMessage, null);
-        // Add logic for connecting the user with a volunteer if needed
+        if ("Default Id".equals(userName)) {
+            SendMessage sendMessage = new SendMessage(chatId, "Мы не смогли найти ваш Username в телеграме, пожалуйста, свяжитесь с волонтером самостоятельно и опишите ему вашу проблему:\n"
+                    + volunteerService.findAvailableVolunteerTelegram(chosenShelterType));
+            InlineKeyboardMarkup inlineKeyboardMarkup = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
+            sendMessage.replyMarkup(inlineKeyboardMarkup);
+            SendResponse sendResponse = animalShelterBot.execute(sendMessage);
+            logger.info("Message sent status: {}", sendResponse.isOk());
+        } else {
+            SendMessage sendMessage = new SendMessage(chatId,"Волонтер в пути! Ожидайте!" );
+            InlineKeyboardMarkup inlineKeyboardMarkup = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
+            sendMessage.replyMarkup(inlineKeyboardMarkup);
+            SendResponse response = animalShelterBot.execute(sendMessage);
+            logger.info("Message sent status: {}", response.isOk());
+
+            Collection<Volunteer> volunteers = volunteerService.findVolunteersByShelterType(chosenShelterType);
+
+            for (Volunteer volunteer : volunteers) {
+                String volunteerMessage = "Пользователь с id @" + userName + " нуждается в помощи. Свяжитесь с ним через Telegram.";
+                sendMessageToVolunteer(volunteer.getChatId(), volunteerMessage);
+            }
+        }
+    }
+
+    private String getUserNameByChatId(Long chatId) {
+        GetChatMember getChatMember = new GetChatMember(chatId.toString(), chatId.intValue());
+
+        GetChatMemberResponse response = animalShelterBot.execute(getChatMember);
+        if (response.isOk()) {
+            ChatMember chatMember = response.chatMember();
+            if (chatMember.user() != null && chatMember.user().username() != null) {
+                return chatMember.user().username();
+            }
+        }
+
+        return "Default Id";
+    }
+
+    private void sendMessageToVolunteer(Long volunteerChatId, String message) {
+        SendMessage request = new SendMessage(volunteerChatId.toString(), message);
+        animalShelterBot.execute(request);
     }
 
     private void sendMainMenuMessage(Long chatId) {
@@ -440,5 +528,16 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         response.replyMarkup(menuKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(response);
         logger.info("Message sent status: {}", sendResponse.isOk());
+    }
+    private void getChatId(Long chatId) {
+        SendMessage request = new SendMessage(chatId.toString(), "Ваш ChatId: " + chatId);
+        animalShelterBot.execute(request);
+    }
+
+    private ShelterType getShelterTypeByUserChatId(Long chatId) {
+        if (chooseShelterType.containsKey(chatId)) {
+            return chooseShelterType.get(chatId);
+        }
+        throw new UserChatIdNotFoundException(String.format("Telegram user chatId = %d not found", chatId));
     }
 }

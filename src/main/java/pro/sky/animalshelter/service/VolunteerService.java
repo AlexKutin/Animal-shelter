@@ -4,8 +4,11 @@ import pro.sky.animalshelter.dto.VolunteerDTO;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.exception.VolunteerNotFoundException;
+import pro.sky.animalshelter.model.ShelterType;
 import pro.sky.animalshelter.model.Volunteer;
 import pro.sky.animalshelter.repository.VolunteerRepository;
+
+import java.util.Collection;
 
 @Service
 public class VolunteerService {
@@ -31,4 +34,19 @@ public class VolunteerService {
         volunteer.setActive(isActive);
         return VolunteerDTO.fromVolunteer(volunteerRepository.save(volunteer));
     }
+    public Collection<Volunteer> findVolunteersByShelterType(ShelterType shelterType) {
+        return volunteerRepository.findVolunteersByShelter_ShelterType(shelterType);
+    }
+    public String findAvailableVolunteerTelegram(ShelterType shelterType) {
+        Collection<Volunteer> volunteers = volunteerRepository.findVolunteersByShelter_ShelterType(shelterType);
+
+        for (Volunteer volunteer : volunteers) {
+            if (volunteer.isActive()) {
+                return volunteer.getTelegramAddress();
+            }
+        }
+
+        return null; // Если нет доступных волонтеров
+    }
 }
+

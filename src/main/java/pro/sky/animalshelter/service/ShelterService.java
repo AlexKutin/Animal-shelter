@@ -64,7 +64,6 @@ public class ShelterService {
         Shelter shelter = findShelterByShelterType(shelterType);
         return ShelterDTO.fromShelter(shelter);
     }
-
     /**
      * Редактирует информацию о выбранном приюте. Поля id и тип приюта (shelterType) изменять нельзя.
      * @param shelterType Тип приюта
@@ -108,7 +107,7 @@ public class ShelterService {
         return VolunteerDTO.fromVolunteer(volunteer);
     }
 
-    private Shelter findShelterByShelterType(ShelterType shelterType) {
+    public Shelter findShelterByShelterType(ShelterType shelterType) {
         return shelterRepository.findSheltersByShelterType(shelterType)
                 .stream()
                 .findFirst()

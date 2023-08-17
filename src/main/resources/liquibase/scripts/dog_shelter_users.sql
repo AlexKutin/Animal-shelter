@@ -8,3 +8,12 @@ CREATE TABLE dog_shelter_users
     user_contacts          VARCHAR(100),
     shelter_id             INT NOT NULL
 );
+
+-- changeset AlexKutin:2
+ALTER TABLE dog_shelter_users ADD COLUMN first_name VARCHAR(50), ADD COLUMN last_name VARCHAR(50);
+
+-- changeset AlexKutin:3
+ALTER TABLE dog_shelter_users ADD COLUMN user_name VARCHAR(50);
+
+-- changeset AlexKutin:4
+ALTER TABLE dog_shelter_users ADD CONSTRAINT dog_shelter_users_shelter_id_fkey FOREIGN KEY (shelter_id) REFERENCES shelters(shelter_id);

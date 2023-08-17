@@ -89,3 +89,7 @@ UPDATE shelters SET driving_directions =  'src/main/resources/catshelter.png' WH
 -- changeset DrogolovaNadezhda: 9
 UPDATE shelters SET driving_directions =  null WHERE shelter_id = 1;
 UPDATE shelters SET driving_directions =  null WHERE shelter_id = 2;
+
+-- changeset BegaliMashrapov:10
+UPDATE shelters SET shelter_name = 'Happy Dog' WHERE shelter_type = 'DOG_SHELTER';
+UPDATE shelters SET shelter_name = 'Nice Cat' WHERE shelter_type = 'CAT_SHELTER';

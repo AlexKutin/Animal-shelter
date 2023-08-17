@@ -1,10 +1,11 @@
 package pro.sky.animalshelter.model;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "volunteers")
-public class Volunteer {
+public class Volunteer implements Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "volunteer_id")
@@ -21,6 +22,19 @@ public class Volunteer {
 
     @Column(name = "volunteer_active")
     private boolean isActive;
+    //Для получения идентификатора чата, волонтер должен отправить команду боту /getchatid,
+    //после это значение необходимо добавить в таблицу в соответствующюю таблицу.
+    // Отправка сообщений волонтерам о помощи реализуется на сновании идентификатора чата волонтера с ботом
+    @Column(name = "chat_id")
+    private Long chatId;
+
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
+    }
 
     @ManyToOne
     @JoinColumn(name = "shelter_id")
@@ -75,6 +89,11 @@ public class Volunteer {
     }
 
     @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    @Override
     public String toString() {
         return "Volunteer{" +
                 "id=" + id +
@@ -84,5 +103,18 @@ public class Volunteer {
                 ", isActive=" + isActive +
                 ", shelter=" + shelter.getShelterName() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Volunteer volunteer = (Volunteer) o;
+        return isActive == volunteer.isActive && Objects.equals(id, volunteer.id) && Objects.equals(name, volunteer.name) && Objects.equals(telegramAddress, volunteer.telegramAddress) && Objects.equals(phone, volunteer.phone) && Objects.equals(shelter, volunteer.shelter);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, telegramAddress, phone, isActive, shelter);
     }
 }
