@@ -60,7 +60,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         animalShelterBot.setUpdatesListener(this);
     }
 
-    private void sendMessage(Long chatId, String message, InlineKeyboardMarkup inlineKeyboardMarkupHelper) {
+    private void sendMessage(Long chatId, String message) {
         SendMessage sendMessage = new SendMessage(chatId, message);
         SendResponse sendResponse = animalShelterBot.execute(sendMessage);
         if (!sendResponse.isOk()) {
@@ -173,7 +173,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             sendCynologist(chatId);
         } else if (CallbackConstants.CANCEL_CONTACT_INPUT.equals(data)) {
             userContactMap.remove(chatId);
-            sendMessage(chatId, "Вы отменили ввод контактов.", null);
+            sendMessage(chatId, "Вы отменили ввод контактов.");
         }
     }
 
@@ -187,8 +187,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     private void sendInvalidMessage(Long chatId) {
-        InlineKeyboardMarkup keyboardMarkup = InlineKeyboardMarkupHelper.createInlineKeyboard();
-        sendMessage(chatId, "Некорректное сообщение.", keyboardMarkup);
+        sendMessage(chatId, "Некорректное сообщение.");
     }
 
     private void handleShelterInfoMessage(Long chatId, String data) {
@@ -215,7 +214,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             SendResponse sendResponse = animalShelterBot.execute(response);
             logger.info("Message sent status: {}", sendResponse.isOk());
         } else {
-            sendMessage(chatId, "\uD83D\uDEAB Ошибка в выборе приюта.", null);
+            sendMessage(chatId, "\uD83D\uDEAB Ошибка в выборе приюта.");
         }
     }
 
@@ -475,7 +474,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
 
     private void sendReportMessage(Long chatId) {
         String reportMessage = "Пожалуйста, пришлите:\n- Фото животного.\n- Рацион животного.\n- Общее самочувствие и привыкание к новому месту.\n- Изменение в поведении: отказ от старых привычек, приобретение новых.";
-        sendMessage(chatId, reportMessage, null);
+        sendMessage(chatId, reportMessage);
         // Add logic for processing the user's message and saving it to the database if needed
     }
     private void sendVolunteerMessage(Long chatId, ShelterType chosenShelterType) {
