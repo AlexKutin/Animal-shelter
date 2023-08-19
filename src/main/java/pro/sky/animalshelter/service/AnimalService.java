@@ -39,6 +39,10 @@ public class AnimalService {
         this.userCatShelterRepository = userCatShelterRepository;
     }
 
+    /**
+     * Сохраняет иформацию о питомце приюта для собак в таблицу dogs_list.
+     * @return DogDTO
+     */
     public DogDTO saveDogToDb(DogDTO dogDTO) {
         Dog dog =  Dog.fromDTO(dogDTO);
         List<Shelter> list = shelterRepository.findSheltersByShelterType(ShelterType.DOG_SHELTER);
@@ -46,7 +50,10 @@ public class AnimalService {
         dog = dogsRepository.save(dog);
         return dog.toDTO();
     }
-
+    /**
+     * Сохраняет иформацию о питомце приюта для кошек в таблицу cats_list.
+     * @return CatDTO
+     */
     public CatDTO saveCatToDb(CatDTO catDTO) {
         Cat cat = Cat.fromDTO(catDTO);
         List<Shelter> list = shelterRepository.findSheltersByShelterType(ShelterType.CAT_SHELTER);
@@ -55,20 +62,29 @@ public class AnimalService {
         return cat.toDTO();
     }
 
+    /**
+     * Сохраняет иформацию о питомце приюта для собак в таблицу dogs_list.
+     * @return DogAdopterListDTO
+     * @throws java.util.NoSuchElementException если переданы некорректные dogId или adopterId
+     */
     public DogAdopterListDTO saveDogAdopter(DogAdopterListDTO dogAdopterListDTO, Integer dogId, Integer adopterId) {
         DogAdopterList dogAdopterList = DogAdopterList.fromDTO(dogAdopterListDTO);
         dogAdopterList.setAdoptionDate(LocalDateTime.now());
-        dogAdopterList.setDogId(dogsRepository.findById(dogId).get());
-        dogAdopterList.setAdopterId(userDogShelterRepository.findById(adopterId).get());
+        dogAdopterList.setDogId(dogsRepository.findById(dogId).orElseThrow());
+        dogAdopterList.setAdopterId(userDogShelterRepository.findById(adopterId).orElseThrow());
         dogAdopterList = dogAdopterListRepository.save(dogAdopterList);
         return dogAdopterList.toDTO();
     }
-
+    /**
+     * Сохраняет иформацию о питомце приюта для кошек в таблицу cats_list.
+     * @return CatAdopterListDTO
+     * @throws java.util.NoSuchElementException если переданы некорректные catId или adopterId
+     */
     public CatAdopterListDTO saveCatAdopter(CatAdopterListDTO catAdopterListDTO, Integer catId, Integer adopterId) {
         CatAdopterList catAdopterList = CatAdopterList.fromDTO(catAdopterListDTO);
         catAdopterList.setAdoptionDate(LocalDateTime.now());
-        catAdopterList.setCatId(catsRepository.findById(catId).get());
-        catAdopterList.setAdopterId(userCatShelterRepository.findById(adopterId).get());
+        catAdopterList.setCatId(catsRepository.findById(catId).orElseThrow());
+        catAdopterList.setAdopterId(userCatShelterRepository.findById(adopterId).orElseThrow());
         catAdopterList = catAdopterListRepository.save(catAdopterList);
         return catAdopterList.toDTO();
     }

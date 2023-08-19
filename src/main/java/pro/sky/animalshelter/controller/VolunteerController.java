@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +20,7 @@ import pro.sky.animalshelter.service.AnimalService;
 import pro.sky.animalshelter.service.UserShelterService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Tag(name = "Раздел для волонтеров", description = "Управление функционалом для волонтеров")
 @RestController()
@@ -90,8 +90,13 @@ public class VolunteerController {
     )
     @PostMapping("/save_dog_adopter")
     public ResponseEntity<DogAdopterListDTO> saveDogAdopter(@RequestBody DogAdopterListDTO dogAdopterListDTO, @RequestParam Integer dogId, @RequestParam Integer adopterId) {
-        DogAdopterListDTO savedDogAdopter = animalService.saveDogAdopter(dogAdopterListDTO, dogId, adopterId);
-        return ResponseEntity.ok(savedDogAdopter);
+        try {
+            DogAdopterListDTO savedDogAdopter = animalService.saveDogAdopter(dogAdopterListDTO, dogId, adopterId);
+            return ResponseEntity.ok(savedDogAdopter);
+        } catch (NoSuchElementException e) {
+            logger.error("Указан неверный id питомца и/или усыновителя");
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @Operation(
@@ -99,7 +104,12 @@ public class VolunteerController {
     )
     @PostMapping("/save_cat_adopter")
     public ResponseEntity<CatAdopterListDTO> saveCatAdopter(@RequestBody CatAdopterListDTO catAdopterListDTO, @RequestParam Integer catId, @RequestParam Integer adopterId) {
-        CatAdopterListDTO savedCatAdopter = animalService.saveCatAdopter(catAdopterListDTO, catId, adopterId);
-        return ResponseEntity.ok(savedCatAdopter);
+        try {
+            CatAdopterListDTO savedCatAdopter = animalService.saveCatAdopter(catAdopterListDTO, catId, adopterId);
+            return ResponseEntity.ok(savedCatAdopter);
+        } catch (NoSuchElementException e) {
+            logger.error("Указан неверный id питомца и/или усыновителя");
+            return ResponseEntity.notFound().build();
+        }
     }
 }

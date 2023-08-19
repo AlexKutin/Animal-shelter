@@ -1,7 +1,6 @@
 package pro.sky.animalshelter.model;
 
 import pro.sky.animalshelter.dto.DogAdopterListDTO;
-import pro.sky.animalshelter.dto.DogDTO;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,10 +14,10 @@ public class DogAdopterList {
     private Integer adoptionId;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "adopter_id")
-    private UserDogShelter adopterId;
+    private UserDogShelter adopter;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dog_id")
-    private Dog dogId;
+    private Dog dog;
     @Column(name = "adoption_date")
     private LocalDateTime adoptionDate;
 
@@ -27,8 +26,8 @@ public class DogAdopterList {
 
     public DogAdopterList(Integer adoptionId, UserDogShelter adopterId, Dog dogId, LocalDateTime adoptionDate) {
         this.adoptionId = adoptionId;
-        this.adopterId = adopterId;
-        this.dogId = dogId;
+        this.adopter = adopterId;
+        this.dog = dogId;
         this.adoptionDate = adoptionDate;
     }
 
@@ -41,19 +40,19 @@ public class DogAdopterList {
     }
 
     public UserDogShelter getAdopterId() {
-        return adopterId;
+        return adopter;
     }
 
     public void setAdopterId(UserDogShelter adopterId) {
-        this.adopterId = adopterId;
+        this.adopter = adopterId;
     }
 
     public Dog getDogId() {
-        return dogId;
+        return dog;
     }
 
     public void setDogId(Dog dogId) {
-        this.dogId = dogId;
+        this.dog = dogId;
     }
 
     public LocalDateTime getAdoptionDate() {

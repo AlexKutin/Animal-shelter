@@ -15,17 +15,17 @@ public class CatAdopterList {
     private Integer adoptionId;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "adopter_id")
-    private UserCatShelter adopterId;
+    private UserCatShelter adopter;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cat_id")
-    private Cat catId;
+    private Cat cat;
     @Column(name = "adoption_date")
     private LocalDateTime adoptionDate;
 
     public CatAdopterList(Integer adoptionId, UserCatShelter adopterId, Cat catId, LocalDateTime adoptionDate) {
         this.adoptionId = adoptionId;
-        this.adopterId = adopterId;
-        this.catId = catId;
+        this.adopter = adopterId;
+        this.cat = catId;
         this.adoptionDate = adoptionDate;
     }
 
@@ -41,19 +41,19 @@ public class CatAdopterList {
     }
 
     public UserCatShelter getAdopterId() {
-        return adopterId;
+        return adopter;
     }
 
     public void setAdopterId(UserCatShelter adopterId) {
-        this.adopterId = adopterId;
+        this.adopter = adopterId;
     }
 
     public Cat getCatId() {
-        return catId;
+        return cat;
     }
 
     public void setCatId(Cat catId) {
-        this.catId = catId;
+        this.cat = catId;
     }
 
     public LocalDateTime getAdoptionDate() {

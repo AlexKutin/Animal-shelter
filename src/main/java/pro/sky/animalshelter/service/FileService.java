@@ -30,8 +30,8 @@ public class FileService {
      * <p>
      * Путь сохраняется в строку соответствующую переданному id.
      */
-    public void saveDirectoryToRepository(Integer id, String shelterName) {
-        Shelter shelter = shelterRepository.findById(id).get();
+    public void saveDirectoryToRepository(ShelterType shelterType, String shelterName) {
+        Shelter shelter = shelterRepository.findSheltersByShelterType(shelterType).get(0);
         shelter.setDrivingDirection(dataFilePath + "/" + shelterName + dataFileName);
         shelterRepository.save(shelter);
     }

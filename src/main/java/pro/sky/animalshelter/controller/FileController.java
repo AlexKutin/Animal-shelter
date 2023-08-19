@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import pro.sky.animalshelter.model.ShelterType;
 import pro.sky.animalshelter.service.FileService;
 
 import java.io.*;
@@ -28,16 +29,17 @@ public class FileController {
             description = "Схема проезда сохраняется в виде изображения формата png, в базу данных сохраняется путь до изображения"
     )
     @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> uploadDataFileDogShelter(@RequestParam MultipartFile file,@RequestParam Integer id,@RequestParam String shelterName) {
+    public ResponseEntity<Void> uploadDataFileDogShelter(@RequestParam MultipartFile file, @RequestParam ShelterType shelterType, @RequestParam String shelterName) {
         File dataFile = fileService.getDataFile(shelterName);
         try (FileOutputStream fos = new FileOutputStream(dataFile)) {
             IOUtils.copy(file.getInputStream(), fos);
-            fileService.saveDirectoryToRepository(id, shelterName);
+            fileService.saveDirectoryToRepository(shelterType, shelterName);
             return ResponseEntity.ok().build();
         } catch (IOException e) {
-            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 
     @Operation(
@@ -52,7 +54,7 @@ public class FileController {
             return ResponseEntity.ok()
                     .contentType(MediaType.IMAGE_PNG)
                     .contentLength(file.length())
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename =\"DogShelter.pnj\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename =\"Shelter.pnj\"")
                     .body(resource);
         } else {
             return ResponseEntity.noContent().build();
