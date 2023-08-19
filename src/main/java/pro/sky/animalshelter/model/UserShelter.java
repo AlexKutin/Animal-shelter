@@ -1,9 +1,12 @@
 package pro.sky.animalshelter.model;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.persistence.*;
+import java.util.Objects;
 
 @MappedSuperclass
-public abstract class UserShelter {
+public abstract class UserShelter implements Comparable<UserShelter> {
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -105,11 +108,29 @@ public abstract class UserShelter {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserShelter that = (UserShelter) o;
+        return Objects.equals(userId, that.userId) && Objects.equals(telegramId, that.telegramId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, telegramId);
+    }
+
     public void fillUserInfo(String userName, String firstName, String lastName, String userContacts, Shelter shelter) {
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.userContacts = userContacts;
         this.shelter = shelter;
+    }
+
+    @Override
+    public int compareTo(@NotNull UserShelter o) {
+        return Integer.compare(this.getUserId(), o.getUserId());
     }
 }

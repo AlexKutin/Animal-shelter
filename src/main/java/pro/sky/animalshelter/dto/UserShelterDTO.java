@@ -8,6 +8,10 @@ import pro.sky.animalshelter.model.UserShelter;
 @Schema(description = "Зрегистрированный пользователь приюта")
 public class UserShelterDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(description = "Id пользователя")
+    private Integer userId;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(description = "Telegram Id пользователя")
     private Long telegramId;
 
@@ -25,6 +29,14 @@ public class UserShelterDTO {
 
     @Schema(description = "Контакты пользователя")
     private String userContacts;
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
 
     public Long getTelegramId() {
         return telegramId;
@@ -77,7 +89,8 @@ public class UserShelterDTO {
     @Override
     public String toString() {
         return "UserShelterDTO{" +
-                "telegramId=" + telegramId +
+                "userId=" + userId +
+                ", telegramId=" + telegramId +
                 ", userName='" + userName + '\'' +
                 ", shelterType=" + shelterType +
                 ", firstName='" + firstName + '\'' +
@@ -88,6 +101,7 @@ public class UserShelterDTO {
 
     public static UserShelterDTO fromUserShelter(UserShelter userShelter) {
         UserShelterDTO userShelterDTO = new UserShelterDTO();
+        userShelterDTO.setUserId(userShelter.getUserId());
         userShelterDTO.setTelegramId(userShelter.getTelegramId());
         userShelterDTO.setUserName(userShelter.getUserName());
         userShelterDTO.setShelterType(userShelter.getShelter().getShelterType());

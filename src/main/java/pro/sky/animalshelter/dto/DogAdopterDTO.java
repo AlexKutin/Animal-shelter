@@ -1,18 +1,16 @@
 package pro.sky.animalshelter.dto;
-import pro.sky.animalshelter.model.Dog;
-import pro.sky.animalshelter.model.UserDogShelter;
 import java.time.LocalDateTime;
 
-public class DogAdopterListDTO {
+public class DogAdopterDTO {
     private Integer adoptionId;
     private LocalDateTime adoptionDate;
 
-    public DogAdopterListDTO(Integer adoptionId, LocalDateTime adoptionDate) {
+    public DogAdopterDTO(Integer adoptionId, LocalDateTime adoptionDate) {
         this.adoptionId = adoptionId;
         this.adoptionDate = adoptionDate;
     }
 
-    public DogAdopterListDTO() {
+    public DogAdopterDTO() {
     }
 
     public Integer getAdoptionId() {

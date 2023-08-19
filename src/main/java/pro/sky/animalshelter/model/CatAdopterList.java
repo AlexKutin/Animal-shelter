@@ -1,7 +1,6 @@
 package pro.sky.animalshelter.model;
 
 import pro.sky.animalshelter.dto.CatAdopterListDTO;
-import pro.sky.animalshelter.dto.DogAdopterListDTO;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

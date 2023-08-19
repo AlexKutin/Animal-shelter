@@ -11,11 +11,11 @@ public class Dog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "dog_id")
     private Integer dogId;
-    @Column(name = "dogName")
+    @Column(name = "dog_name")
     private String dogName;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shelter_id")
-    private Shelter shelterId;
+    private Shelter shelter;
     @Column(name = "age")
     private Integer age;
     @Column(name = "gender")
@@ -23,10 +23,10 @@ public class Dog {
     @Column(name = "breed")
     private String breed;
 
-    public Dog(Integer dogId, String dogName, Shelter shelterId, Integer age, String gender, String breed) {
+    public Dog(Integer dogId, String dogName, Shelter shelter, Integer age, String gender, String breed) {
         this.dogId = dogId;
         this.dogName = dogName;
-        this.shelterId = shelterId;
+        this.shelter = shelter;
         this.age = age;
         this.gender = gender;
         this.breed = breed;
@@ -51,12 +51,12 @@ public class Dog {
         this.dogName = dogName;
     }
 
-    public Shelter getShelterId() {
-        return shelterId;
+    public Shelter getShelter() {
+        return shelter;
     }
 
-    public void setShelterId(Shelter shelterId) {
-        this.shelterId = shelterId;
+    public void setShelter(Shelter shelterId) {
+        this.shelter = shelterId;
     }
 
     public Integer getAge() {

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.dto.UserShelterDTO;
 import pro.sky.animalshelter.exception.ShelterNotFoundException;
+import pro.sky.animalshelter.exception.UserNotFoundException;
 import pro.sky.animalshelter.model.*;
 import pro.sky.animalshelter.repository.UserCatShelterRepository;
 import pro.sky.animalshelter.repository.UserDogShelterRepository;
@@ -69,5 +70,15 @@ public class UserShelterService {
         }
         logger.error("Shelter type {} not supported. The list users can not be created", shelterType);
         throw new ShelterNotFoundException(String.format("Shelter type: %s not supported yet", shelterType));
+    }
+
+    public UserCatShelter findUserCatShelterById(Integer userId) {
+        return userCatShelterRepository.findById(userId)
+                .orElseThrow (() -> new UserNotFoundException(String.format("userId = %d not found in Cat users database", userId)));
+    }
+
+    public UserDogShelter findUserDogShelterById(Integer userId) {
+        return userDogShelterRepository.findById(userId)
+                .orElseThrow (() -> new UserNotFoundException(String.format("userId = %d not found in Dog users database", userId)));
     }
 }
