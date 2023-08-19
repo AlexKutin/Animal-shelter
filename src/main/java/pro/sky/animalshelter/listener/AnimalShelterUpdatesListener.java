@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
+import pro.sky.animalshelter.Constants.CallbackConstants;
 import pro.sky.animalshelter.dto.RulesDTO;
 import pro.sky.animalshelter.dto.ShelterDTO;
 import pro.sky.animalshelter.exception.UserChatIdNotFoundException;
@@ -113,64 +114,64 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         Long chatId = callbackQuery.message().chat().id();
         String data = callbackQuery.data();
 
-        if ("Приют кошек\uD83D\uDC31".equals(data) || "Приют собак\uD83D\uDC36".equals(data)) {
+        if (CallbackConstants.SHELTER_CAT.equals(data) || CallbackConstants.SHELTER_DOG.equals(data)) {
             handleShelterInfoMessage(chatId, data);
-        } else if ("Info".equals(data)) {
+        } else if (CallbackConstants.INFO.equals(data)) {
             sendShelterInfoOptions(chatId);
-        } else if ("ShelterInfoAbout".equals(data)) {
+        } else if (CallbackConstants.SHELTER_INFO_ABOUT.equals(data)) {
             sendShelterInfoAbout(chatId);
-        } else if ("ShelterInfoAddress".equals(data)) {
+        } else if (CallbackConstants.SHELTER_INFO_ADDRESS.equals(data)) {
             sendShelterInfoAddress(chatId);
-        } else if ("ShelterContacts".equals(data)) {
+        } else if (CallbackConstants.SHELTER_INFO_CONTACTS.equals(data)) {
             sendShelterContacts(chatId);
-        } else if ("ShelterInfoSecurityContacts".equals(data)) {
+        } else if (CallbackConstants.SHELTER_INFO_SECURITY_CONTACTS.equals(data)) {
             sendShelterSecurityContacts(chatId);
-        } else if ("ShelterInfoSafetyTips".equals(data)) {
+        } else if (CallbackConstants.SHELTER_INFO_SAFETY_TIPS.equals(data)) {
             sendShelterSafetyTips(chatId);
-        } else if ("ShelterInfoLeaveContacts".equals(data)) {
+        } else if (CallbackConstants.SHELTER_INFO_LEAVE_CONTACTS.equals(data)) {
             sendShelterLeaveContacts(chatId);
-        } else if ("AdoptionRules".equals(data)) {
+        } else if (CallbackConstants.ADOPTIONS_RULES.equals(data)) {
             sendAdoptionRules(chatId);
-        } else if ("AdoptionRulesIntroduction".equals(data)) {
+        } else if (CallbackConstants.ADOPTIONS_RULES_INTRODUCTION.equals(data)) {
             sendAdoptionRulesIntroduction(chatId);
-        } else if ("AdoptionRulesDocuments".equals(data)) {
+        } else if (CallbackConstants.ADOPTIONS_RULES_DOCUMENTS.equals(data)) {
             sendListDocForTakePet(chatId);
-        } else if ("AdoptionRulesTransport".equals(data)) {
+        } else if (CallbackConstants.ADOPTIONS_RULES_TRANSPORT.equals(data)) {
             sendRulesTransport(chatId);
-        } else if ("AdoptionRulesHouseSetup".equals(data)) {
+        } else if (CallbackConstants.ADOPTIONS_RULES_HOUSE_SETUP.equals(data)) {
             sendRulesHouseSetup(chatId);
-        } else if ("AdoptionRulesHouseSetupPuppyKitten".equals(data)) {
+        } else if (CallbackConstants.ADOPTIONS_RULES_HOUSE_SETUP_PUPPY_KITTEN.equals(data)) {
             sendRulesHouseSetupForChild(chatId);
-        } else if ("AdoptionRulesHouseSetupAdult".equals(data)) {
+        } else if (CallbackConstants.ADOPTIONS_RULES_HOUSE_SETUP_ADULT.equals(data)) {
             sendRulesHouseSetupForAdult(chatId);
-        } else if ("AdoptionRulesHouseSetupSpecialNeeds".equals(data)) {
+        } else if (CallbackConstants.ADOPTIONS_RULES_HOUSE_SETUP_SPECIAL_NEEDS.equals(data)) {
             sendRulesHouseSetupForSpecial(chatId);
-        } else if ("BackToPetHouseSelection".equals(data)) {
+        } else if (CallbackConstants.BACK_TO_HOUSE_SELECTION.equals(data)) {
             sendRulesHouseSetup(chatId);
-        } else if ("AdoptionRulesRejectionReasons".equals(data)) {
+        } else if (CallbackConstants.ADOPTION_RULES_REJECTION_REASONS.equals(data)) {
             sendReasonsRefusal(chatId);
-        } else if ("Cynologist".equals(data)) {
+        } else if (CallbackConstants.CYNOLOGIST.equals(data)) {
             sendCynologist(chatId);
-        } else if ("AdviceFromCynologist".equals(data)) {
+        } else if (CallbackConstants.ADVICE_FROM_CYNOLOGIST.equals(data)) {
             sendAdviceFromCynologist(chatId);
-        } else if ("ListCynologist".equals(data)) {
+        } else if (CallbackConstants.LIST_CYNOLOGIST.equals(data)) {
             sendListCynologist(chatId);
-        } else if ("SendReport".equals(data)) {
+        } else if (CallbackConstants.SEND_REPORT.equals(data)) {
             sendReportMessage(chatId);
-        } else if ("CallVolunteer".equals(data)) {
+        } else if (CallbackConstants.CALL_VOLUNTEER.equals(data)) {
             ShelterType chosenShelterType = chooseShelterType.get(chatId);
             sendVolunteerMessage(chatId, chosenShelterType);
-        } else if ("BackShelterMenu".equals(data)) {
+        } else if (CallbackConstants.BACK_SHELTER_MENU.equals(data)) {
             sendMainMenuMessage(chatId);
-        } else if ("BackMainMenu".equals(data)) {
+        } else if (CallbackConstants.BACK_MAIN_MENU.equals(data)) {
             backMainMenu(chatId);
-        } else if ("BackShelterInfo".equals(data)) {
+        } else if (CallbackConstants.BACK_SHELTER_INFO.equals(data)) {
             sendShelterInfoOptions(chatId);
-        } else if ("BackAdoptionRules".equals(data)) {
+        } else if (CallbackConstants.BACK_ADOPTION_RULES.equals(data)) {
             sendAdoptionRules(chatId);
-        } else if ("BackToCynologist".equals(data)) {
+        } else if (CallbackConstants.BACK_TO_CYNOLOGIST.equals(data)) {
             sendCynologist(chatId);
-        } else if ("CancelContactInput".equals(data)) {
+        } else if (CallbackConstants.CANCEL_CONTACT_INPUT.equals(data)) {
             userContactMap.remove(chatId);
             sendMessage(chatId, "Вы отменили ввод контактов.", null);
         }
