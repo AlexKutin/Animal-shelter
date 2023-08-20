@@ -17,3 +17,6 @@ ALTER TABLE dog_adopter_list ADD COLUMN adopter_status VARCHAR(25),
 ALTER TABLE dog_adopter_list RENAME COLUMN adopter_id TO user_id;
 
 ALTER TABLE dog_adopter_list RENAME COLUMN adoption_id TO adopter_id;
+
+-- changeset AlexKutin:4
+ALTER TABLE dog_adopter_list RENAME TO dog_adopters

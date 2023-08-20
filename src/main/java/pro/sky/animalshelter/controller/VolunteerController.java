@@ -164,7 +164,8 @@ public class VolunteerController {
     )
     @GetMapping("/get_dog_adopters")
     public ResponseEntity<List<AnimalAdopterDTO>> getDogAdopters(
-            @RequestParam @Parameter(description = "Статус усыновителя") AdopterStatus adopterStatus) {
+            @RequestParam(required = false)
+            @Parameter(description = "Статус усыновителя") AdopterStatus adopterStatus) {
         List<AnimalAdopterDTO> dogAdopters = animalService.getDogAdopters(adopterStatus);
         return ResponseEntity.ok(dogAdopters);
     }
@@ -174,8 +175,30 @@ public class VolunteerController {
             tags = {"Приют кошек - Усыновители"}
     )
     @PostMapping("/save_cat_adopter")
-    public ResponseEntity<CatAdopterListDTO> saveCatAdopter(@RequestBody CatAdopterListDTO catAdopterListDTO, @RequestParam Integer catId, @RequestParam Integer adopterId) {
-        CatAdopterListDTO savedCatAdopter = animalService.saveCatAdopter(catAdopterListDTO, catId, adopterId);
+    public ResponseEntity<AnimalAdopterDTO> saveCatAdopter(@RequestBody AnimalAdopterDTO animalAdopterDTO/*, @RequestParam Integer catId, @RequestParam Integer adopterId*/) {
+        AnimalAdopterDTO savedCatAdopter = animalService.saveCatAdopter(animalAdopterDTO/*, catId, adopterId*/);
         return ResponseEntity.ok(savedCatAdopter);
+    }
+
+    @Operation(
+            summary = "Получение списка всех усыновителей приюта для кошек",
+            description = "Получение списка всех усыновителей приюта для кошек в соответствии со статусом",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Список всех усыновителей",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    array = @ArraySchema(
+                                            schema = @Schema(implementation = AnimalAdopterDTO.class)
+                                    )
+                            )
+                    )
+            },
+            tags = {"Приют кошек - Усыновители"}
+    )
+    @GetMapping("/get_cat_adopters")
+    public ResponseEntity<List<AnimalAdopterDTO>> getCatAdopters(
+            @RequestParam @Parameter(description = "Статус усыновителя") AdopterStatus adopterStatus) {
+        List<AnimalAdopterDTO> catAdopters = animalService.getCatAdopters(adopterStatus);
+        return ResponseEntity.ok(catAdopters);
     }
 }
