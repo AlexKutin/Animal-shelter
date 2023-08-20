@@ -3,6 +3,7 @@ package pro.sky.animalshelter.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import pro.sky.animalshelter.model.Report;
+import pro.sky.animalshelter.model.UserShelter;
 
 import java.sql.Timestamp;
 
@@ -12,6 +13,8 @@ public class ReportDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(name = "идентификатор отчета")
     private Integer idReport;
+    @Schema(name = "автор отчета")
+    private Integer userShelter;
     @Schema(name = "содержание отчета")
     private String description;
     @Schema(name = "Фото отчета")
@@ -25,6 +28,14 @@ public class ReportDTO {
 
     public void setIdReport(Integer idReport) {
         this.idReport = idReport;
+    }
+
+    public Integer getUserShelter() {
+        return userShelter;
+    }
+
+    public void setUserShelter(Integer userShelter) {
+        this.userShelter = userShelter;
     }
 
     public String getDescription() {
@@ -54,6 +65,7 @@ public class ReportDTO {
     public static ReportDTO fromReport(Report report) {
         ReportDTO reportDTO = new ReportDTO();
         reportDTO.setIdReport(report.getIdReport());
+        reportDTO.setUserShelter(report.getUserShelter());
         reportDTO.setDescription(report.getDescription());
         reportDTO.setPhoto(report.getPhoto());
         reportDTO.setDateTimeReport(report.getDateTimeReport());
@@ -62,8 +74,9 @@ public class ReportDTO {
     }
 
     public Report toReport() {
-        Report report = new Report();
+        Report report = new Report(userShelter, description, photo, dateTimeReport);
         report.setIdReport(this.getIdReport());
+        report.setUserShelter(this.getUserShelter());
         report.setDescription(this.getDescription());
         report.setPhoto(this.getPhoto());
         report.setDateTimeReport(this.getDateTimeReport());

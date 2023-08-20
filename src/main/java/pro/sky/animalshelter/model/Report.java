@@ -10,10 +10,20 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_report")
     private Integer idReport;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
+    private Integer userShelter;
     private String description;
     private String photo;
     @Column(name = "date_report")
     private Timestamp dateTimeReport;
+
+    public Report(Integer userShelter, String description, String photo, Timestamp dateTimeReport) {
+        this.userShelter = userShelter;
+        this.description = description;
+        this.photo = photo;
+        this.dateTimeReport = dateTimeReport;
+    }
 
     public Integer getIdReport() {
         return idReport;
@@ -21,6 +31,14 @@ public class Report {
 
     public void setIdReport(Integer idReport) {
         this.idReport = idReport;
+    }
+
+    public Integer getUserShelter() {
+        return userShelter;
+    }
+
+    public void setUserShelter(Integer userShelter) {
+        this.userShelter = userShelter;
     }
 
     public String getDescription() {
@@ -51,9 +69,10 @@ public class Report {
     public String toString() {
         return "Report{" +
                 "idReport=" + idReport +
+                ", userShelter=" + userShelter +
                 ", description='" + description + '\'' +
                 ", photo='" + photo + '\'' +
-                ", dateReport=" + dateTimeReport +
+                ", dateTimeReport=" + dateTimeReport +
                 '}';
     }
 
