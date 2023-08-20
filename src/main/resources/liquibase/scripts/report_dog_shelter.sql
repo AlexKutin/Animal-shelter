@@ -12,10 +12,6 @@ CREATE TABLE report_dog_shelter
 
 ALTER TABLE report_dog_shelter ADD CONSTRAINT report_dog_shelter_user_id_fkey FOREIGN KEY (user_id) REFERENCES dog_shelter_users(user_id);
 
--- changeset InnaSerebriakova:2
-alter table report_dog_shelter
-    alter column date_report type timestamp using date_report::timestamp;
-
 -- changeset AlexKutin:2
 ALTER TABLE report_dog_shelter DROP CONSTRAINT IF EXISTS report_dog_shelter_user_id_fkey;
 

@@ -52,63 +52,26 @@ public class ReportService {
         logger.error("Shelter type {} not supported. The list users can not be created", shelterType);
         throw new ShelterNotFoundException(String.format("Shelter type: %s not supported yet", shelterType));
     }
-}
-import org.jvnet.hk2.annotations.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import pro.sky.animalshelter.dto.ReportDTO;
-import pro.sky.animalshelter.dto.UserShelterDTO;
-import pro.sky.animalshelter.model.*;
-import pro.sky.animalshelter.repository.ReportCatShelterRepository;
-import pro.sky.animalshelter.repository.ReportDogShelterRepository;
-import pro.sky.animalshelter.repository.UserCatShelterRepository;
-import pro.sky.animalshelter.repository.UsersRepository;
 
-import java.sql.Timestamp;
+    //    public void saveReport(ReportDTO reportDTO, Integer userShelter, String description, String photo, Timestamp dateTimeReport) throws IllegalArgumentException {
+    public ReportAnimalDTO saveReport(ReportAnimalDTO reportAnimalDTO) {
+        ShelterType shelterType = reportAnimalDTO.getShelterType();
+        if (shelterType == ShelterType.DOG_SHELTER) {
+            ReportDogShelter reportDogShelter = ReportDogShelter.fromDTO(reportAnimalDTO);
+            DogAdopter dogAdopter = adopterService.findDogAdopterById(reportAnimalDTO.getAdopterId());
+            reportDogShelter.setDogAdopter(dogAdopter);
 
-@Service
-public class ReportService {
-    private final Logger logger = LoggerFactory.getLogger(ReportService.class);
+            reportDogShelter = reportDogShelterRepository.save(reportDogShelter);
+            return reportDogShelter.toDTO();
+        } else if (shelterType == ShelterType.CAT_SHELTER) {
+            ReportCatShelter reportCatShelter = ReportCatShelter.fromDTO(reportAnimalDTO);
+            reportCatShelter.setCatAdopter(adopterService.findCatAdopterById(reportAnimalDTO.getAdopterId()));
 
-    private final UserCatShelter userCatShelter;
-    private final UsersRepository usersRepository;
-    private final Report report;
-    private final UserShelterService userShelterService;
-    private final UserShelterDTO userShelterDTO;
-    private final ReportCatShelterRepository reportCatShelterRepository;
-    private final ReportDogShelterRepository reportDogShelterRepository;
-
-
-    @Autowired
-
-    public ReportService(UserCatShelter userCatShelter, UserCatShelterRepository userCatShelterRepository, UsersRepository usersRepository, Report report, UserShelterService userShelterService, UserShelterDTO userShelterDTO, ReportCatShelterRepository reportCatShelterRepository, ReportDogShelterRepository reportDogShelterRepository) {
-        this.userCatShelter = userCatShelter;
-        this.usersRepository = usersRepository;
-        this.report = report;
-        this.userShelterService = userShelterService;
-        this.userShelterDTO = userShelterDTO;
-        this.reportCatShelterRepository = reportCatShelterRepository;
-        this.reportDogShelterRepository = reportDogShelterRepository;
-    }
-
-
-    public void saveReport(ReportDTO reportDTO, Integer userShelter, String description, String photo, Timestamp dateTimeReport) throws IllegalArgumentException {
-        UserShelterDTO userShelterDTO = UserShelterDTO.fromUserShelter(reportDTO.getUserShelter());
-        try {
-            if (userShelterDTO == null) {
-                System.out.println("Этого пользователя нет в базе усыновителей");
-
-            } else if (userShelterDTO.getShelterType() == ShelterType.DOG_SHELTER) {
-                ReportDogShelter reportDogShelter = new ReportDogShelter(userShelter, description, photo, dateTimeReport);
-                reportDogShelterRepository.save(reportDogShelter);
-            } else if (userShelterDTO.getShelterType() == ShelterType.CAT_SHELTER) {
-                ReportCatShelter reportCatShelter = new ReportCatShelter(userShelter, description, photo, dateTimeReport);
-                reportCatShelterRepository.save(reportCatShelter);
-            }
-        } catch (IllegalArgumentException e) {
-            System.out.println("Не корректное значение");
+            reportCatShelter = reportCatShelterRepository.save(reportCatShelter);
+            return reportCatShelter.toDTO();
         }
+        logger.error("Shelter type {} not supported. The list users can not be created", shelterType);
+        throw new ShelterNotFoundException(String.format("Shelter type: %s not supported yet", shelterType));
     }
 }
 

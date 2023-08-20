@@ -18,9 +18,21 @@ public abstract class ReportAnimal {
 
     @Column(name = "date_report", nullable = false)
     private LocalDate dateReport;
+//    private Timestamp dateTimeReport;
+
     @Column(name = "report_status")
     @Enumerated(EnumType.STRING)
     private ReportStatus reportStatus;
+
+    public ReportAnimal() {
+    }
+
+//    public ReportAnimal(Integer userShelter, String description, String photo, Timestamp dateTimeReport) {
+//        this.userShelter = userShelter;
+//        this.description = description;
+//        this.photo = photo;
+//        this.dateTimeReport = dateTimeReport;
+//    }
 
     public abstract Adopter getAdopter();
 
@@ -47,6 +59,14 @@ public abstract class ReportAnimal {
     public void setPhoto(String photo) {
         this.photo = photo;
     }
+
+//    public Timestamp getDateTimeReport() {
+//        return dateTimeReport;
+//    }
+//
+//    public void setDateTimeReport(Timestamp dateTimeReport) {
+//        this.dateTimeReport = dateTimeReport;
+//    }
 
     public LocalDate getDateReport() {
         return dateReport;
@@ -75,4 +95,6 @@ public abstract class ReportAnimal {
 
         return reportAnimalDTO;
     }
+
+
 }

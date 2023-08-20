@@ -17,6 +17,9 @@ public class ReportAnimalDTO {
     @Schema(description = "Идентификатор отчета")
     private Integer idReport;
 
+    @Schema(description = "chatId усыновителя (информация от/для бота)")
+    private Long chatId;
+
     @Schema(description = "Идентификатор усыновителя")
     private Integer adopterId;
 
@@ -46,6 +49,14 @@ public class ReportAnimalDTO {
 
     public void setIdReport(Integer idReport) {
         this.idReport = idReport;
+    }
+
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
     }
 
     public Integer getAdopterId() {
@@ -93,6 +104,7 @@ public class ReportAnimalDTO {
         return "ReportAnimalDTO{" +
                 "shelterType=" + shelterType +
                 ", idReport=" + idReport +
+                ", chatId=" + chatId +
                 ", adopterId=" + adopterId +
                 ", description='" + description + '\'' +
                 ", photo='" + photo + '\'' +

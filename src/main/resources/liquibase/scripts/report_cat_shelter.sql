@@ -23,7 +23,3 @@ ALTER TABLE report_cat_shelter ADD CONSTRAINT report_cat_shelter_adopter_id_fkey
 
 -- changeset AlexKutin:3
 ALTER TABLE report_cat_shelter ADD COLUMN report_status VARCHAR(25);
--- changeset InnaSerebriakova:2
-alter table report_cat_shelter
-    alter column date_report type timestamp using date_report::timestamp;
-

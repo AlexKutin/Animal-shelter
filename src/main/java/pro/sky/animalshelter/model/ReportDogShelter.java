@@ -3,11 +3,9 @@ package pro.sky.animalshelter.model;
 import pro.sky.animalshelter.dto.ReportAnimalDTO;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 
 @Entity
 @Table(name = "report_dog_shelter")
-public class ReportDogShelter extends Report{
 public class ReportDogShelter extends ReportAnimal {
 //    @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,8 +31,10 @@ public class ReportDogShelter extends ReportAnimal {
 //        this.idReport = idReport;
 //    }
 
-    public ReportDogShelter(Integer idReport, Integer userShelter, String description, String photo, Timestamp dateTimeReport) {
-        super(idReport, userShelter, description, photo, dateTimeReport);
+//    public ReportDogShelter(Integer idReport, Integer userShelter, String description, String photo, Timestamp dateTimeReport) {
+//        super(idReport, userShelter, description, photo, dateTimeReport);
+//    }
+
     @Override
     public DogAdopter getAdopter() {
         return dogAdopter;
@@ -85,5 +85,16 @@ public class ReportDogShelter extends ReportAnimal {
                 ", dateReport=" + getDateReport() +
                 ", reportStatus=" + getReportStatus() +
                 '}';
+    }
+
+    public static ReportDogShelter fromDTO(ReportAnimalDTO reportAnimalDTO) {
+        ReportDogShelter reportDogShelter = new ReportDogShelter();
+        reportDogShelter.setDescription(reportAnimalDTO.getDescription());
+        reportDogShelter.setPhoto(reportAnimalDTO.getPhoto());
+        reportDogShelter.setDateReport(reportAnimalDTO.getDateReport());
+        reportDogShelter.setReportStatus(reportAnimalDTO.getReportStatus());
+
+        return reportDogShelter;
+
     }
 }

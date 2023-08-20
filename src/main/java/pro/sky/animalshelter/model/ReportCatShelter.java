@@ -1,9 +1,9 @@
 package pro.sky.animalshelter.model;
 
+import pro.sky.animalshelter.dto.AnimalAdopterDTO;
 import pro.sky.animalshelter.dto.ReportAnimalDTO;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 
 @Entity
 @Table(name = "report_cat_shelter")
@@ -17,12 +17,10 @@ public class ReportCatShelter extends ReportAnimal {
     public CatAdopter getAdopter() {
         return catAdopter;
     }
-public class ReportCatShelter extends Report {
 
-    public ReportCatShelter(Integer idReport, Integer userShelter, String description, String photo, Timestamp dateTimeReport) {
-        super(idReport, userShelter, description, photo, dateTimeReport);
-    }
-}
+//    public ReportCatShelter(Integer idReport, Integer userShelter, String description, String photo, Timestamp dateTimeReport) {
+//        super(idReport, userShelter, description, photo, dateTimeReport);
+//    }
 
     public void setCatAdopter(CatAdopter catAdopter) {
         this.catAdopter = catAdopter;
@@ -45,6 +43,17 @@ public class ReportCatShelter extends Report {
                 ", dateReport=" + getDateReport() +
                 ", reportStatus=" + getReportStatus() +
                 '}';
+    }
+
+    public static ReportCatShelter fromDTO(ReportAnimalDTO reportAnimalDTO) {
+        ReportCatShelter reportCatShelter = new ReportCatShelter();
+        reportCatShelter.setDescription(reportAnimalDTO.getDescription());
+        reportCatShelter.setPhoto(reportAnimalDTO.getPhoto());
+        reportCatShelter.setDateReport(reportAnimalDTO.getDateReport());
+        reportCatShelter.setReportStatus(reportAnimalDTO.getReportStatus());
+
+        return reportCatShelter;
+
     }
 }
 
