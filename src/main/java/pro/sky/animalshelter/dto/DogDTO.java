@@ -1,14 +1,24 @@
 package pro.sky.animalshelter.dto;
 
-import pro.sky.animalshelter.model.Shelter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.persistence.*;
-
+@Schema(description = "Собака")
 public class DogDTO {
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(description = "Идентификатор собаки")
     private Integer dogId;
+
+    @Schema(description = "Имя собаки")
     private String dogName;
+
+    @Schema(description = "Возраст")
     private Integer age;
+
+    @Schema(description = "Пол")
     private String gender;
+
+    @Schema(description = "Порода")
     private String breed;
 
     public DogDTO(Integer dogId, String dogName, Integer age, String gender, String breed) {

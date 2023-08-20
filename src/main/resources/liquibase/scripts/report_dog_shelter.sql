@@ -15,3 +15,14 @@ ALTER TABLE report_dog_shelter ADD CONSTRAINT report_dog_shelter_user_id_fkey FO
 -- changeset InnaSerebriakova:2
 alter table report_dog_shelter
     alter column date_report type timestamp using date_report::timestamp;
+
+-- changeset AlexKutin:2
+ALTER TABLE report_dog_shelter DROP CONSTRAINT IF EXISTS report_dog_shelter_user_id_fkey;
+
+ALTER TABLE report_dog_shelter RENAME COLUMN user_id TO adopter_id;
+
+ALTER TABLE report_dog_shelter ADD CONSTRAINT report_dog_shelter_adopter_id_fkey FOREIGN KEY (adopter_id)
+    REFERENCES dog_adopters(adopter_id);
+
+-- changeset AlexKutin:3
+ALTER TABLE report_dog_shelter ADD COLUMN report_status VARCHAR(25);

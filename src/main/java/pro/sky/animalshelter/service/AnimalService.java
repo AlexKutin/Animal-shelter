@@ -1,50 +1,57 @@
 package pro.sky.animalshelter.service;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pro.sky.animalshelter.dto.CatAdopterListDTO;
-import pro.sky.animalshelter.dto.CatDTO;
-import pro.sky.animalshelter.dto.DogAdopterListDTO;
-import pro.sky.animalshelter.dto.DogDTO;
+import pro.sky.animalshelter.dto.*;
+import pro.sky.animalshelter.exception.AnimalNotFoundException;
 import pro.sky.animalshelter.model.*;
 import pro.sky.animalshelter.repository.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class AnimalService {
-    @Autowired
+    private final ShelterService shelterService;
+    private final UserShelterService userShelterService;
+
     private final DogsRepository dogsRepository;
-    @Autowired
     private final CatsRepository catsRepository;
-    @Autowired
     private final ShelterRepository shelterRepository;
-    @Autowired
-    private final DogAdopterListRepository dogAdopterListRepository;
-    @Autowired
-    private final CatAdopterListRepository catAdopterListRepository;
-    @Autowired
-    private final UserDogShelterRepository userDogShelterRepository;
-    @Autowired
-    private final UserCatShelterRepository userCatShelterRepository;
-    public AnimalService(DogsRepository dogsRepository, CatsRepository catsRepository, ShelterRepository shelterRepository, DogAdopterListRepository dogAdopterListRepository, CatAdopterListRepository catAdopterListRepository, UserDogShelterRepository userDogShelterRepository, UserCatShelterRepository userCatShelterRepository) {
+    private final DogAdopterRepository dogAdopterRepository;
+    private final CatAdopterRepository catAdopterRepository;
+
+    public AnimalService(ShelterService shelterService, UserShelterService userShelterService, DogsRepository dogsRepository, CatsRepository catsRepository, ShelterRepository shelterRepository, DogAdopterRepository dogAdopterRepository, CatAdopterRepository catAdopterRepository) {
+        this.shelterService = shelterService;
+        this.userShelterService = userShelterService;
         this.dogsRepository = dogsRepository;
         this.catsRepository = catsRepository;
         this.shelterRepository = shelterRepository;
-        this.dogAdopterListRepository = dogAdopterListRepository;
-        this.catAdopterListRepository = catAdopterListRepository;
-        this.userDogShelterRepository = userDogShelterRepository;
-        this.userCatShelterRepository = userCatShelterRepository;
+        this.dogAdopterRepository = dogAdopterRepository;
+        this.catAdopterRepository = catAdopterRepository;
     }
 
     public DogDTO saveDogToDb(DogDTO dogDTO) {
         Dog dog =  Dog.fromDTO(dogDTO);
-        List<Shelter> list = shelterRepository.findSheltersByShelterType(ShelterType.DOG_SHELTER);
-        dog.setShelterId(list.get(0));
+        Shelter dogShelter = shelterService.findShelterByShelterType(ShelterType.DOG_SHELTER);
+        dog.setShelter(dogShelter);
         dog = dogsRepository.save(dog);
         return dog.toDTO();
+    }
+
+    public List<DogDTO> getAllDogs() {
+        return dogsRepository.findAll()
+                .stream()
+                .map(Dog::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<CatDTO> getAllCats() {
+        return catsRepository.findAll()
+                .stream()
+                .map(Cat::toDTO)
+                .collect(Collectors.toList());
     }
 
     public CatDTO saveCatToDb(CatDTO catDTO) {
@@ -55,21 +62,66 @@ public class AnimalService {
         return cat.toDTO();
     }
 
-    public DogAdopterListDTO saveDogAdopter(DogAdopterListDTO dogAdopterListDTO, Integer dogId, Integer adopterId) {
-        DogAdopterList dogAdopterList = DogAdopterList.fromDTO(dogAdopterListDTO);
-        dogAdopterList.setAdoptionDate(LocalDateTime.now());
-        dogAdopterList.setDogId(dogsRepository.findById(dogId).get());
-        dogAdopterList.setAdopterId(userDogShelterRepository.findById(adopterId).get());
-        dogAdopterList = dogAdopterListRepository.save(dogAdopterList);
-        return dogAdopterList.toDTO();
+    public AnimalAdopterDTO saveDogAdopter(AnimalAdopterDTO animalAdopterDTO) {
+        DogAdopter dogAdopter = new DogAdopter();
+        dogAdopter.setDog(findDogById(animalAdopterDTO.getAnimalId()));
+        dogAdopter.setUser(userShelterService.findUserDogShelterById(animalAdopterDTO.getUserId()));
+        dogAdopter.setAdoptionDate(LocalDateTime.now());
+        dogAdopter.setAdopterStatus(animalAdopterDTO.getAdopterStatus());
+        dogAdopter.setEndProbationDate(LocalDateTime.now().plusMonths(1));
+        dogAdopter = dogAdopterRepository.save(dogAdopter);
+        return dogAdopter.toDTO();
     }
 
-    public CatAdopterListDTO saveCatAdopter(CatAdopterListDTO catAdopterListDTO, Integer catId, Integer adopterId) {
-        CatAdopterList catAdopterList = CatAdopterList.fromDTO(catAdopterListDTO);
-        catAdopterList.setAdoptionDate(LocalDateTime.now());
-        catAdopterList.setCatId(catsRepository.findById(catId).get());
-        catAdopterList.setAdopterId(userCatShelterRepository.findById(adopterId).get());
-        catAdopterList = catAdopterListRepository.save(catAdopterList);
-        return catAdopterList.toDTO();
+//    public CatAdopterListDTO saveCatAdopter(CatAdopterListDTO catAdopterListDTO, Integer catId, Integer adopterId) {
+//        CatAdopterList catAdopterList = CatAdopterList.fromDTO(catAdopterListDTO);
+//        catAdopterList.setAdoptionDate(LocalDateTime.now());
+//        catAdopterList.setCat(catsRepository.findById(catId).get());
+//        catAdopterList.setAdopterId(userCatShelterRepository.findById(adopterId).get());
+//        catAdopterList = catAdopterListRepository.save(catAdopterList);
+//        return catAdopterList.toDTO();
+//    }
+
+    public AnimalAdopterDTO saveCatAdopter(AnimalAdopterDTO animalAdopterDTO) {
+        CatAdopter catAdopter = new CatAdopter();
+        catAdopter.setCat(findCatById(animalAdopterDTO.getAnimalId()));
+        catAdopter.setUser(userShelterService.findUserCatShelterById(animalAdopterDTO.getUserId()));
+        catAdopter.setAdoptionDate(LocalDateTime.now());
+        catAdopter.setAdopterStatus(animalAdopterDTO.getAdopterStatus());
+        catAdopter.setEndProbationDate(LocalDateTime.now().plusMonths(1));
+        catAdopter = catAdopterRepository.save(catAdopter);
+
+        return catAdopter.toDTO();
+    }
+
+    public List<AnimalAdopterDTO> getDogAdopters(AdopterStatus adopterStatus) {
+        List<DogAdopter> dogAdopters;
+        if (Objects.nonNull(adopterStatus)) {
+            dogAdopters = dogAdopterRepository.findAllByAdopterStatusOrderByUser(adopterStatus);
+        } else  {
+            dogAdopters = dogAdopterRepository.findAll();
+        }
+        return dogAdopters
+                .stream()
+                .map(DogAdopter::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<AnimalAdopterDTO> getCatAdopters(AdopterStatus adopterStatus) {
+        List<CatAdopter> catAdopters = catAdopterRepository.findAllByAdopterStatusOrderByUser(adopterStatus);
+        return catAdopters
+                .stream()
+                .map(CatAdopter::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    private Cat findCatById(Integer animalId) {
+        return catsRepository.findById(animalId)
+                .orElseThrow(() -> new AnimalNotFoundException(animalId + " not found in database"));
+    }
+
+    private Dog findDogById(Integer animalId) {
+        return dogsRepository.findById(animalId)
+                .orElseThrow(() -> new AnimalNotFoundException(animalId + " not found in database"));
     }
 }

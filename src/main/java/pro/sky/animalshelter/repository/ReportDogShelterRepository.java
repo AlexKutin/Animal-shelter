@@ -1,7 +1,11 @@
 package pro.sky.animalshelter.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import pro.sky.animalshelter.model.ReportDogShelter;
+import pro.sky.animalshelter.model.*;
 
-public interface ReportDogShelterRepository extends JpaRepository<ReportDogShelter, Long> {
+import java.util.List;
+
+public interface ReportDogShelterRepository extends JpaRepository<ReportDogShelter, Integer> {
+
+    List<ReportDogShelter> findByDogAdopterAndReportStatus(DogAdopter dogAdopter, ReportStatus reportStatus);
 }
