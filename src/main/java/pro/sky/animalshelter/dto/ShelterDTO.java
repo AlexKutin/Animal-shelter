@@ -32,17 +32,6 @@ public class ShelterDTO {
     @Schema(description = "Техника безопасности на территории приюта")
     private String safetyInfo;
 
-//    public ShelterDTO(Integer id, ShelterType shelterType, String shelterName, String shelterDescription, String shelterAddress, String drivingDirection, String shelterContacts, String securityContacts) {
-//        this.id = id;
-//        this.shelterType = shelterType;
-//        this.shelterName = shelterName;
-//        this.shelterDescription = shelterDescription;
-//        this.shelterAddress = shelterAddress;
-//        this.drivingDirection = drivingDirection;
-//        this.shelterContacts = shelterContacts;
-//        this.securityContacts = securityContacts;
-//    }
-
     public Integer getId() {
         return id;
     }
@@ -150,18 +139,18 @@ public class ShelterDTO {
         return shelterDTO;
     }
 
-    public Shelter toShelter() {
-        Shelter shelter = new Shelter();
-        shelter.setId(this.getId());
-        shelter.setShelterType(this.getShelterType());
-        shelter.setShelterName(this.getShelterName());
-        shelter.setShelterDescription(this.getShelterDescription());
-        shelter.setShelterAddress(this.getShelterAddress());
-        shelter.setShelterContacts(this.getShelterContacts());
-        shelter.setSecurityContacts(this.getSecurityContacts());
-        shelter.setSafetyInfo(this.getSafetyInfo());
-        shelter.setDrivingDirection(this.getDrivingDirection());
-
-        return shelter;
-    }
+//    public Shelter toShelter() {
+//        Shelter shelter = new Shelter();
+//        shelter.setId(this.getId());
+//        shelter.setShelterType(this.getShelterType());
+//        shelter.setShelterName(this.getShelterName());
+//        shelter.setShelterDescription(this.getShelterDescription());
+//        shelter.setShelterAddress(this.getShelterAddress());
+//        shelter.setShelterContacts(this.getShelterContacts());
+//        shelter.setSecurityContacts(this.getSecurityContacts());
+//        shelter.setSafetyInfo(this.getSafetyInfo());
+//        shelter.setDrivingDirection(this.getDrivingDirection());
+//
+//        return shelter;
+//    }
 }

@@ -1,71 +1,52 @@
 package pro.sky.animalshelter.model;
 
+import pro.sky.animalshelter.dto.ReportAnimalDTO;
+
 import javax.persistence.*;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "report_cat_shelter")
-public class ReportCatShelter {
+public class ReportCatShelter extends ReportAnimal {
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = "id_report")
-        private Integer idReport;
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
-        private UserCatShelter userDogShelter;
-        private String description;
-        private String photo;
-        private LocalDate dateReport;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "adopter_id", referencedColumnName = "adopter_id", nullable = false)
+    private CatAdopter catAdopter;
 
-    public Integer getIdReport() {
-        return idReport;
+    @Override
+    public CatAdopter getAdopter() {
+        return catAdopter;
     }
 
-    public void setIdReport(Integer idReport) {
-        this.idReport = idReport;
+    public void setCatAdopter(CatAdopter catAdopter) {
+        this.catAdopter = catAdopter;
     }
 
-    public UserCatShelter getUserDogShelter() {
-        return userDogShelter;
+    @Override
+    public ReportAnimalDTO toDTO() {
+        ReportAnimalDTO reportAnimalDTO = super.toDTO();
+        reportAnimalDTO.setShelterType(ShelterType.CAT_SHELTER);
+        return reportAnimalDTO;
     }
 
-    public void setUserDogShelter(UserCatShelter userDogShelter) {
-        this.userDogShelter = userDogShelter;
-    }
+    public static ReportCatShelter fromDTO(ReportAnimalDTO reportAnimalDTO) {
+        ReportCatShelter reportCatShelter = new ReportCatShelter();
+        reportCatShelter.setDescription(reportAnimalDTO.getDescription());
+        reportCatShelter.setPhoto(reportAnimalDTO.getPhoto());
+        reportCatShelter.setDateReport(reportAnimalDTO.getDateReport());
+        reportCatShelter.setReportStatus(reportAnimalDTO.getReportStatus());
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
-
-    public LocalDate getDateReport() {
-        return dateReport;
-    }
-
-    public void setDateReport(LocalDate dateReport) {
-        this.dateReport = dateReport;
+        return reportCatShelter;
     }
 
     @Override
     public String toString() {
         return "ReportCatShelter{" +
-                "idReport=" + idReport +
-                ", userDogShelter=" + userDogShelter +
-                ", description='" + description + '\'' +
-                ", photo='" + photo + '\'' +
-                ", dateReport=" + dateReport +
+                "reportId=" + getReportId() +
+                ", adopter=" + getAdopter().getNotNullUserName() +
+                ", description='" + getDescription() + '\'' +
+                ", photo='" + getPhoto() + '\'' +
+                ", dateReport=" + getDateReport() +
+                ", reportStatus=" + getReportStatus() +
                 '}';
     }
 }
