@@ -15,7 +15,7 @@ public class ReportAnimalDTO {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(description = "Идентификатор отчета")
-    private Integer idReport;
+    private Integer reportId;
 
     @Schema(description = "chatId усыновителя (информация от/для бота)")
     private Long chatId;
@@ -43,12 +43,12 @@ public class ReportAnimalDTO {
         this.shelterType = shelterType;
     }
 
-    public Integer getIdReport() {
-        return idReport;
+    public Integer getReportId() {
+        return reportId;
     }
 
-    public void setIdReport(Integer idReport) {
-        this.idReport = idReport;
+    public void setReportId(Integer reportId) {
+        this.reportId = reportId;
     }
 
     public Long getChatId() {
@@ -103,7 +103,7 @@ public class ReportAnimalDTO {
     public String toString() {
         return "ReportAnimalDTO{" +
                 "shelterType=" + shelterType +
-                ", idReport=" + idReport +
+                ", reportId=" + reportId +
                 ", chatId=" + chatId +
                 ", adopterId=" + adopterId +
                 ", description='" + description + '\'' +

@@ -1,6 +1,5 @@
 package pro.sky.animalshelter.model;
 
-import pro.sky.animalshelter.dto.AnimalAdopterDTO;
 import pro.sky.animalshelter.dto.ReportAnimalDTO;
 
 import javax.persistence.*;
@@ -18,10 +17,6 @@ public class ReportCatShelter extends ReportAnimal {
         return catAdopter;
     }
 
-//    public ReportCatShelter(Integer idReport, Integer userShelter, String description, String photo, Timestamp dateTimeReport) {
-//        super(idReport, userShelter, description, photo, dateTimeReport);
-//    }
-
     public void setCatAdopter(CatAdopter catAdopter) {
         this.catAdopter = catAdopter;
     }
@@ -33,18 +28,6 @@ public class ReportCatShelter extends ReportAnimal {
         return reportAnimalDTO;
     }
 
-    @Override
-    public String toString() {
-        return "ReportCatShelter{" +
-                "idReport=" + getIdReport() +
-                ", catAdopter=" + catAdopter +
-                ", description='" + getDescription() + '\'' +
-                ", photo='" + getPhoto() + '\'' +
-                ", dateReport=" + getDateReport() +
-                ", reportStatus=" + getReportStatus() +
-                '}';
-    }
-
     public static ReportCatShelter fromDTO(ReportAnimalDTO reportAnimalDTO) {
         ReportCatShelter reportCatShelter = new ReportCatShelter();
         reportCatShelter.setDescription(reportAnimalDTO.getDescription());
@@ -53,7 +36,18 @@ public class ReportCatShelter extends ReportAnimal {
         reportCatShelter.setReportStatus(reportAnimalDTO.getReportStatus());
 
         return reportCatShelter;
+    }
 
+    @Override
+    public String toString() {
+        return "ReportCatShelter{" +
+                "reportId=" + getReportId() +
+                ", adopter=" + getAdopter().getNotNullUserName() +
+                ", description='" + getDescription() + '\'' +
+                ", photo='" + getPhoto() + '\'' +
+                ", dateReport=" + getDateReport() +
+                ", reportStatus=" + getReportStatus() +
+                '}';
     }
 }
 

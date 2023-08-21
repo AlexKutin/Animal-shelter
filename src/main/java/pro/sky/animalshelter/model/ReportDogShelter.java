@@ -7,33 +7,10 @@ import javax.persistence.*;
 @Entity
 @Table(name = "report_dog_shelter")
 public class ReportDogShelter extends ReportAnimal {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Column(name = "id_report")
-//    private Integer idReport;
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
-//    private UserDogShelter userDogShelter;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "adopter_id", referencedColumnName = "adopter_id", nullable = false)
     private DogAdopter dogAdopter;
-
-//    private String description;
-//    private String photo;
-//    private LocalDate dateReport;
-//
-//    public Integer getIdReport() {
-//        return idReport;
-//    }
-//
-//    public void setIdReport(Integer idReport) {
-//        this.idReport = idReport;
-//    }
-
-//    public ReportDogShelter(Integer idReport, Integer userShelter, String description, String photo, Timestamp dateTimeReport) {
-//        super(idReport, userShelter, description, photo, dateTimeReport);
-//    }
 
     @Override
     public DogAdopter getAdopter() {
@@ -43,30 +20,6 @@ public class ReportDogShelter extends ReportAnimal {
     public void setDogAdopter(DogAdopter dogAdopter) {
         this.dogAdopter = dogAdopter;
     }
-
-//    public String getDescription() {
-//        return description;
-//    }
-//
-//    public void setDescription(String description) {
-//        this.description = description;
-//    }
-//
-//    public String getPhoto() {
-//        return photo;
-//    }
-//
-//    public void setPhoto(String photo) {
-//        this.photo = photo;
-//    }
-//
-//    public LocalDate getDateReport() {
-//        return dateReport;
-//    }
-//
-//    public void setDateReport(LocalDate dateReport) {
-//        this.dateReport = dateReport;
-//    }
 
     @Override
     public ReportAnimalDTO toDTO() {
@@ -78,8 +31,8 @@ public class ReportDogShelter extends ReportAnimal {
     @Override
     public String toString() {
         return "ReportDogShelter{" +
-                "idReport=" + getIdReport() +
-                ", dogAdopter=" + dogAdopter +
+                "reportId=" + getReportId() +
+                ", adopter=" + getAdopter().getNotNullUserName() +
                 ", description='" + getDescription() + '\'' +
                 ", photo='" + getPhoto() + '\'' +
                 ", dateReport=" + getDateReport() +

@@ -1,13 +1,12 @@
 package pro.sky.animalshelter.controller;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pro.sky.animalshelter.dto.ReportAnimalDTO;
 import pro.sky.animalshelter.exception.AdopterNotFoundException;
+import pro.sky.animalshelter.exception.ReportNotFoundException;
 import pro.sky.animalshelter.exception.ShelterNotFoundException;
 import pro.sky.animalshelter.model.ReportStatus;
 import pro.sky.animalshelter.model.ShelterType;
@@ -25,14 +24,37 @@ public class ReportController {
         this.reportService = reportService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<ReportAnimalDTO>> getReportsByAdopter(
-            @RequestParam ShelterType shelterType,
-            @RequestParam Integer adopterId,
-            @RequestParam ReportStatus reportStatus) {
+    @GetMapping("/cat_shelter_reports")
+    public ResponseEntity<List<ReportAnimalDTO>> getReportsByCatShelterAdopter(
+            @RequestParam @Parameter(description = "Id усыновителя") Integer adopterId,
+            @RequestParam @Parameter(description = "Статус отчета") ReportStatus reportStatus) {
         try {
-            List<ReportAnimalDTO> reportAnimalDTOList = reportService.getReportsByAdopterAndStatus(shelterType, adopterId, reportStatus);
+            List<ReportAnimalDTO> reportAnimalDTOList = reportService.getReportsByAdopterAndStatus(ShelterType.CAT_SHELTER, adopterId, reportStatus);
             return ResponseEntity.ok(reportAnimalDTOList);
+        } catch (AdopterNotFoundException | ShelterNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("dog_shelter_reports")
+    public ResponseEntity<List<ReportAnimalDTO>> getReportsByDogShelterAdopter(
+            @RequestParam @Parameter(description = "Id усыновителя") Integer adopterId,
+            @RequestParam @Parameter(description = "Статус отчета") ReportStatus reportStatus) {
+        try {
+            List<ReportAnimalDTO> reportAnimalDTOList = reportService.getReportsByAdopterAndStatus(ShelterType.DOG_SHELTER, adopterId, reportStatus);
+            return ResponseEntity.ok(reportAnimalDTOList);
+        } catch (ReportNotFoundException | ShelterNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("process_report")
+    public ResponseEntity<ReportAnimalDTO> processReportCatShelter(
+            @RequestParam @Parameter(description = "Id Отчета") Integer reportId,
+            @RequestParam @Parameter(description = "Статус отчета после обработки волонтером") ReportStatus reportStatus) {
+        try {
+            ReportAnimalDTO reportAnimalDTO = reportService.editStatusReport(ShelterType.CAT_SHELTER, reportId, reportStatus);
+            return ResponseEntity.ok(reportAnimalDTO);
         } catch (AdopterNotFoundException | ShelterNotFoundException e) {
             return ResponseEntity.notFound().build();
         }

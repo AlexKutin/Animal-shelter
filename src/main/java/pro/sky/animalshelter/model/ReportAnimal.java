@@ -10,7 +10,7 @@ public abstract class ReportAnimal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_report")
-    private Integer idReport;
+    private Integer reportId;
 
     @Column(name = "description")
     private String description;
@@ -27,21 +27,14 @@ public abstract class ReportAnimal {
     public ReportAnimal() {
     }
 
-//    public ReportAnimal(Integer userShelter, String description, String photo, Timestamp dateTimeReport) {
-//        this.userShelter = userShelter;
-//        this.description = description;
-//        this.photo = photo;
-//        this.dateTimeReport = dateTimeReport;
-//    }
-
     public abstract Adopter getAdopter();
 
-    public Integer getIdReport() {
-        return idReport;
+    public Integer getReportId() {
+        return reportId;
     }
 
-    public void setIdReport(Integer idReport) {
-        this.idReport = idReport;
+    public void setReportId(Integer reportId) {
+        this.reportId = reportId;
     }
 
     public String getDescription() {
@@ -86,7 +79,7 @@ public abstract class ReportAnimal {
 
     public ReportAnimalDTO toDTO() {
         ReportAnimalDTO reportAnimalDTO = new ReportAnimalDTO();
-        reportAnimalDTO.setIdReport(this.getIdReport());
+        reportAnimalDTO.setReportId(this.getReportId());
         reportAnimalDTO.setAdopterId(this.getAdopter().getAdopterId());
         reportAnimalDTO.setDescription(this.getDescription());
         reportAnimalDTO.setPhoto(this.getPhoto());
@@ -95,6 +88,4 @@ public abstract class ReportAnimal {
 
         return reportAnimalDTO;
     }
-
-
 }

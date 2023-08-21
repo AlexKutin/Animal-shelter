@@ -1,9 +1,14 @@
 package pro.sky.animalshelter.service;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import pro.sky.animalshelter.dto.ReportAnimalDTO;
+import pro.sky.animalshelter.exception.AnimalNotFoundException;
+import pro.sky.animalshelter.exception.ReportNotFoundException;
 import pro.sky.animalshelter.exception.ShelterNotFoundException;
 import pro.sky.animalshelter.model.*;
 import pro.sky.animalshelter.repository.ReportCatShelterRepository;
@@ -62,18 +67,58 @@ public class ReportService {
             reportDogShelter.setDogAdopter(dogAdopter);
 
             reportDogShelter = reportDogShelterRepository.save(reportDogShelter);
+            logger.info("Report saved successful: {}", reportAnimalDTO);
             return reportDogShelter.toDTO();
         } else if (shelterType == ShelterType.CAT_SHELTER) {
             ReportCatShelter reportCatShelter = ReportCatShelter.fromDTO(reportAnimalDTO);
-            reportCatShelter.setCatAdopter(adopterService.findCatAdopterById(reportAnimalDTO.getAdopterId()));
+            CatAdopter catAdopter = adopterService.findCatAdopterById(reportAnimalDTO.getAdopterId());
+            reportCatShelter.setCatAdopter(catAdopter);
 
             reportCatShelter = reportCatShelterRepository.save(reportCatShelter);
+            logger.info("Report saved successful: {}", reportAnimalDTO);
             return reportCatShelter.toDTO();
         }
-        logger.error("Shelter type {} not supported. The list users can not be created", shelterType);
+        logger.error("Shelter type {} not supported. Report can not be saved", shelterType);
         throw new ShelterNotFoundException(String.format("Shelter type: %s not supported yet", shelterType));
     }
+
+    public ReportAnimalDTO editStatusReport(ShelterType shelterType, Integer reportId, ReportStatus reportStatus) {
+        ReportAnimalDTO reportAnimalDTO;
+        if (shelterType == ShelterType.DOG_SHELTER) {
+            ReportDogShelter reportDogShelter = getReportDogShelterById(reportId);
+            reportDogShelter.setReportStatus(reportStatus);
+            reportDogShelter = reportDogShelterRepository.save(reportDogShelter);
+            reportAnimalDTO = reportDogShelter.toDTO();
+            logger.info("Report status {} saved successful for report: {}", reportStatus, reportAnimalDTO);
+            return reportDogShelter.toDTO();
+        } else if (shelterType == ShelterType.CAT_SHELTER) {
+            ReportCatShelter reportCatShelter = getReportCatShelterById(reportId);
+            reportCatShelter.setReportStatus(reportStatus);
+
+            reportCatShelter = reportCatShelterRepository.save(reportCatShelter);
+            reportAnimalDTO = reportCatShelter.toDTO();
+            logger.info("Report status {} saved successful for report: {}", reportStatus, reportAnimalDTO);
+            return reportAnimalDTO;
+        }
+        logger.error("Shelter type {} not supported. Report can not be saved", shelterType);
+        throw new ShelterNotFoundException(String.format("Shelter type: %s not supported yet", shelterType));
+    }
+
+
+    public ReportCatShelter getReportCatShelterById(Integer reportId) {
+        return reportCatShelterRepository.findById(reportId)
+                .orElseThrow(() -> new ReportNotFoundException(
+                        String.format("Отчет пользователя c id = %d not found in Cat Shelter database", reportId)));
+    }
+
+    public ReportDogShelter getReportDogShelterById(Integer reportId) {
+        return reportDogShelterRepository.findById(reportId)
+                .orElseThrow(() -> new ReportNotFoundException(
+                        String.format("Отчет пользователя c id = %d not found in Dog Shelter database", reportId)));
+    }
 }
+
+
 
 /*
     public Report findReportByid(Integer userId) {

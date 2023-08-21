@@ -1,7 +1,7 @@
 package pro.sky.animalshelter.model;
 
 /**
- * Состояния для отчетов усыновителя
+ * Статусы для отчетов усыновителя
  */
 public enum ReportStatus {
     REPORT_NEW,             // Новый отчет (подлежит рассмотрению)
