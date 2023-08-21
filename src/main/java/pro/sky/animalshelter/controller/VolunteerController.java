@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pro.sky.animalshelter.dto.*;
 import pro.sky.animalshelter.exception.AnimalNotFoundException;
+import pro.sky.animalshelter.exception.DuplicateAdopterException;
 import pro.sky.animalshelter.exception.ShelterNotFoundException;
 import pro.sky.animalshelter.exception.UserNotFoundException;
 import pro.sky.animalshelter.model.*;
@@ -135,16 +136,13 @@ public class VolunteerController {
     public ResponseEntity<AnimalAdopterDTO> saveDogAdopter(
             @RequestBody @Parameter(description = "Информация об усыновителе") AnimalAdopterDTO animalAdopterDTO) {
         animalAdopterDTO.setShelterType(ShelterType.DOG_SHELTER);
-        try {
+//        try {
             AnimalAdopterDTO savedDogAdopter = animalService.saveDogAdopter(animalAdopterDTO);
             return ResponseEntity.ok(savedDogAdopter);
-        } catch (UserNotFoundException e) {
-            logger.error("Указанный id пользователя приюта = {} не найден в БД ", animalAdopterDTO.getUserId());
-            return ResponseEntity.notFound().build();
-        } catch (AnimalNotFoundException e) {
+        /*} catch (AnimalNotFoundException e) {
             logger.error("Указанный id собаки = {} не найден в БД приюта", animalAdopterDTO.getAnimalId());
             return ResponseEntity.notFound().build();
-        }
+        }*/
     }
 
     @Operation(
@@ -176,9 +174,28 @@ public class VolunteerController {
     )
     @PostMapping("/save_cat_adopter")
     public ResponseEntity<AnimalAdopterDTO> saveCatAdopter(@RequestBody AnimalAdopterDTO animalAdopterDTO/*, @RequestParam Integer catId, @RequestParam Integer adopterId*/) {
+        animalAdopterDTO.setShelterType(ShelterType.CAT_SHELTER);
         AnimalAdopterDTO savedCatAdopter = animalService.saveCatAdopter(animalAdopterDTO/*, catId, adopterId*/);
         return ResponseEntity.ok(savedCatAdopter);
     }
+
+    @ExceptionHandler(DuplicateAdopterException.class)  // 400
+    public ResponseEntity<ErrorDTO> handleDuplicateAdopter(DuplicateAdopterException e) {
+        return ResponseEntity.badRequest().body(e.toErrorDTO());
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)  // 404
+    public ResponseEntity<?> handleUserNotFound(UserNotFoundException e) {
+        logger.error(e.getMessage());
+        return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(AnimalNotFoundException.class)  // 404
+    public ResponseEntity<?> handleAnimalNotFound(AnimalNotFoundException e) {
+        logger.error(e.getMessage());
+        return ResponseEntity.notFound().build();
+    }
+
 
     @Operation(
             summary = "Получение списка всех усыновителей приюта для кошек",
@@ -197,7 +214,7 @@ public class VolunteerController {
     )
     @GetMapping("/get_cat_adopters")
     public ResponseEntity<List<AnimalAdopterDTO>> getCatAdopters(
-            @RequestParam @Parameter(description = "Статус усыновителя") AdopterStatus adopterStatus) {
+            @RequestParam(required = false) @Parameter(description = "Статус усыновителя") AdopterStatus adopterStatus) {
         List<AnimalAdopterDTO> catAdopters = animalService.getCatAdopters(adopterStatus);
         return ResponseEntity.ok(catAdopters);
     }

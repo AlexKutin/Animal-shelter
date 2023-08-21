@@ -61,12 +61,12 @@ public abstract class Adopter {
 
     public AnimalAdopterDTO toDTO() {
         AnimalAdopterDTO animalAdopterDTO = new AnimalAdopterDTO();
-        animalAdopterDTO.setShelterType(ShelterType.DOG_SHELTER);
+
         animalAdopterDTO.setAdopterId(this.getAdopterId());
 
         UserShelter userShelter = this.getUser();
         animalAdopterDTO.setUserId(userShelter.getUserId());
-        animalAdopterDTO.setUserName(getNotNullUserName(userShelter));
+        animalAdopterDTO.setUserName(this.getNotNullUserName());
         animalAdopterDTO.setAdoptionDate(this.getAdoptionDate().
                 format(DateTimeFormatter.ofPattern("dd:MM:yyyy HH:mm")));
         animalAdopterDTO.setAdopterStatus(this.getAdopterStatus());
@@ -76,15 +76,15 @@ public abstract class Adopter {
         return animalAdopterDTO;
     }
 
-    @NotNull
-    public static String getNotNullUserName(UserShelter userShelter) {
-        return Optional.of(userShelter.getUserName())
-                .orElse(userShelter.getFirstName() + " " + userShelter.getLastName());
-    }
+//    @NotNull
+//    public static String getNotNullUserName(UserShelter userShelter) {
+//        return Optional.ofNullable(userShelter.getUserName())
+//                .orElse(userShelter.getFirstName() + " " + userShelter.getLastName());
+//    }
 
     public String getNotNullUserName() {
         UserShelter userShelter = this.getUser();
-        return Optional.of(userShelter.getUserName())
+        return Optional.ofNullable(userShelter.getUserName())
                 .orElse(userShelter.getFirstName() + " " + userShelter.getLastName());
     }
 

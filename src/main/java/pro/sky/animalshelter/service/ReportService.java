@@ -15,6 +15,7 @@ import pro.sky.animalshelter.repository.ReportCatShelterRepository;
 import pro.sky.animalshelter.repository.ReportDogShelterRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,8 +36,12 @@ public class ReportService {
         List<ReportAnimalDTO> reportAnimalDTOList;
         if (shelterType == ShelterType.DOG_SHELTER) {
             DogAdopter dogAdopter = adopterService.findDogAdopterById(adopterId);
-            List<ReportDogShelter> dogAdopterReports = reportDogShelterRepository.findByDogAdopterAndReportStatus(dogAdopter, reportStatus);
-
+            List<ReportDogShelter> dogAdopterReports;
+            if (Objects.nonNull(reportStatus)) {
+                dogAdopterReports = reportDogShelterRepository.findByDogAdopterAndReportStatus(dogAdopter, reportStatus);
+            } else {
+                dogAdopterReports = reportDogShelterRepository.findByDogAdopter(dogAdopter);
+            }
             logger.info("The list reports of DogAdopter (id = {}, userName = {}) has been successfully loaded, found {} reports",
                     adopterId, dogAdopter.getNotNullUserName(), dogAdopterReports.size());
             reportAnimalDTOList = dogAdopterReports.stream()

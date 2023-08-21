@@ -33,7 +33,7 @@ public class DogAdopter extends Adopter {
 
     public AnimalAdopterDTO toDTO() {
         AnimalAdopterDTO animalAdopterDTO = super.toDTO();
-
+        animalAdopterDTO.setShelterType(ShelterType.DOG_SHELTER);
         animalAdopterDTO.setAnimalId(this.getDog().getDogId());
         animalAdopterDTO.setAnimalName(this.getDog().getDogName());
 
