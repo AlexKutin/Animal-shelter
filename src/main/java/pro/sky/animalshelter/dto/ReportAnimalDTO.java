@@ -26,9 +26,13 @@ public class ReportAnimalDTO {
     @Schema(description = "Текстовая часть отчета")
     private String description;
 
-    @Schema(description = "Путь к фотографии отчета")
-    private String photo;
+    //    @Schema(description = "Путь к фотографии отчета")
+//    private String photo;
+    @Schema(description = "Имя файла изображения отчета")
+    private String photoFilename; // Изменили название поля
 
+    @Schema(description = "Бинарные данные изображения отчета")
+    private byte[] photoData;
     @Schema(description = "Дата получения отчета")
     private LocalDate dateReport;
 
@@ -75,13 +79,13 @@ public class ReportAnimalDTO {
         this.description = description;
     }
 
-    public String getPhoto() {
-        return photo;
-    }
+//    public String getPhoto() {
+//        return photo;
+//    }
 
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
+//    public void setPhoto(String photo) {
+//        this.photo = photo;
+//    }
 
     public LocalDate getDateReport() {
         return dateReport;
@@ -99,6 +103,22 @@ public class ReportAnimalDTO {
         this.reportStatus = reportStatus;
     }
 
+    public String getPhotoFilename() {
+        return photoFilename;
+    }
+
+    public void setPhotoFilename(String photoFilename) {
+        this.photoFilename = photoFilename;
+    }
+
+    public byte[] getPhotoData() {
+        return photoData;
+    }
+
+    public void setPhotoData(byte[] photoData) {
+        this.photoData = photoData;
+    }
+
     @Override
     public String toString() {
         return "ReportAnimalDTO{" +
@@ -107,9 +127,10 @@ public class ReportAnimalDTO {
                 ", chatId=" + chatId +
                 ", adopterId=" + adopterId +
                 ", description='" + description + '\'' +
-                ", photo='" + photo + '\'' +
+                ", photoFilename='" + photoFilename + '\'' +
                 ", dateReport=" + dateReport +
                 ", reportStatus=" + reportStatus +
+                "PhotoData=" + photoData +
                 '}';
     }
 }

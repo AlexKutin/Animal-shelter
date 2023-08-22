@@ -14,12 +14,21 @@ public abstract class ReportAnimal {
 
     @Column(name = "description")
     private String description;
-    private String photo;
+//    private String photo;
 
     @Column(name = "date_report", nullable = false)
     private LocalDate dateReport;
-//    private Timestamp dateTimeReport;
+    //    private Timestamp dateTimeReport;
+//    @Lob // Добавляем аннотацию для бинарных данных (BLOB)
+//    @Column(name = "photo_data")
+//    private byte[] photoData;
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "photo_data", columnDefinition = "bytea")
+    private byte[] photoData;
 
+    @Column(name = "photo_filename")
+    private String photoFilename;
     @Column(name = "report_status")
     @Enumerated(EnumType.STRING)
     private ReportStatus reportStatus;
@@ -45,13 +54,13 @@ public abstract class ReportAnimal {
         this.description = description;
     }
 
-    public String getPhoto() {
-        return photo;
-    }
+//    public String getPhoto() {
+//        return photo;
+//    }
 
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
+//    public void setPhoto(String photo) {
+//        this.photo = photo;
+//    }
 
 //    public Timestamp getDateTimeReport() {
 //        return dateTimeReport;
@@ -60,6 +69,22 @@ public abstract class ReportAnimal {
 //    public void setDateTimeReport(Timestamp dateTimeReport) {
 //        this.dateTimeReport = dateTimeReport;
 //    }
+
+    public byte[] getPhotoData() {
+        return photoData;
+    }
+
+    public void setPhotoData(byte[] photoData) {
+        this.photoData = photoData;
+    }
+
+    public String getPhotoFilename() {
+        return photoFilename;
+    }
+
+    public void setPhotoFilename(String photoFilename) {
+        this.photoFilename = photoFilename;
+    }
 
     public LocalDate getDateReport() {
         return dateReport;
@@ -82,10 +107,10 @@ public abstract class ReportAnimal {
         reportAnimalDTO.setReportId(this.getReportId());
         reportAnimalDTO.setAdopterId(this.getAdopter().getAdopterId());
         reportAnimalDTO.setDescription(this.getDescription());
-        reportAnimalDTO.setPhoto(this.getPhoto());
+        reportAnimalDTO.setPhotoFilename(this.getPhotoFilename());
         reportAnimalDTO.setDateReport(this.getDateReport());
         reportAnimalDTO.setReportStatus(this.getReportStatus());
-
+        reportAnimalDTO.setPhotoData(this.getPhotoData());
         return reportAnimalDTO;
     }
 }
