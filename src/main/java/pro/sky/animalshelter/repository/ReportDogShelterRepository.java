@@ -8,4 +8,5 @@ import java.util.List;
 public interface ReportDogShelterRepository extends JpaRepository<ReportDogShelter, Integer> {
 
     List<ReportDogShelter> findByDogAdopterAndReportStatus(DogAdopter dogAdopter, ReportStatus reportStatus);
+    List<ReportDogShelter> findByDogAdopter(DogAdopter dogAdopter);
 }

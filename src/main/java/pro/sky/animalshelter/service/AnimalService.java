@@ -1,8 +1,11 @@
 package pro.sky.animalshelter.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.dto.*;
 import pro.sky.animalshelter.exception.AnimalNotFoundException;
+import pro.sky.animalshelter.exception.DuplicateAdopterException;
 import pro.sky.animalshelter.model.*;
 import pro.sky.animalshelter.repository.*;
 
@@ -13,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class AnimalService {
+    private  final Logger logger = LoggerFactory.getLogger(AnimalService.class);
     private final ShelterService shelterService;
     private final UserShelterService userShelterService;
 
@@ -63,9 +67,16 @@ public class AnimalService {
     }
 
     public AnimalAdopterDTO saveDogAdopter(AnimalAdopterDTO animalAdopterDTO) {
+        Integer userId = animalAdopterDTO.getUserId();
+        Integer dogId = animalAdopterDTO.getAnimalId();
+        if (dogAdopterRepository.isPresentDogAdopterByUserAndDog(userId, dogId)) {
+            logger.warn("Dog Shelter: Adopter duplication error: userId = {} and catId = {} already present", userId, dogId);
+            throw new DuplicateAdopterException(
+                    String.format("Dog Shelter: Adopter duplication error: userId = %d and dogId = %d already present", userId, dogId));
+        }
         DogAdopter dogAdopter = new DogAdopter();
-        dogAdopter.setDog(findDogById(animalAdopterDTO.getAnimalId()));
-        dogAdopter.setUser(userShelterService.findUserDogShelterById(animalAdopterDTO.getUserId()));
+        dogAdopter.setDog(findDogById(dogId));
+        dogAdopter.setUser(userShelterService.findUserDogShelterById(userId));
         dogAdopter.setAdoptionDate(LocalDateTime.now());
         dogAdopter.setAdopterStatus(animalAdopterDTO.getAdopterStatus());
         dogAdopter.setEndProbationDate(LocalDateTime.now().plusMonths(1));
@@ -83,9 +94,16 @@ public class AnimalService {
 //    }
 
     public AnimalAdopterDTO saveCatAdopter(AnimalAdopterDTO animalAdopterDTO) {
+        Integer userId = animalAdopterDTO.getUserId();
+        Integer catId = animalAdopterDTO.getAnimalId();
+        if (catAdopterRepository.isPresentCatAdopterByUserAndCat(userId, catId)) {
+            logger.warn("Cat Shelter: Adopter duplication error: userId = {} and catId = {} already present", userId, catId);
+            throw new DuplicateAdopterException(
+                    String.format("Cat Shelter: Adopter duplication error: userId = %d and catId = %d already present", userId, catId));
+        }
         CatAdopter catAdopter = new CatAdopter();
-        catAdopter.setCat(findCatById(animalAdopterDTO.getAnimalId()));
-        catAdopter.setUser(userShelterService.findUserCatShelterById(animalAdopterDTO.getUserId()));
+        catAdopter.setCat(findCatById(catId));
+        catAdopter.setUser(userShelterService.findUserCatShelterById(userId));
         catAdopter.setAdoptionDate(LocalDateTime.now());
         catAdopter.setAdopterStatus(animalAdopterDTO.getAdopterStatus());
         catAdopter.setEndProbationDate(LocalDateTime.now().plusMonths(1));
@@ -117,11 +135,11 @@ public class AnimalService {
 
     private Cat findCatById(Integer animalId) {
         return catsRepository.findById(animalId)
-                .orElseThrow(() -> new AnimalNotFoundException(animalId + " not found in database"));
+                .orElseThrow(() -> new AnimalNotFoundException("Cat with id = " + animalId + " not found in database"));
     }
 
     private Dog findDogById(Integer animalId) {
         return dogsRepository.findById(animalId)
-                .orElseThrow(() -> new AnimalNotFoundException(animalId + " not found in database"));
+                .orElseThrow(() -> new AnimalNotFoundException("Dog with id = " + animalId + " not found in database"));
     }
 }

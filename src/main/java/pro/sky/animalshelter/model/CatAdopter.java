@@ -34,6 +34,7 @@ public class CatAdopter extends Adopter {
 
     public AnimalAdopterDTO toDTO() {
         AnimalAdopterDTO animalAdopterDTO = super.toDTO();
+        animalAdopterDTO.setShelterType(ShelterType.CAT_SHELTER);
         animalAdopterDTO.setAnimalId(this.getCat().getCatId());
         animalAdopterDTO.setAnimalName(this.getCat().getCatName());
 
