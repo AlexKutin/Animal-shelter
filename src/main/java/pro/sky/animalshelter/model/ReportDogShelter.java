@@ -36,7 +36,8 @@ public class ReportDogShelter extends ReportAnimal {
                 ", description='" + getDescription() + '\'' +
                 ", photoFilename='" + getPhotoFilename() + '\'' +
                 ", dateReport=" + getDateReport() +
-                ", reportStatus=" + getReportStatus() + "Photo" + getPhotoData() +
+                ", reportStatus=" + getReportStatus() +
+//                "Photo" + getPhotoData() +
                 '}';
     }
 

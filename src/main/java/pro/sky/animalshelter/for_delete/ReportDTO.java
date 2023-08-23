@@ -1,9 +1,7 @@
-package pro.sky.animalshelter.dto;
+package pro.sky.animalshelter.for_delete;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import pro.sky.animalshelter.model.Report;
-import pro.sky.animalshelter.model.UserShelter;
 
 import java.sql.Timestamp;
 

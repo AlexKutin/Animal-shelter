@@ -29,22 +29,27 @@ public class UserShelterService {
         this.shelterService = shelterService;
     }
 
-    public void saveUserContacts(ShelterType shelterType, Long telegramId, String userName, String firstName, String lastName, String userContacts) {
+//    public void saveUserContacts(ShelterType shelterType, Long telegramId, String userName, String firstName, String lastName, String userContacts) {
+    public void saveUserContacts(UserShelterDTO userShelterDTO) {
+        ShelterType shelterType = userShelterDTO.getShelterType();
         Shelter shelter = shelterService.findShelterByShelterType(shelterType);
         if (shelterType == ShelterType.DOG_SHELTER) {
-            UserDogShelter userDogShelter = userDogShelterRepository.findUserDogShelterByTelegramId(telegramId);
+            UserDogShelter userDogShelter = userDogShelterRepository.findUserDogShelterByTelegramId(userShelterDTO.getTelegramId());
             if (userDogShelter == null) {
-                userDogShelter = new UserDogShelter(telegramId, userName, firstName, lastName, userContacts, shelter);
+//                userDogShelter = new UserDogShelter(telegramId, userName, firstName, lastName, userContacts, shelter);
+                userDogShelter = UserDogShelter.fromDTO(userShelterDTO);
+                userDogShelter.setShelter(shelter);
             } else {
-                userDogShelter.fillUserInfo(userName, firstName, lastName, userContacts, shelter);
+                userDogShelter.fillUserInfo(userShelterDTO);
             }
             userDogShelterRepository.save(userDogShelter);
         } else if (shelterType == ShelterType.CAT_SHELTER) {
-            UserCatShelter userCatShelter = userCatShelterRepository.findUserCatShelterByTelegramId(telegramId);
+            UserCatShelter userCatShelter = userCatShelterRepository.findUserCatShelterByTelegramId(userShelterDTO.getTelegramId());
             if (userCatShelter == null) {
-                userCatShelter = new UserCatShelter(telegramId, userName, firstName, lastName, userContacts, shelter);
+                userCatShelter = UserCatShelter.fromDTO(userShelterDTO);
+                userCatShelter.setShelter(shelter);
             } else {
-                userCatShelter.fillUserInfo(userName, firstName, lastName, userContacts, shelter);
+                userCatShelter.fillUserInfo(userShelterDTO);
             }
             userCatShelterRepository.save(userCatShelter);
         }
@@ -56,14 +61,14 @@ public class UserShelterService {
         if (shelterType == ShelterType.DOG_SHELTER) {
             userShelterDTOList = userDogShelterRepository.findAllByShelter(shelter)
                     .stream()
-                    .map(UserShelterDTO::fromUserShelter)
+                    .map(UserDogShelter::toDTO)
                     .collect(Collectors.toList());
             logger.info("The list users of Dog Shelter ({}) has been successfully created", shelter.getShelterName());
             return userShelterDTOList;
         } else if (shelterType == ShelterType.CAT_SHELTER) {
             userShelterDTOList = userCatShelterRepository.findAllByShelter(shelter)
                     .stream()
-                    .map(UserShelterDTO::fromUserShelter)
+                    .map(UserCatShelter::toDTO)
                     .collect(Collectors.toList());
             logger.info("The list users of Cat Shelter ({}) has been successfully created", shelter.getShelterName());
             return userShelterDTOList;

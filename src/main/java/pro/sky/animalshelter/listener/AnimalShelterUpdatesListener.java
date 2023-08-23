@@ -16,9 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 import pro.sky.animalshelter.Constants.CallbackConstants;
-import pro.sky.animalshelter.dto.ReportAnimalDTO;
 import pro.sky.animalshelter.dto.RulesDTO;
 import pro.sky.animalshelter.dto.ShelterDTO;
+import pro.sky.animalshelter.dto.UserShelterDTO;
 import pro.sky.animalshelter.exception.UserChatIdNotFoundException;
 import pro.sky.animalshelter.keyBoard.InlineKeyboardMarkupHelper;
 import pro.sky.animalshelter.model.ShelterType;
@@ -97,7 +97,17 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             sendStartMessage(chatId);
         } else if (userContactMap.containsKey(chatId)) {
             ShelterType chosenShelterType = getShelterTypeByUserChatId(chatId);
-            userShelterService.saveUserContacts(chosenShelterType, telegramId, userName, firstName, lastName, userContacts);
+            UserShelterDTO userShelterDTO = new UserShelterDTO();
+            userShelterDTO.setShelterType(chosenShelterType);
+            userShelterDTO.setChatId(chatId);
+            userShelterDTO.setTelegramId(telegramId);
+            userShelterDTO.setUserName(userName);
+            userShelterDTO.setFirstName(firstName);
+            userShelterDTO.setLastName(lastName);
+            userShelterDTO.setUserContacts(userContacts);
+
+
+            userShelterService.saveUserContacts(userShelterDTO);
             SendMessage response = new SendMessage(chatId, "Спасибо! Ваши контакты сохранены. Наши волонтеры свяжутся с вами в ближайшее время.");
             InlineKeyboardMarkup keyboardMarkup = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
             response.replyMarkup(keyboardMarkup);

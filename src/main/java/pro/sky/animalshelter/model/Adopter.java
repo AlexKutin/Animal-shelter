@@ -1,6 +1,5 @@
 package pro.sky.animalshelter.model;
 
-import org.jetbrains.annotations.NotNull;
 import pro.sky.animalshelter.dto.AnimalAdopterDTO;
 
 import javax.persistence.*;
@@ -75,12 +74,6 @@ public abstract class Adopter {
 
         return animalAdopterDTO;
     }
-
-//    @NotNull
-//    public static String getNotNullUserName(UserShelter userShelter) {
-//        return Optional.ofNullable(userShelter.getUserName())
-//                .orElse(userShelter.getFirstName() + " " + userShelter.getLastName());
-//    }
 
     public String getNotNullUserName() {
         UserShelter userShelter = this.getUser();

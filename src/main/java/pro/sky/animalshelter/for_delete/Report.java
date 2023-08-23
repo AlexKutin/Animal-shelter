@@ -1,9 +1,8 @@
-package pro.sky.animalshelter.model;
+package pro.sky.animalshelter.for_delete;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 
-@MappedSuperclass
 public class Report {
 
     @Id

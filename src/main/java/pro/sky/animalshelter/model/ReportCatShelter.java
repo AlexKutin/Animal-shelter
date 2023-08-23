@@ -44,7 +44,7 @@ public class ReportCatShelter extends ReportAnimal {
                 "reportId=" + getReportId() +
                 ", adopter=" + getAdopter().getNotNullUserName() +
                 ", description='" + getDescription() + '\'' +
-                ", photo='" + getPhotoData() + '\'' +
+//                ", photo='" + getPhotoData() + '\'' +
                 "photoFileName=" + getPhotoFilename()+
                 ", dateReport=" + getDateReport() +
                 ", reportStatus=" + getReportStatus() +

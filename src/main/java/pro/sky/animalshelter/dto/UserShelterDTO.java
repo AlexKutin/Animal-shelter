@@ -15,6 +15,10 @@ public class UserShelterDTO {
     @Schema(description = "Telegram Id пользователя")
     private Long telegramId;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(description = "chat Id пользователя")
+    private Long chatId;
+
     @Schema(description = "Telegram Username пользователя")
     private String userName;
 
@@ -44,6 +48,14 @@ public class UserShelterDTO {
 
     public void setTelegramId(Long telegramId) {
         this.telegramId = telegramId;
+    }
+
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
     }
 
     public String getUserName() {
@@ -91,6 +103,7 @@ public class UserShelterDTO {
         return "UserShelterDTO{" +
                 "userId=" + userId +
                 ", telegramId=" + telegramId +
+                ", chatId=" + chatId +
                 ", userName='" + userName + '\'' +
                 ", shelterType=" + shelterType +
                 ", firstName='" + firstName + '\'' +
@@ -99,10 +112,11 @@ public class UserShelterDTO {
                 '}';
     }
 
-    public static UserShelterDTO fromUserShelter(UserShelter userShelter) {
+    /*public static UserShelterDTO fromUserShelter(UserShelter userShelter) {
         UserShelterDTO userShelterDTO = new UserShelterDTO();
         userShelterDTO.setUserId(userShelter.getUserId());
         userShelterDTO.setTelegramId(userShelter.getTelegramId());
+        userShelterDTO.setChatId(userShelter.getChatId());
         userShelterDTO.setUserName(userShelter.getUserName());
         userShelterDTO.setShelterType(userShelter.getShelter().getShelterType());
         userShelterDTO.setFirstName(userShelter.getFirstName());
@@ -110,5 +124,16 @@ public class UserShelterDTO {
         userShelterDTO.setUserContacts(userShelter.getUserContacts());
 
         return userShelterDTO;
-    }
+    }*/
+
+    /*public UserShelter fillUserInfoFromDTO(UserShelter userShelter) {
+        userShelter.setUserId(this.getUserId());
+        userShelter.setTelegramId(this.getTelegramId());
+        userShelter.setChatId(this.getChatId());
+        userShelter.setUserName(this.getUserName());
+        userShelter.setFirstName(this.getFirstName());
+        userShelter.setLastName(this.getLastName());
+        userShelter.setUserContacts(this.getUserContacts());
+        return userShelter;
+    }*/
 }

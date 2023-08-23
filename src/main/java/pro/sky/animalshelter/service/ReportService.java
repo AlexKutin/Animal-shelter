@@ -1,13 +1,9 @@
 package pro.sky.animalshelter.service;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import pro.sky.animalshelter.dto.ReportAnimalDTO;
-import pro.sky.animalshelter.exception.AnimalNotFoundException;
 import pro.sky.animalshelter.exception.ReportNotFoundException;
 import pro.sky.animalshelter.exception.ShelterNotFoundException;
 import pro.sky.animalshelter.model.*;
