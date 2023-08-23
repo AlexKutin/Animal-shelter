@@ -4,31 +4,35 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.*;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
-import com.pengrad.telegrambot.request.GetChatMember;
-import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.request.SendPhoto;
+import com.pengrad.telegrambot.request.*;
 import com.pengrad.telegrambot.response.GetChatMemberResponse;
+import com.pengrad.telegrambot.response.GetFileResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 import pro.sky.animalshelter.Constants.CallbackConstants;
+import pro.sky.animalshelter.dto.ReportAnimalDTO;
 import pro.sky.animalshelter.dto.RulesDTO;
 import pro.sky.animalshelter.dto.ShelterDTO;
 import pro.sky.animalshelter.dto.UserShelterDTO;
 import pro.sky.animalshelter.exception.UserChatIdNotFoundException;
 import pro.sky.animalshelter.keyBoard.InlineKeyboardMarkupHelper;
-import pro.sky.animalshelter.model.ShelterType;
-import pro.sky.animalshelter.model.Volunteer;
+import pro.sky.animalshelter.model.*;
 import pro.sky.animalshelter.service.*;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Component
@@ -42,17 +46,20 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     private final UserShelterService userShelterService;
     private final VolunteerService volunteerService;
     private final ReportService reportService;
+    private final AdopterService adopterService;
     private final Map<Long, ShelterType> chooseShelterType = new HashMap<>();
+    private final Map<Long, ShelterType> reportDataMap = new HashMap<>();
 
     @Autowired
     public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService shelterService,
-                                        RulesService rulesService, UserShelterService userShelterService, VolunteerService volunteerService, ReportService reportService) {
+                                        RulesService rulesService, UserShelterService userShelterService, VolunteerService volunteerService, ReportService reportService, AdopterService adopterService) {
         this.animalShelterBot = animalShelterBot;
         this.shelterService = shelterService;
         this.rulesService = rulesService;
         this.userShelterService = userShelterService;
         this.volunteerService = volunteerService;
         this.reportService = reportService;
+        this.adopterService = adopterService;
     }
 
     @PostConstruct
@@ -106,7 +113,6 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             userShelterDTO.setLastName(lastName);
             userShelterDTO.setUserContacts(userContacts);
 
-
             userShelterService.saveUserContacts(userShelterDTO);
             SendMessage response = new SendMessage(chatId, "Спасибо! Ваши контакты сохранены. Наши волонтеры свяжутся с вами в ближайшее время.");
             InlineKeyboardMarkup keyboardMarkup = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
@@ -115,6 +121,19 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             logger.info("Message sent status: {}", sendResponse.isOk());
         } else if ("/getchatid".equals(text)) {
             getChatId(chatId);
+        } else if (reportDataMap.containsKey(chatId)) {
+            PhotoSize[] photoSizesArray = message.photo();
+            List<PhotoSize> photos = Arrays.asList(photoSizesArray);
+            String fileId = photos.get(photos.size() - 1).fileId();
+
+            // Получаем фактические данные файла
+            byte[] photoData = getPhotoData(fileId);
+
+            // Сохранение отчета
+            saveReportToService(chatId, text, photoData);
+
+            // Отправка подтверждающего сообщения
+            SendMessage sendMessage = new SendMessage(chatId, "Спасибо! Ваш отчет сохранен.");
         } else {
             sendInvalidMessage(chatId);
         }
@@ -485,8 +504,71 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     private void sendReportMessage(Long chatId) {
         String reportMessage = "Пожалуйста, пришлите:\n- Фото животного.\n- Рацион животного.\n- Общее самочувствие и привыкание к новому месту.\n- Изменение в поведении: отказ от старых привычек, приобретение новых.";
         sendMessage(chatId, reportMessage);
-        // Add logic for processing the user's message and saving it to the database if needed
+        ShelterType shelterType = getShelterTypeByUserChatId(chatId);
+        reportDataMap.put(chatId, shelterType);
     }
+    // Метод сохранения отчета в сервисе
+
+    private void saveReportToService(Long chatId, String text, byte[] photoData) {
+        ShelterType shelterType = getShelterTypeByUserChatId(chatId);
+        int userId = getUserIdFromChatId(chatId);
+        Integer adopterId = adopterService.getAdopterIdByUserId(userId);
+        // Генерируем уникальное имя файла
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
+        String photoFilename = shelterType + "_" + timestamp + ".jpg";
+        // Создаем DTO для сохранения в сервисе
+        ReportAnimalDTO reportAnimalDTO = new ReportAnimalDTO();
+        reportAnimalDTO.setShelterType(shelterType);
+        reportAnimalDTO.setChatId(chatId); // Устанавливаем chatId
+        reportAnimalDTO.setAdopterId(adopterId); // Получаем adopterId в зависимости от chatId
+        reportAnimalDTO.setDescription(text);
+        reportAnimalDTO.setPhotoFilename(photoFilename); // Устанавливаем имя файла (замените на фактическое имя)
+        reportAnimalDTO.setPhotoData(photoData);
+        reportAnimalDTO.setDateReport(LocalDate.now()); // Устанавливаем текущую дату
+        reportAnimalDTO.setReportStatus(ReportStatus.REPORT_NEW); // Устанавливаем начальный статус
+
+        // Вызываем метод сервиса для сохранения отчета
+        reportService.saveReport(reportAnimalDTO);
+    }
+
+    private byte[] getPhotoData(String fileId) {
+        GetFile getFile = new GetFile(fileId);
+        GetFileResponse file = animalShelterBot.execute(getFile);
+
+        // Получаем ссылку на файл
+        String filePath = file.file().fileId();
+
+        // Вызываем метод бота для получения фотографии как массива байтов
+        GetFile fileDataRequest = new GetFile(filePath);
+        GetFileResponse imgFile = animalShelterBot.execute(fileDataRequest);
+        if (imgFile == null) {
+            logger.error("imgFile is null");
+            return null;
+        }
+        logger.info("id", fileId);
+        logger.info("imgFile: {}", imgFile);
+        logger.info("filePath: {}", filePath);
+        // Получаем InputStream фотографии и конвертируем в массив байтов
+        try (InputStream inputStream = new URL(imgFile.file().filePath()).openStream()) {
+            return IOUtils.toByteArray(inputStream);
+        } catch (IOException e) {
+            logger.error("Error converting photo data to bytes: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    private int getUserIdFromChatId(Long chatId) {
+        GetChat getChatRequest = new GetChat(chatId.toString());
+        Chat chat = animalShelterBot.execute(getChatRequest).chat();
+
+        if (chat != null && chat.id() != null) {
+            return Math.toIntExact(chat.id());
+        } else {
+            return Math.toIntExact(-1L);
+        }
+
+    }
+
     private void sendVolunteerMessage(Long chatId, ShelterType chosenShelterType) {
         String userName = getUserNameByChatId(chatId);
 
@@ -498,7 +580,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             SendResponse sendResponse = animalShelterBot.execute(sendMessage);
             logger.info("Message sent status: {}", sendResponse.isOk());
         } else {
-            SendMessage sendMessage = new SendMessage(chatId,"Волонтер в пути! Ожидайте!" );
+            SendMessage sendMessage = new SendMessage(chatId, "Волонтер в пути! Ожидайте!");
             InlineKeyboardMarkup inlineKeyboardMarkup = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
             sendMessage.replyMarkup(inlineKeyboardMarkup);
             SendResponse response = animalShelterBot.execute(sendMessage);
@@ -539,6 +621,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         SendResponse sendResponse = animalShelterBot.execute(response);
         logger.info("Message sent status: {}", sendResponse.isOk());
     }
+
     private void getChatId(Long chatId) {
         SendMessage request = new SendMessage(chatId.toString(), "Ваш ChatId: " + chatId);
         animalShelterBot.execute(request);

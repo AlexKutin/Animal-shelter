@@ -13,4 +13,5 @@ public interface CatAdopterRepository extends JpaRepository<CatAdopter, Integer>
     @Query(value = "SELECT EXISTS (SELECT adopter_id FROM cat_adopters WHERE user_id = :userId and cat_id = :catId)", nativeQuery = true)
     boolean isPresentCatAdopterByUserAndCat(Integer userId, Integer catId);
 
+    CatAdopter findByUserUserId(Integer userId);
 }

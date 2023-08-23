@@ -59,29 +59,6 @@ public class ReportService {
         throw new ShelterNotFoundException(String.format("Shelter type: %s not supported yet", shelterType));
     }
 
-    //    public void saveReport(ReportDTO reportDTO, Integer userShelter, String description, String photo, Timestamp dateTimeReport) throws IllegalArgumentException {
-//    public ReportAnimalDTO saveReport(ReportAnimalDTO reportAnimalDTO) {
-//        ShelterType shelterType = reportAnimalDTO.getShelterType();
-//        if (shelterType == ShelterType.DOG_SHELTER) {
-//            ReportDogShelter reportDogShelter = ReportDogShelter.fromDTO(reportAnimalDTO);
-//            DogAdopter dogAdopter = adopterService.findDogAdopterById(reportAnimalDTO.getAdopterId());
-//            reportDogShelter.setDogAdopter(dogAdopter);
-//
-//            reportDogShelter = reportDogShelterRepository.save(reportDogShelter);
-//            logger.info("Report saved successful: {}", reportAnimalDTO);
-//            return reportDogShelter.toDTO();
-//        } else if (shelterType == ShelterType.CAT_SHELTER) {
-//            ReportCatShelter reportCatShelter = ReportCatShelter.fromDTO(reportAnimalDTO);
-//            CatAdopter catAdopter = adopterService.findCatAdopterById(reportAnimalDTO.getAdopterId());
-//            reportCatShelter.setCatAdopter(catAdopter);
-//
-//            reportCatShelter = reportCatShelterRepository.save(reportCatShelter);
-//            logger.info("Report saved successful: {}", reportAnimalDTO);
-//            return reportCatShelter.toDTO();
-//        }
-//        logger.error("Shelter type {} not supported. Report can not be saved", shelterType);
-//        throw new ShelterNotFoundException(String.format("Shelter type: %s not supported yet", shelterType));
-//    }
     public ReportAnimalDTO saveReport(ReportAnimalDTO reportAnimalDTO) {
         ShelterType shelterType = reportAnimalDTO.getShelterType();
 

@@ -2,7 +2,6 @@ package pro.sky.animalshelter.service;
 
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.exception.AdopterNotFoundException;
-import pro.sky.animalshelter.exception.ShelterNotFoundException;
 import pro.sky.animalshelter.model.CatAdopter;
 import pro.sky.animalshelter.model.DogAdopter;
 import pro.sky.animalshelter.repository.CatAdopterRepository;
@@ -28,5 +27,16 @@ public class AdopterService {
         return dogAdopterRepository.findById(adopterId)
                 .orElseThrow(() -> new AdopterNotFoundException(
                         String.format("Adopter with id = %d not found in Dog Shelter database", adopterId)));
+    }
+
+    public Integer getAdopterIdByUserId(Integer userId) {
+        CatAdopter catAdopter = catAdopterRepository.findByUserUserId(userId);
+        DogAdopter dogAdopter = dogAdopterRepository.findByUserUserId(userId);
+        if (catAdopter != null) {
+            return catAdopter.getAdopterId();
+        } else if (dogAdopter != null) {
+            return dogAdopter.getAdopterId();
+        }
+        return null;
     }
 }
