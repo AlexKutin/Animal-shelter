@@ -130,7 +130,6 @@ public class ReportAnimalDTO {
                 ", photoFilename='" + photoFilename + '\'' +
                 ", dateReport=" + dateReport +
                 ", reportStatus=" + reportStatus +
-                "PhotoData=" + photoData +
                 '}';
     }
 }

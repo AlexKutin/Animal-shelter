@@ -14,4 +14,6 @@ public interface UserDogShelterRepository extends JpaRepository<UserDogShelter, 
 
     UserDogShelter findUserDogShelterByTelegramId(Long telegramId);
 
+    UserDogShelter findUserDogShelterByChatId(Long chatId);
+
 }

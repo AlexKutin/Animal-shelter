@@ -38,11 +38,6 @@ public abstract class UserShelter implements Comparable<UserShelter> {
     public UserShelter() {
     }
 
-    /*public UserShelter(Long telegramId, String userName, String firstName, String lastName, String userContacts, Shelter shelter) {
-        this.telegramId = telegramId;
-        fillUserInfo(userName, firstName, lastName, userContacts, shelter);
-    }*/
-
     public Integer getUserId() {
         return userId;
     }

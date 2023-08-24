@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pro.sky.animalshelter.dto.ReportAnimalDTO;
+import pro.sky.animalshelter.exception.AdopterNotFoundException;
 import pro.sky.animalshelter.exception.ReportNotFoundException;
 import pro.sky.animalshelter.exception.ShelterNotFoundException;
 import pro.sky.animalshelter.model.*;
@@ -21,8 +22,8 @@ public class ReportService {
     private final ReportCatShelterRepository reportCatShelterRepository;
     private final AdopterService adopterService;
 
-
-    public ReportService(ReportDogShelterRepository reportDogShelterRepository, ReportCatShelterRepository reportCatShelterRepository, AdopterService adopterService) {
+    public ReportService(ReportDogShelterRepository reportDogShelterRepository, ReportCatShelterRepository reportCatShelterRepository,
+                         AdopterService adopterService) {
         this.reportDogShelterRepository = reportDogShelterRepository;
         this.reportCatShelterRepository = reportCatShelterRepository;
         this.adopterService = adopterService;
@@ -61,10 +62,21 @@ public class ReportService {
 
     public ReportAnimalDTO saveReport(ReportAnimalDTO reportAnimalDTO) {
         ShelterType shelterType = reportAnimalDTO.getShelterType();
+        Long chatId = reportAnimalDTO.getChatId();
+        Integer adopterId = reportAnimalDTO.getAdopterId();
+        ReportAnimalDTO resultAnimalDTO;
+        if (chatId == null && adopterId == null) {
+            throw new AdopterNotFoundException("Не задано ни одного идентификатора для поиска усыновителя (chatId && adopterId = null");
+        }
 
         if (shelterType == ShelterType.DOG_SHELTER) {
             ReportDogShelter reportDogShelter = ReportDogShelter.fromDTO(reportAnimalDTO);
-            DogAdopter dogAdopter = adopterService.findDogAdopterById(reportAnimalDTO.getAdopterId());
+            DogAdopter dogAdopter;
+            if (chatId != null) {
+                dogAdopter = adopterService.findDogAdopterByChatIdAndStatus(chatId, AdopterStatus.PROBATION_ACTIVE);
+            } else {
+                dogAdopter = adopterService.findDogAdopterById(adopterId);
+            }
             reportDogShelter.setDogAdopter(dogAdopter);
 
             // Передача бинарных данных изображения и имя файла
@@ -72,11 +84,18 @@ public class ReportService {
             reportDogShelter.setPhotoFilename(reportAnimalDTO.getPhotoFilename());
 
             reportDogShelter = reportDogShelterRepository.save(reportDogShelter);
-            logger.info("Report saved successfully: {}", reportAnimalDTO);
-            return reportDogShelter.toDTO();
+            resultAnimalDTO = reportDogShelter.toDTO();
+            logger.info("Report saved successfully: {}", resultAnimalDTO);
+            return resultAnimalDTO;
         } else if (shelterType == ShelterType.CAT_SHELTER) {
             ReportCatShelter reportCatShelter = ReportCatShelter.fromDTO(reportAnimalDTO);
-            CatAdopter catAdopter = adopterService.findCatAdopterById(reportAnimalDTO.getAdopterId());
+            CatAdopter catAdopter;
+            if (chatId != null) {
+                catAdopter = adopterService.findCatAdopterByChatIdAndStatuses(chatId,
+                        List.of(AdopterStatus.PROBATION_ACTIVE, AdopterStatus.WAITING_REPORT));
+            } else {
+                catAdopter = adopterService.findCatAdopterById(adopterId);
+            }
             reportCatShelter.setCatAdopter(catAdopter);
 
             // Передача бинарных данных изображения и имя файла
@@ -84,8 +103,10 @@ public class ReportService {
             reportCatShelter.setPhotoFilename(reportAnimalDTO.getPhotoFilename());
 
             reportCatShelter = reportCatShelterRepository.save(reportCatShelter);
-            logger.info("Report saved successfully: {}", reportAnimalDTO);
-            return reportCatShelter.toDTO();
+            resultAnimalDTO = reportCatShelter.toDTO();
+
+            logger.info("Report saved successfully: {}", resultAnimalDTO);
+            return resultAnimalDTO;
         }
         logger.error("Shelter type {} not supported. Report cannot be saved", shelterType);
         throw new ShelterNotFoundException(String.format("Shelter type: %s not supported yet", shelterType));
@@ -127,20 +148,4 @@ public class ReportService {
     }
 }
 
-
-
-/*
-    public Report findReportByid(Integer userId) {
-        return ReportDTO.fromReport();
-    }
-    public Report findReportByid(Integer userId) {
-        return ReportDTO.fromReport();
-    }
-
-    ReportDTO updateReportByIdReport(Integer idReport, Report report) {
-        Report report1 = ReportCatShelterRepository.getReportById(idReport).put(report);
-
-        return ReportDTO.fromReport();
-    }
-}*/
 

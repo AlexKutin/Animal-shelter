@@ -1,5 +1,6 @@
 package pro.sky.animalshelter.model;
 
+import org.hibernate.annotations.Type;
 import pro.sky.animalshelter.dto.ReportAnimalDTO;
 
 import javax.persistence.*;
@@ -19,12 +20,11 @@ public abstract class ReportAnimal {
     @Column(name = "date_report", nullable = false)
     private LocalDate dateReport;
     //    private Timestamp dateTimeReport;
-//    @Lob // Добавляем аннотацию для бинарных данных (BLOB)
-//    @Column(name = "photo_data")
-//    private byte[] photoData;
-    @Lob
+
+    @Lob // Добавляем аннотацию для бинарных данных (BLOB)
+    @Type(type = "org.hibernate.type.BinaryType")
+    @Column(name = "photo_data")
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "photo_data", columnDefinition = "bytea")
     private byte[] photoData;
 
     @Column(name = "photo_filename")
@@ -111,6 +111,7 @@ public abstract class ReportAnimal {
         reportAnimalDTO.setDateReport(this.getDateReport());
         reportAnimalDTO.setReportStatus(this.getReportStatus());
         reportAnimalDTO.setPhotoData(this.getPhotoData());
+        reportAnimalDTO.setChatId(this.getAdopter().getUser().getChatId());
         return reportAnimalDTO;
     }
 }

@@ -134,6 +134,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
 
             // Отправка подтверждающего сообщения
             SendMessage sendMessage = new SendMessage(chatId, "Спасибо! Ваш отчет сохранен.");
+            SendResponse sendResponse = animalShelterBot.execute(sendMessage);
         } else {
             sendInvalidMessage(chatId);
         }
@@ -511,8 +512,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
 
     private void saveReportToService(Long chatId, String text, byte[] photoData) {
         ShelterType shelterType = getShelterTypeByUserChatId(chatId);
-        int userId = getUserIdFromChatId(chatId);
-        Integer adopterId = adopterService.getAdopterIdByUserId(userId);
+//        int userId = getUserIdFromChatId(chatId);
+//        Integer adopterId = adopterService.getAdopterIdByUserId(userId);
         // Генерируем уникальное имя файла
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
         String photoFilename = shelterType + "_" + timestamp + ".jpg";
@@ -520,7 +521,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         ReportAnimalDTO reportAnimalDTO = new ReportAnimalDTO();
         reportAnimalDTO.setShelterType(shelterType);
         reportAnimalDTO.setChatId(chatId); // Устанавливаем chatId
-        reportAnimalDTO.setAdopterId(adopterId); // Получаем adopterId в зависимости от chatId
+//        reportAnimalDTO.setAdopterId(adopterId); // Получаем adopterId в зависимости от chatId
         reportAnimalDTO.setDescription(text);
         reportAnimalDTO.setPhotoFilename(photoFilename); // Устанавливаем имя файла (замените на фактическое имя)
         reportAnimalDTO.setPhotoData(photoData);
@@ -528,6 +529,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         reportAnimalDTO.setReportStatus(ReportStatus.REPORT_NEW); // Устанавливаем начальный статус
 
         // Вызываем метод сервиса для сохранения отчета
+        // Добавть обработку исключения UserNotFoundException - выводить сообщение пользователю !
         reportService.saveReport(reportAnimalDTO);
     }
 
@@ -545,11 +547,11 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             logger.error("imgFile is null");
             return null;
         }
-        logger.info("id", fileId);
+        logger.info("id: {}", fileId);
         logger.info("imgFile: {}", imgFile);
         logger.info("filePath: {}", filePath);
         // Получаем InputStream фотографии и конвертируем в массив байтов
-        try (InputStream inputStream = new URL(imgFile.file().filePath()).openStream()) {
+        try (InputStream inputStream = new URL(animalShelterBot.getFullFilePath(imgFile.file())).openStream()) {
             return IOUtils.toByteArray(inputStream);
         } catch (IOException e) {
             logger.error("Error converting photo data to bytes: {}", e.getMessage());

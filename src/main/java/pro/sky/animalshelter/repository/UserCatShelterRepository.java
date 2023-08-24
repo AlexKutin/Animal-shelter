@@ -13,4 +13,6 @@ public interface UserCatShelterRepository extends JpaRepository<UserCatShelter, 
     List<UserCatShelter> findAllByShelter(Shelter shelter);
 
     UserCatShelter findUserCatShelterByTelegramId(Long telegramId);
+
+    UserCatShelter findUserCatShelterByChatId(Long chatId);
 }

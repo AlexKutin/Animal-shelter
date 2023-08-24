@@ -34,4 +34,7 @@ ALTER TABLE report_cat_shelter ADD COLUMN photo_data BYTEA;
 -- Добавление столбца photo_filename для хранения имени файла изображения
 ALTER TABLE report_cat_shelter ADD COLUMN photo_filename VARCHAR(100);
 
+-- changeset AlexKutin:5
+ALTER TABLE report_cat_shelter ALTER COLUMN description DROP NOT NULL;
+
 

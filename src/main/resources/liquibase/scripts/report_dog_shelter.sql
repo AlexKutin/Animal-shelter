@@ -22,6 +22,7 @@ ALTER TABLE report_dog_shelter ADD CONSTRAINT report_dog_shelter_adopter_id_fkey
 
 -- changeset AlexKutin:3
 ALTER TABLE report_dog_shelter ADD COLUMN report_status VARCHAR(25);
+
 -- changeset BegaliMashrapov:4
 -- Удаление столбца photo
 ALTER TABLE report_dog_shelter DROP COLUMN IF EXISTS photo;
@@ -31,3 +32,6 @@ ALTER TABLE report_dog_shelter ADD COLUMN photo_data BYTEA;
 
 -- Добавление столбца photo_filename для хранения имени файла изображения
 ALTER TABLE report_dog_shelter ADD COLUMN photo_filename VARCHAR(100);
+
+-- changeset AlexKutin:5
+ALTER TABLE report_dog_shelter ALTER COLUMN description DROP NOT NULL;
