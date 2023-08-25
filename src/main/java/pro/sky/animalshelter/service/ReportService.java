@@ -11,8 +11,8 @@ import pro.sky.animalshelter.model.*;
 import pro.sky.animalshelter.repository.ReportCatShelterRepository;
 import pro.sky.animalshelter.repository.ReportDogShelterRepository;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,35 +29,60 @@ public class ReportService {
         this.adopterService = adopterService;
     }
 
-    public List<ReportAnimalDTO> getReportsByAdopterAndStatus(ShelterType shelterType, Integer adopterId, ReportStatus reportStatus) {
-        List<ReportAnimalDTO> reportAnimalDTOList;
-        if (shelterType == ShelterType.DOG_SHELTER) {
+    public List<ReportAnimalDTO> getReportsDogSheltersByAdopterAndStatus(Integer adopterId, Collection<ReportStatus> reportStatuses) {
+        List<ReportDogShelter> dogAdopterReports;
+        if (adopterId == null && (reportStatuses == null || reportStatuses.isEmpty())) {
+            dogAdopterReports = reportDogShelterRepository.findAll();
+            logger.info("The list reports of DogAdopter for all users has been successfully loaded, found {} reports",
+                    dogAdopterReports.size());
+            return toAnimalDTOList(dogAdopterReports);
+        }
+        if (adopterId != null) {
             DogAdopter dogAdopter = adopterService.findDogAdopterById(adopterId);
-            List<ReportDogShelter> dogAdopterReports;
-            if (Objects.nonNull(reportStatus)) {
-                dogAdopterReports = reportDogShelterRepository.findByDogAdopterAndReportStatus(dogAdopter, reportStatus);
+            if (reportStatuses != null && !reportStatuses.isEmpty()) {
+                dogAdopterReports = reportDogShelterRepository.findByDogAdopterAndReportStatusIn(dogAdopter, reportStatuses);
             } else {
                 dogAdopterReports = reportDogShelterRepository.findByDogAdopter(dogAdopter);
             }
             logger.info("The list reports of DogAdopter (id = {}, userName = {}) has been successfully loaded, found {} reports",
                     adopterId, dogAdopter.getNotNullUserName(), dogAdopterReports.size());
-            reportAnimalDTOList = dogAdopterReports.stream()
-                    .map(ReportDogShelter::toDTO)
-                    .collect(Collectors.toList());
-            return reportAnimalDTOList;
-        } else if (shelterType == ShelterType.CAT_SHELTER) {
-            CatAdopter catAdopter = adopterService.findCatAdopterById(adopterId);
-            List<ReportCatShelter> catAdopterReports = reportCatShelterRepository.findByCatAdopterAndReportStatus(catAdopter, reportStatus);
+            return toAnimalDTOList(dogAdopterReports);
+        }
+        dogAdopterReports = reportDogShelterRepository.findByReportStatusIn(reportStatuses);
+        logger.info("The list reports of DogAdopter for all users with reportStatus = {} has been successfully loaded, found {} reports",
+                reportStatuses, dogAdopterReports.size());
+        return toAnimalDTOList(dogAdopterReports);
+    }
 
+    private <T extends ReportAnimal> List<ReportAnimalDTO> toAnimalDTOList(List<T> dogAdopterReports) {
+        return dogAdopterReports.stream()
+                .map(ReportAnimal::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ReportAnimalDTO> getReportsCatShelterByAdopterAndStatus(Integer adopterId, Collection<ReportStatus> reportStatuses) {
+        List<ReportCatShelter> catAdopterReports;
+        if (adopterId == null && (reportStatuses == null || reportStatuses.isEmpty())) {
+            catAdopterReports = reportCatShelterRepository.findAll();
+            logger.info("The list reports of CatAdopter for all users has been successfully loaded, found {} reports",
+                    catAdopterReports.size());
+            return toAnimalDTOList(catAdopterReports);
+        }
+        if (adopterId != null) {
+            CatAdopter catAdopter = adopterService.findCatAdopterById(adopterId);
+            if (reportStatuses != null && !reportStatuses.isEmpty()) {
+                catAdopterReports = reportCatShelterRepository.findByCatAdopterAndReportStatusIn(catAdopter, reportStatuses);
+            } else {
+                catAdopterReports = reportCatShelterRepository.findByCatAdopter(catAdopter);
+            }
             logger.info("The list reports of CatAdopter (id = {}, userName = {}) has been successfully loaded, found {} reports",
                     adopterId, catAdopter.getNotNullUserName(), catAdopterReports.size());
-            reportAnimalDTOList = catAdopterReports.stream()
-                    .map(ReportCatShelter::toDTO)
-                    .collect(Collectors.toList());
-            return reportAnimalDTOList;
+            return toAnimalDTOList(catAdopterReports);
         }
-        logger.error("Shelter type {} not supported. The list users can not be created", shelterType);
-        throw new ShelterNotFoundException(String.format("Shelter type: %s not supported yet", shelterType));
+        catAdopterReports = reportCatShelterRepository.findByReportStatusIn(reportStatuses);
+        logger.info("The list reports of CatAdopter for all users with reportStatus = {} has been successfully loaded, found {} reports",
+                reportStatuses, catAdopterReports.size());
+        return toAnimalDTOList(catAdopterReports);
     }
 
     public ReportAnimalDTO saveReport(ReportAnimalDTO reportAnimalDTO) {

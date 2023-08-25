@@ -17,6 +17,9 @@ public class ReportAnimalDTO {
     @Schema(description = "Идентификатор отчета")
     private Integer reportId;
 
+    @Schema(description = "Статус отчета")
+    private ReportStatus reportStatus;
+
     @Schema(description = "chatId усыновителя (информация от/для бота)")
     private Long chatId;
 
@@ -35,9 +38,6 @@ public class ReportAnimalDTO {
     private byte[] photoData;
     @Schema(description = "Дата получения отчета")
     private LocalDate dateReport;
-
-    @Schema(description = "Статус отчета")
-    private ReportStatus reportStatus;
 
     public ShelterType getShelterType() {
         return shelterType;
@@ -124,12 +124,12 @@ public class ReportAnimalDTO {
         return "ReportAnimalDTO{" +
                 "shelterType=" + shelterType +
                 ", reportId=" + reportId +
+                ", reportStatus=" + reportStatus +
                 ", chatId=" + chatId +
                 ", adopterId=" + adopterId +
                 ", description='" + description + '\'' +
                 ", photoFilename='" + photoFilename + '\'' +
                 ", dateReport=" + dateReport +
-                ", reportStatus=" + reportStatus +
                 '}';
     }
 }
