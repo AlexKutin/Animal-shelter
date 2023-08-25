@@ -84,15 +84,6 @@ public class AnimalService {
         return dogAdopter.toDTO();
     }
 
-//    public CatAdopterListDTO saveCatAdopter(CatAdopterListDTO catAdopterListDTO, Integer catId, Integer adopterId) {
-//        CatAdopterList catAdopterList = CatAdopterList.fromDTO(catAdopterListDTO);
-//        catAdopterList.setAdoptionDate(LocalDateTime.now());
-//        catAdopterList.setCat(catsRepository.findById(catId).get());
-//        catAdopterList.setAdopterId(userCatShelterRepository.findById(adopterId).get());
-//        catAdopterList = catAdopterListRepository.save(catAdopterList);
-//        return catAdopterList.toDTO();
-//    }
-
     public AnimalAdopterDTO saveCatAdopter(AnimalAdopterDTO animalAdopterDTO) {
         Integer userId = animalAdopterDTO.getUserId();
         Integer catId = animalAdopterDTO.getAnimalId();
@@ -126,7 +117,12 @@ public class AnimalService {
     }
 
     public List<AnimalAdopterDTO> getCatAdopters(AdopterStatus adopterStatus) {
-        List<CatAdopter> catAdopters = catAdopterRepository.findAllByAdopterStatusOrderByUser(adopterStatus);
+        List<CatAdopter> catAdopters;
+        if (Objects.nonNull(adopterStatus)) {
+            catAdopters = catAdopterRepository.findAllByAdopterStatusOrderByUser(adopterStatus);
+        } else  {
+            catAdopters = catAdopterRepository.findAll();
+        }
         return catAdopters
                 .stream()
                 .map(CatAdopter::toDTO)

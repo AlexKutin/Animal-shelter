@@ -12,11 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pro.sky.animalshelter.dto.*;
-import pro.sky.animalshelter.exception.AnimalNotFoundException;
-import pro.sky.animalshelter.exception.DuplicateAdopterException;
-import pro.sky.animalshelter.exception.ShelterNotFoundException;
-import pro.sky.animalshelter.exception.UserNotFoundException;
+import pro.sky.animalshelter.exception.*;
 import pro.sky.animalshelter.model.*;
+import pro.sky.animalshelter.service.AdopterService;
 import pro.sky.animalshelter.service.AnimalService;
 import pro.sky.animalshelter.service.UserShelterService;
 
@@ -29,12 +27,13 @@ public class VolunteerController {
     private final Logger logger = LoggerFactory.getLogger(VolunteerController.class);
 
     private final UserShelterService userShelterService;
-
     private final AnimalService animalService;
+    private final AdopterService adopterService;
 
-    public VolunteerController(UserShelterService userShelterService, AnimalService animalService) {
+    public VolunteerController(UserShelterService userShelterService, AnimalService animalService, AdopterService adopterService) {
         this.userShelterService = userShelterService;
         this.animalService = animalService;
+        this.adopterService = adopterService;
     }
 
     @Operation(
@@ -136,13 +135,8 @@ public class VolunteerController {
     public ResponseEntity<AnimalAdopterDTO> saveDogAdopter(
             @RequestBody @Parameter(description = "Информация об усыновителе") AnimalAdopterDTO animalAdopterDTO) {
         animalAdopterDTO.setShelterType(ShelterType.DOG_SHELTER);
-//        try {
-            AnimalAdopterDTO savedDogAdopter = animalService.saveDogAdopter(animalAdopterDTO);
-            return ResponseEntity.ok(savedDogAdopter);
-        /*} catch (AnimalNotFoundException e) {
-            logger.error("Указанный id собаки = {} не найден в БД приюта", animalAdopterDTO.getAnimalId());
-            return ResponseEntity.notFound().build();
-        }*/
+        AnimalAdopterDTO savedDogAdopter = animalService.saveDogAdopter(animalAdopterDTO);
+        return ResponseEntity.ok(savedDogAdopter);
     }
 
     @Operation(
@@ -169,6 +163,21 @@ public class VolunteerController {
     }
 
     @Operation(
+            summary = "Изменение статуса испытательного срока для усыновителя собаки",
+            description = "Изменение волонтером статуса испытательного срока для усыновителя собаки",
+            tags = {"Приют собак - Усыновители"}
+    )
+    @PostMapping("/save_probation_status_dog_adopter")
+    public ResponseEntity<AnimalAdopterDTO> saveProbationStatusDogAdopter(
+            @RequestParam @Parameter(description = "id усыновителя") Integer adopterId,
+            @RequestParam @Parameter(
+                    description = "Статус испытательного срока усыновителя",
+                    schema = @Schema(implementation = PROBATION_STATUS.class)) PROBATION_STATUS probationStatus) {
+        AnimalAdopterDTO dogAdopterDTO = adopterService.processProbationStatusForDogAdopter(adopterId, probationStatus);
+        return ResponseEntity.ok(dogAdopterDTO);
+    }
+
+    @Operation(
             summary = "Добавление в базу данных записи о закреплении кошки за усыновителем",
             tags = {"Приют кошек - Усыновители"}
     )
@@ -178,24 +187,6 @@ public class VolunteerController {
         AnimalAdopterDTO savedCatAdopter = animalService.saveCatAdopter(animalAdopterDTO/*, catId, adopterId*/);
         return ResponseEntity.ok(savedCatAdopter);
     }
-
-    @ExceptionHandler(DuplicateAdopterException.class)  // 400
-    public ResponseEntity<ErrorDTO> handleDuplicateAdopter(DuplicateAdopterException e) {
-        return ResponseEntity.badRequest().body(e.toErrorDTO());
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)  // 404
-    public ResponseEntity<?> handleUserNotFound(UserNotFoundException e) {
-        logger.error(e.getMessage());
-        return ResponseEntity.notFound().build();
-    }
-
-    @ExceptionHandler(AnimalNotFoundException.class)  // 404
-    public ResponseEntity<?> handleAnimalNotFound(AnimalNotFoundException e) {
-        logger.error(e.getMessage());
-        return ResponseEntity.notFound().build();
-    }
-
 
     @Operation(
             summary = "Получение списка всех усыновителей приюта для кошек",
@@ -217,5 +208,43 @@ public class VolunteerController {
             @RequestParam(required = false) @Parameter(description = "Статус усыновителя") AdopterStatus adopterStatus) {
         List<AnimalAdopterDTO> catAdopters = animalService.getCatAdopters(adopterStatus);
         return ResponseEntity.ok(catAdopters);
+    }
+
+    @Operation(
+            summary = "Изменение статуса испытательного срока для усыновителя кошки",
+            description = "Изменение волонтером статуса испытательного срока для усыновителя кошки",
+            tags = {"Приют кошек - Усыновители"}
+    )
+    @PostMapping("/save_probation_status_cat_adopter")
+    public ResponseEntity<AnimalAdopterDTO> saveProbationStatusCatAdopter(
+            @RequestParam @Parameter(description = "id усыновителя") Integer adopterId,
+            @RequestParam @Parameter(
+                    description = "Статус испытательного срока усыновителя",
+                    schema = @Schema(implementation = PROBATION_STATUS.class)) PROBATION_STATUS probationStatus) {
+        AnimalAdopterDTO dogAdopterDTO = adopterService.processProbationStatusForCatAdopter(adopterId, probationStatus);
+        return ResponseEntity.ok(dogAdopterDTO);
+    }
+
+    @ExceptionHandler(DuplicateAdopterException.class)  // 400
+    public ResponseEntity<ErrorDTO> handleDuplicateAdopter(DuplicateAdopterException e) {
+        return ResponseEntity.badRequest().body(e.toErrorDTO());
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)  // 404
+    public ResponseEntity<?> handleUserNotFound(UserNotFoundException e) {
+        logger.error(e.getMessage());
+        return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(AnimalNotFoundException.class)  // 404
+    public ResponseEntity<?> handleAnimalNotFound(AnimalNotFoundException e) {
+        logger.error(e.getMessage());
+        return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(AdopterNotFoundException.class)  // 404
+    public ResponseEntity<?> handleAdopterNotFound(AdopterNotFoundException e) {
+        logger.error(e.getMessage());
+        return ResponseEntity.notFound().build();
     }
 }
