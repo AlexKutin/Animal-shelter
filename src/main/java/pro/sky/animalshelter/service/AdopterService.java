@@ -52,13 +52,17 @@ public class AdopterService {
                         String.format("Adopter with chatId = %d and status = %s not found in Cat Shelter database", chatId, adopterStatuses)));
     }
 
-    public Integer getAdopterIdByChatId(Long chatId) {
-        CatAdopter catAdopter = catAdopterRepository.findAdopterIdByChatId(chatId);
-        DogAdopter dogAdopter = dogAdopterRepository.findAdopterIdByChatId(chatId);
-        if (catAdopter != null) {
-            return catAdopter.getAdopterId();
-        } else if (dogAdopter != null) {
-            return dogAdopter.getAdopterId();
+    public Integer getAdopterIdByChatId(Long chatId, ShelterType chooseShelterType) {
+        if (chooseShelterType == ShelterType.DOG_SHELTER) {
+            DogAdopter dogAdopter = dogAdopterRepository.findAdopterIdByChatId(chatId);
+            if (dogAdopter != null) {
+                return dogAdopter.getAdopterId();
+            }
+        } else if (chooseShelterType == ShelterType.CAT_SHELTER) {
+            CatAdopter catAdopter = catAdopterRepository.findAdopterIdByChatId(chatId);
+            if (catAdopter != null) {
+                return catAdopter.getAdopterId();
+            }
         }
         return 0;
     }
@@ -79,6 +83,9 @@ public class AdopterService {
 
     private static void processProbationStatusForAdopter(Adopter adopter, PROBATION_STATUS probationStatus) {
         switch (probationStatus) {
+            case PROBATION_ACTIVE:
+                adopter.setAdopterStatus(AdopterStatus.PROBATION_ACTIVE);
+                break;
             case PROBATION_SUCCESS:
                 adopter.setAdopterStatus(AdopterStatus.PROBATION_PASSED);
                 break;

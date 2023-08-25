@@ -476,7 +476,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     private void sendReportMessage(Long chatId, ShelterType chooseShelterType) {
-        if (adopterService.getAdopterIdByChatId(chatId) == 0) {
+        if (adopterService.getAdopterIdByChatId(chatId, chooseShelterType) == 0) {
             sendMessage(chatId, TextConstants.SEND_REPORT_MESSAGE_ERROR + volunteerService.findAvailableVolunteerTelegram(chooseShelterType));
         } else {
             sendMessage(chatId, TextConstants.REPORT_MESSAGE);

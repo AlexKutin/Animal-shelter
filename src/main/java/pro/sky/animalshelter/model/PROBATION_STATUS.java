@@ -4,6 +4,8 @@ package pro.sky.animalshelter.model;
  * Статусы для испытательного срока для усыновителя
  */
 public enum PROBATION_STATUS {
+    PROBATION_ACTIVE("Испытательный срок активен"),
+
     PROBATION_SUCCESS("Испытательный срок пройден"),
 
     PROBATION_ADD_14("Испытательный срок продлен на 14 дней"),

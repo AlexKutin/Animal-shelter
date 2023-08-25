@@ -174,6 +174,8 @@ public class VolunteerController {
                     description = "Статус испытательного срока усыновителя",
                     schema = @Schema(implementation = PROBATION_STATUS.class)) PROBATION_STATUS probationStatus) {
         AnimalAdopterDTO dogAdopterDTO = adopterService.processProbationStatusForDogAdopter(adopterId, probationStatus);
+        logger.info("Для усыновителя id: {}, userName: {}, собака: {} установлен статус: {}",
+                adopterId, dogAdopterDTO.getUserName(), dogAdopterDTO.getAnimalName(), probationStatus);
         return ResponseEntity.ok(dogAdopterDTO);
     }
 
@@ -221,8 +223,10 @@ public class VolunteerController {
             @RequestParam @Parameter(
                     description = "Статус испытательного срока усыновителя",
                     schema = @Schema(implementation = PROBATION_STATUS.class)) PROBATION_STATUS probationStatus) {
-        AnimalAdopterDTO dogAdopterDTO = adopterService.processProbationStatusForCatAdopter(adopterId, probationStatus);
-        return ResponseEntity.ok(dogAdopterDTO);
+        AnimalAdopterDTO catAdopterDTO = adopterService.processProbationStatusForCatAdopter(adopterId, probationStatus);
+        logger.info("Для усыновителя id: {}, userName: {}, кошка: {}  установлен статус: {}",
+                adopterId, catAdopterDTO.getUserName(), catAdopterDTO.getAnimalName(), probationStatus);
+        return ResponseEntity.ok(catAdopterDTO);
     }
 
     @ExceptionHandler(DuplicateAdopterException.class)  // 400
