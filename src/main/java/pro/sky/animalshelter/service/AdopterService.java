@@ -51,9 +51,17 @@ public class AdopterService {
                 .orElseThrow(() -> new AdopterNotFoundException(
                         String.format("Adopter with chatId = %d and status = %s not found in Cat Shelter database", chatId, adopterStatuses)));
     }
-     public Integer getAdopterIdByChatId(Long chatId) {
+
+    public Integer getAdopterIdByChatId(Long chatId) {
         CatAdopter catAdopter = catAdopterRepository.findAdopterIdByChatId(chatId);
         DogAdopter dogAdopter = dogAdopterRepository.findAdopterIdByChatId(chatId);
+        if (catAdopter != null) {
+            return catAdopter.getAdopterId();
+        } else if (dogAdopter != null) {
+            return dogAdopter.getAdopterId();
+        }
+        return 0;
+    }
 
     public AnimalAdopterDTO processProbationStatusForDogAdopter(Integer adopterId, PROBATION_STATUS probationStatus) {
         DogAdopter dogAdopter = findDogAdopterById(adopterId);
@@ -89,15 +97,16 @@ public class AdopterService {
                 break;
         }
     }
-
-   /* public Integer getAdopterIdByUserId(Integer userId) {
-        CatAdopter catAdopter = catAdopterRepository.findByUserUserId(userId);
-        DogAdopter dogAdopter = dogAdopterRepository.findByUserUserId(userId);
-        if (catAdopter != null) {
-            return catAdopter.getAdopterId();
-        } else if (dogAdopter != null) {
-            return dogAdopter.getAdopterId();
-        }
-        return 0;
-    }
 }
+
+//   /* public Integer getAdopterIdByUserId(Integer userId) {
+//        CatAdopter catAdopter = catAdopterRepository.findByUserUserId(userId);
+//        DogAdopter dogAdopter = dogAdopterRepository.findByUserUserId(userId);
+//        if (catAdopter != null) {
+//            return catAdopter.getAdopterId();
+//        } else if (dogAdopter != null) {
+//            return dogAdopter.getAdopterId();
+//        }
+//        return 0;
+//    }
+//}

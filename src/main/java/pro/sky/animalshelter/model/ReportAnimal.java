@@ -111,7 +111,7 @@ public abstract class ReportAnimal {
         reportAnimalDTO.setDateReport(this.getDateReport());
         reportAnimalDTO.setReportStatus(this.getReportStatus());
         reportAnimalDTO.setPhotoData(this.getPhotoData());
-        reportAnimalDTO.setChatId(this.getAdopter().getUser().getChatId());
+        reportAnimalDTO.setChatId(this.getAdopter().getChatId());
         return reportAnimalDTO;
     }
 }
