@@ -49,7 +49,9 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     private final ReportService reportService;
     private final AdopterService adopterService;
     private final Map<Long, ShelterType> chooseShelterType = new HashMap<>();
-    private final Map<Long, ShelterType> reportDataMap = new HashMap<>();
+    private final Map<Long, ReportStage> reportStageMap = new HashMap<>();
+    private final Map<Long, byte[]> photoDataMap = new HashMap<>();
+    private final Map<Long, ShelterType> shelterTypeMap = new HashMap<>();
 
     @Autowired
     public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService shelterService,
@@ -115,44 +117,43 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             userShelterDTO.setUserContacts(userContacts);
 
             userShelterService.saveUserContacts(userShelterDTO);
-            SendMessage response = new SendMessage(chatId, "Спасибо! Ваши контакты сохранены. Наши волонтеры свяжутся с вами в ближайшее время.");
+            SendMessage response = new SendMessage(chatId, TextConstants.SEND_LEAVE_CONTACTS_SUCCESSFULLY);
             InlineKeyboardMarkup keyboardMarkup = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
             response.replyMarkup(keyboardMarkup);
             SendResponse sendResponse = animalShelterBot.execute(response);
             logger.info("Message sent status: {}", sendResponse.isOk());
         } else if ("/getchatid".equals(text)) {
             getChatId(chatId);
-        } else if (reportDataMap.containsKey(chatId)) {
-            boolean hasPhoto = message.photo() != null && message.photo().length > 0;
-            boolean hasText = message.text() != null && !message.text().isEmpty();
+        } else if (reportStageMap.containsKey(chatId)) {
+            ReportStage reportStage = reportStageMap.get(chatId);
+            if (reportStage == ReportStage.AWAITING_PHOTO) {
+                if (message.photo() != null && message.photo().length > 0) {
+                    photoDataMap.put(chatId, getPhotoData(message.photo()[0].fileId()));
+                    shelterTypeMap.put(chatId, getShelterTypeByUserChatId(chatId));
 
-            if (hasText && !hasPhoto) {
-                // Клиент прислал только текст, попросим его прислать фотографию
-                SendMessage requestPhotoMessage = new SendMessage(chatId, "Пожалуйста, прикрепите фотографию к вашему сообщению.");
-                SendResponse requestPhotoResponse = animalShelterBot.execute(requestPhotoMessage);
-            } else if (!hasText && hasPhoto) {
-                // Клиент прислал только фотографию, попросим его прислать текст
-                SendMessage requestTextMessage = new SendMessage(chatId, "Пожалуйста, добавьте описание к вашей фотографии.");
-                SendResponse requestTextResponse = animalShelterBot.execute(requestTextMessage);
-            } else if (hasText && hasPhoto) {
-                // Клиент прислал и текст и фотографию
-                PhotoSize[] photoSizesArray = message.photo();
-                List<PhotoSize> photos = Arrays.asList(photoSizesArray);
-                String fileId = photos.get(photos.size() - 1).fileId();
+                    reportStageMap.put(chatId, ReportStage.AWAITING_DESCRIPTION);
+                    SendMessage requestTextMessage = new SendMessage(chatId, TextConstants.REPORT_MESSAGE_DESCRIPTION);
+                    SendResponse requestTextResponse = animalShelterBot.execute(requestTextMessage);
+                } else {
+                    SendMessage requestPhotoMessage = new SendMessage(chatId, TextConstants.REPORT_MESSAGE_ERROR);
+                    SendResponse requestPhotoResponse = animalShelterBot.execute(requestPhotoMessage);
+                }
+            } else if (reportStage == ReportStage.AWAITING_DESCRIPTION) {
+                byte[] photoData = photoDataMap.get(chatId);
+                ShelterType shelterType = shelterTypeMap.get(chatId);
 
-                // Получаем фактические данные файла
-                byte[] photoData = getPhotoData(fileId);
+                if (photoData != null && shelterType != null) {
+                    saveReportToService(chatId, message.text(), photoData, shelterType);
 
-                // Сохранение отчета
-                saveReportToService(chatId, text, photoData);
-
-                // Отправка подтверждающего сообщения
-                SendMessage sendMessage = new SendMessage(chatId, "Спасибо! Ваш отчет сохранен.");
-                SendResponse sendResponse = animalShelterBot.execute(sendMessage);
+                    reportStageMap.put(chatId, ReportStage.COMPLETED);
+                    SendMessage sendResponse = new SendMessage(chatId, TextConstants.REPORT_MESSAGE_SUCCESSFULLY);
+                    SendResponse response = animalShelterBot.execute(sendResponse);
+                }
             }
         } else {
             sendInvalidMessage(chatId);
         }
+
     }
 
     private void handleCallbackQuery(CallbackQuery callbackQuery) {
@@ -219,7 +220,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             sendCynologist(chatId);
         } else if (CallbackConstants.CANCEL_CONTACT_INPUT.equals(data)) {
             userContactMap.remove(chatId);
-            sendMessage(chatId, "Вы отменили ввод контактов.");
+            sendMessage(chatId, TextConstants.SEND_LEAVE_CONTACTS_CANCEL);
         }
     }
 
@@ -476,46 +477,36 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
 
     private void sendReportMessage(Long chatId, ShelterType chooseShelterType) {
         if (adopterService.getAdopterIdByChatId(chatId) == 0) {
-            sendMessage(chatId, "Вы не являетесь усыновителем, пожалуйста свяжитесь с волонтером:" + volunteerService.findAvailableVolunteerTelegram(chooseShelterType));
+            sendMessage(chatId, TextConstants.SEND_REPORT_MESSAGE_ERROR + volunteerService.findAvailableVolunteerTelegram(chooseShelterType));
         } else {
             sendMessage(chatId, TextConstants.REPORT_MESSAGE);
-            ShelterType shelterType = getShelterTypeByUserChatId(chatId);
-            reportDataMap.put(chatId, shelterType);
+//            ShelterType shelterType = getShelterTypeByUserChatId(chatId);
+            reportStageMap.put(chatId, ReportStage.AWAITING_PHOTO);
         }
     }
     // Метод сохранения отчета в сервисе
 
-    private void saveReportToService(Long chatId, String text, byte[] photoData) {
-        ShelterType shelterType = getShelterTypeByUserChatId(chatId);
-//        int userId = getUserIdFromChatId(chatId);
-//        Integer adopterId = adopterService.getAdopterIdByUserId(userId);
-        // Генерируем уникальное имя файла
+    private void saveReportToService(Long chatId, String description, byte[] photoData, ShelterType shelterType) {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
         String photoFilename = shelterType + "_" + timestamp + ".jpg";
         // Создаем DTO для сохранения в сервисе
         ReportAnimalDTO reportAnimalDTO = new ReportAnimalDTO();
         reportAnimalDTO.setShelterType(shelterType);
-        reportAnimalDTO.setChatId(chatId); // Устанавливаем chatId
-//        reportAnimalDTO.setAdopterId(adopterId); // Получаем adopterId в зависимости от chatId
-        reportAnimalDTO.setDescription(text);
-        reportAnimalDTO.setPhotoFilename(photoFilename); // Устанавливаем имя файла (замените на фактическое имя)
+        reportAnimalDTO.setChatId(chatId);
+        reportAnimalDTO.setDescription(description);
+        reportAnimalDTO.setPhotoFilename(photoFilename);
         reportAnimalDTO.setPhotoData(photoData);
-        reportAnimalDTO.setDateReport(LocalDate.now()); // Устанавливаем текущую дату
-        reportAnimalDTO.setReportStatus(ReportStatus.REPORT_NEW); // Устанавливаем начальный статус
+        reportAnimalDTO.setDateReport(LocalDate.now());
+        reportAnimalDTO.setReportStatus(ReportStatus.REPORT_NEW);
 
-        // Вызываем метод сервиса для сохранения отчета
-        // Добавть обработку исключения UserNotFoundException - выводить сообщение пользователю !
         reportService.saveReport(reportAnimalDTO);
     }
 
     private byte[] getPhotoData(String fileId) {
         GetFile getFile = new GetFile(fileId);
         GetFileResponse file = animalShelterBot.execute(getFile);
-
-        // Получаем ссылку на файл
         String filePath = file.file().fileId();
 
-        // Вызываем метод бота для получения фотографии как массива байтов
         GetFile fileDataRequest = new GetFile(filePath);
         GetFileResponse imgFile = animalShelterBot.execute(fileDataRequest);
         if (imgFile == null) {
@@ -533,18 +524,6 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             return null;
         }
     }
-
-//    private int getUserIdFromChatId(Long chatId) {
-//        GetChat getChatRequest = new GetChat(chatId.toString());
-//        Chat chat = animalShelterBot.execute(getChatRequest).chat();
-//
-//        if (chat != null && chat.id() != null) {
-//            return Math.toIntExact(chat.id());
-//        } else {
-//            return Math.toIntExact(-1L);
-//        }
-//
-//    }
 
     private void sendVolunteerMessage(Long chatId, ShelterType chosenShelterType) {
         String userName = getUserNameByChatId(chatId);
