@@ -534,17 +534,17 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         }
     }
 
-    private int getUserIdFromChatId(Long chatId) {
-        GetChat getChatRequest = new GetChat(chatId.toString());
-        Chat chat = animalShelterBot.execute(getChatRequest).chat();
-
-        if (chat != null && chat.id() != null) {
-            return Math.toIntExact(chat.id());
-        } else {
-            return Math.toIntExact(-1L);
-        }
-
-    }
+//    private int getUserIdFromChatId(Long chatId) {
+//        GetChat getChatRequest = new GetChat(chatId.toString());
+//        Chat chat = animalShelterBot.execute(getChatRequest).chat();
+//
+//        if (chat != null && chat.id() != null) {
+//            return Math.toIntExact(chat.id());
+//        } else {
+//            return Math.toIntExact(-1L);
+//        }
+//
+//    }
 
     private void sendVolunteerMessage(Long chatId, ShelterType chosenShelterType) {
         String userName = getUserNameByChatId(chatId);

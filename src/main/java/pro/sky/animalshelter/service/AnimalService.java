@@ -69,6 +69,7 @@ public class AnimalService {
     public AnimalAdopterDTO saveDogAdopter(AnimalAdopterDTO animalAdopterDTO) {
         Integer userId = animalAdopterDTO.getUserId();
         Integer dogId = animalAdopterDTO.getAnimalId();
+        Long chatId = animalAdopterDTO.getChatId();
         if (dogAdopterRepository.isPresentDogAdopterByUserAndDog(userId, dogId)) {
             logger.warn("Dog Shelter: Adopter duplication error: userId = {} and catId = {} already present", userId, dogId);
             throw new DuplicateAdopterException(
@@ -76,6 +77,7 @@ public class AnimalService {
         }
         DogAdopter dogAdopter = new DogAdopter();
         dogAdopter.setDog(findDogById(dogId));
+        dogAdopter.setChatId(chatId);
         dogAdopter.setUser(userShelterService.findUserDogShelterById(userId));
         dogAdopter.setAdoptionDate(LocalDateTime.now());
         dogAdopter.setAdopterStatus(animalAdopterDTO.getAdopterStatus());
@@ -96,6 +98,7 @@ public class AnimalService {
     public AnimalAdopterDTO saveCatAdopter(AnimalAdopterDTO animalAdopterDTO) {
         Integer userId = animalAdopterDTO.getUserId();
         Integer catId = animalAdopterDTO.getAnimalId();
+        Long chatId = animalAdopterDTO.getChatId();
         if (catAdopterRepository.isPresentCatAdopterByUserAndCat(userId, catId)) {
             logger.warn("Cat Shelter: Adopter duplication error: userId = {} and catId = {} already present", userId, catId);
             throw new DuplicateAdopterException(
@@ -103,6 +106,7 @@ public class AnimalService {
         }
         CatAdopter catAdopter = new CatAdopter();
         catAdopter.setCat(findCatById(catId));
+        catAdopter.setChatId(chatId);
         catAdopter.setUser(userShelterService.findUserCatShelterById(userId));
         catAdopter.setAdoptionDate(LocalDateTime.now());
         catAdopter.setAdopterStatus(animalAdopterDTO.getAdopterStatus());
