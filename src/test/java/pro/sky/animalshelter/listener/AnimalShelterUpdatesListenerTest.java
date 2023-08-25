@@ -1,18 +1,24 @@
 package pro.sky.animalshelter.listener;
 
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.CallbackQuery;
+import com.pengrad.telegrambot.model.Chat;
+import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.request.SendMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pro.sky.animalshelter.Constants.CallbackConstants;
+import pro.sky.animalshelter.Constants.TextConstants;
+import pro.sky.animalshelter.keyBoard.InlineKeyboardMarkupHelper;
 
-import java.util.Collections;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -20,6 +26,9 @@ public class AnimalShelterUpdatesListenerTest {
 
     @Mock
     private TelegramBot animalShelterBot;
+
+    @Captor
+    ArgumentCaptor<SendMessage> captor;
 
     @InjectMocks
     private AnimalShelterUpdatesListener updatesListener;
@@ -32,16 +41,29 @@ public class AnimalShelterUpdatesListenerTest {
     @Test
     public void testInit() {
         updatesListener.init();
-        Mockito.verify(animalShelterBot, Mockito.times(1)).setUpdatesListener(updatesListener);
+        verify(animalShelterBot, Mockito.times(1)).setUpdatesListener(updatesListener);
     }
-//    @Test
-//    public void testProcess() {
-//        Update mockUpdate = Mockito.mock(Update.class);
-//        List<Update> mockUpdates = Collections.singletonList(mockUpdate);
-//
-//        updatesListener.process(mockUpdates);
-//
-//        Mockito.verify(animalShelterBot).execute(Mockito.any());
-//    }
 
+    @Test
+    void name() {
+        var upd = mock(Update.class);
+        var callback = mock(CallbackQuery.class);
+        var message = mock(Message.class);
+        var chat = mock(Chat.class);
+        when(upd.callbackQuery()).thenReturn(callback);
+        when(callback.data()).thenReturn(CallbackConstants.INFO);
+        when(callback.message()).thenReturn(message);
+        when(message.chat()).thenReturn(chat);
+        when(chat.id()).thenReturn(1L);
+
+        updatesListener.process(List.of(upd));
+
+        verify(animalShelterBot).execute(captor.capture());
+
+        var value = captor.getValue();
+
+        assertEquals(value.getParameters().get("chat_id"), 1L); // проверили, что чат айди поставился верно
+        assertEquals(value.getParameters().get("text"), TextConstants.WELCOME_MESSAGE); // проверили, что текст верный, однако сейчас текст записан строкой прям в коде, поэтому имеет смысл вынести все тексты сообщений в отдельные класс констант, в тестах будет проще
+        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createShelterInfoInlineKeyboard()); // проверили, что клавиатура поставилась верно
+    }
 }
