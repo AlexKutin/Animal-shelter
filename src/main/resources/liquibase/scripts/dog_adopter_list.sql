@@ -20,3 +20,5 @@ ALTER TABLE dog_adopter_list RENAME COLUMN adoption_id TO adopter_id;
 
 -- changeset AlexKutin:4
 ALTER TABLE dog_adopter_list RENAME TO dog_adopters
+-- changeset BM:5
+ALTER TABLE dog_adopters ADD COLUMN chat_id BIGINT UNIQUE;

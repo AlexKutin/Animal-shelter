@@ -17,6 +17,8 @@ public class AnimalAdopterDTO {
 
     @Schema(description = "Идентификатор пользователя")
     private Integer userId;
+    @Schema(description = "Идентификатор чата")
+    private Long chatId;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(description = "Имя пользователя")
@@ -109,6 +111,14 @@ public class AnimalAdopterDTO {
 
     public void setEndProbationDate(String endProbationDate) {
         this.endProbationDate = endProbationDate;
+    }
+
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
     }
 
     @Override

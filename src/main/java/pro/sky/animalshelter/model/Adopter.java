@@ -13,6 +13,8 @@ public abstract class Adopter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "adopter_id")
     private Integer adopterId;
+    @Column(name = "chat_id", unique = true)
+    private Long chatId;
 
     @Column(name = "adoption_date")
     private LocalDateTime adoptionDate;
@@ -58,6 +60,14 @@ public abstract class Adopter {
         this.endProbationDate = endProbationDate;
     }
 
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
+    }
+
     public AnimalAdopterDTO toDTO() {
         AnimalAdopterDTO animalAdopterDTO = new AnimalAdopterDTO();
 
@@ -71,6 +81,7 @@ public abstract class Adopter {
         animalAdopterDTO.setAdopterStatus(this.getAdopterStatus());
         animalAdopterDTO.setEndProbationDate(this.getEndProbationDate().
                 format(DateTimeFormatter.ofPattern("dd:MM:yyyy")));
+        animalAdopterDTO.setChatId(this.chatId);
 
         return animalAdopterDTO;
     }

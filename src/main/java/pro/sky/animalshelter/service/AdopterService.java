@@ -46,15 +46,14 @@ public class AdopterService {
                 .orElseThrow(() -> new AdopterNotFoundException(
                         String.format("Adopter with chatId = %d and status = %s not found in Cat Shelter database", chatId, adopterStatuses)));
     }
-
-   /* public Integer getAdopterIdByUserId(Integer userId) {
-        CatAdopter catAdopter = catAdopterRepository.findByUserUserId(userId);
-        DogAdopter dogAdopter = dogAdopterRepository.findByUserUserId(userId);
+     public Integer getAdopterIdByChatId(Long chatId) {
+        CatAdopter catAdopter = catAdopterRepository.findAdopterIdByChatId(chatId);
+        DogAdopter dogAdopter = dogAdopterRepository.findAdopterIdByChatId(chatId);
         if (catAdopter != null) {
             return catAdopter.getAdopterId();
         } else if (dogAdopter != null) {
             return dogAdopter.getAdopterId();
         }
-        return null;
-    }*/
+        return 0;
+    }
 }

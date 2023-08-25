@@ -16,5 +16,5 @@ public interface CatAdopterRepository extends JpaRepository<CatAdopter, Integer>
     boolean isPresentCatAdopterByUserAndCat(Integer userId, Integer catId);
 
     CatAdopter findCatAdopterByUserAndAdopterStatusIn(UserCatShelter userCatShelter, Collection<AdopterStatus> adopterStatuses);
-
+    CatAdopter findAdopterIdByChatId(Long chatId);
 }

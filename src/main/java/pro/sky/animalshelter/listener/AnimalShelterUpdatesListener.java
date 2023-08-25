@@ -47,7 +47,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     private final UserShelterService userShelterService;
     private final VolunteerService volunteerService;
     private final ReportService reportService;
-//    private final AdopterService adopterService;
+    private final AdopterService adopterService;
     private final Map<Long, ShelterType> chooseShelterType = new HashMap<>();
     private final Map<Long, ShelterType> reportDataMap = new HashMap<>();
 
@@ -60,7 +60,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         this.userShelterService = userShelterService;
         this.volunteerService = volunteerService;
         this.reportService = reportService;
-//        this.adopterService = adopterService;
+        this.adopterService = adopterService;
     }
 
     @PostConstruct
@@ -123,19 +123,33 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         } else if ("/getchatid".equals(text)) {
             getChatId(chatId);
         } else if (reportDataMap.containsKey(chatId)) {
-            PhotoSize[] photoSizesArray = message.photo();
-            List<PhotoSize> photos = Arrays.asList(photoSizesArray);
-            String fileId = photos.get(photos.size() - 1).fileId();
+            boolean hasPhoto = message.photo() != null && message.photo().length > 0;
+            boolean hasText = message.text() != null && !message.text().isEmpty();
 
-            // Получаем фактические данные файла
-            byte[] photoData = getPhotoData(fileId);
+            if (hasText && !hasPhoto) {
+                // Клиент прислал только текст, попросим его прислать фотографию
+                SendMessage requestPhotoMessage = new SendMessage(chatId, "Пожалуйста, прикрепите фотографию к вашему сообщению.");
+                SendResponse requestPhotoResponse = animalShelterBot.execute(requestPhotoMessage);
+            } else if (!hasText && hasPhoto) {
+                // Клиент прислал только фотографию, попросим его прислать текст
+                SendMessage requestTextMessage = new SendMessage(chatId, "Пожалуйста, добавьте описание к вашей фотографии.");
+                SendResponse requestTextResponse = animalShelterBot.execute(requestTextMessage);
+            } else if (hasText && hasPhoto) {
+                // Клиент прислал и текст и фотографию
+                PhotoSize[] photoSizesArray = message.photo();
+                List<PhotoSize> photos = Arrays.asList(photoSizesArray);
+                String fileId = photos.get(photos.size() - 1).fileId();
 
-            // Сохранение отчета
-            saveReportToService(chatId, text, photoData);
+                // Получаем фактические данные файла
+                byte[] photoData = getPhotoData(fileId);
 
-            // Отправка подтверждающего сообщения
-            SendMessage sendMessage = new SendMessage(chatId, "Спасибо! Ваш отчет сохранен.");
-            SendResponse sendResponse = animalShelterBot.execute(sendMessage);
+                // Сохранение отчета
+                saveReportToService(chatId, text, photoData);
+
+                // Отправка подтверждающего сообщения
+                SendMessage sendMessage = new SendMessage(chatId, "Спасибо! Ваш отчет сохранен.");
+                SendResponse sendResponse = animalShelterBot.execute(sendMessage);
+            }
         } else {
             sendInvalidMessage(chatId);
         }
@@ -188,7 +202,8 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         } else if (CallbackConstants.LIST_CYNOLOGIST.equals(data)) {
             sendListCynologist(chatId);
         } else if (CallbackConstants.SEND_REPORT.equals(data)) {
-            sendReportMessage(chatId);
+            ShelterType chosenShelterType = chooseShelterType.get(chatId);
+            sendReportMessage(chatId, chosenShelterType);
         } else if (CallbackConstants.CALL_VOLUNTEER.equals(data)) {
             ShelterType chosenShelterType = chooseShelterType.get(chatId);
             sendVolunteerMessage(chatId, chosenShelterType);
@@ -338,7 +353,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     }
 
     private void backMainMenu(Long chatId) {
-        SendMessage response = new SendMessage(chatId,TextConstants.BACK_MAIN_MENU);
+        SendMessage response = new SendMessage(chatId, TextConstants.BACK_MAIN_MENU);
         InlineKeyboardMarkup menuKeyboard = InlineKeyboardMarkupHelper.createMainMenuInlineKeyboard();
         response.replyMarkup(menuKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(response);
@@ -459,10 +474,14 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         logger.info("Message sent status: {}", sendResponse.isOk());
     }
 
-    private void sendReportMessage(Long chatId) {
-        sendMessage(chatId, TextConstants.REPORT_MESSAGE);
-        ShelterType shelterType = getShelterTypeByUserChatId(chatId);
-        reportDataMap.put(chatId, shelterType);
+    private void sendReportMessage(Long chatId, ShelterType chooseShelterType) {
+        if (adopterService.getAdopterIdByChatId(chatId) == 0) {
+            sendMessage(chatId, "Вы не являетесь усыновителем, пожалуйста свяжитесь с волонтером:" + volunteerService.findAvailableVolunteerTelegram(chooseShelterType));
+        } else {
+            sendMessage(chatId, TextConstants.REPORT_MESSAGE);
+            ShelterType shelterType = getShelterTypeByUserChatId(chatId);
+            reportDataMap.put(chatId, shelterType);
+        }
     }
     // Метод сохранения отчета в сервисе
 

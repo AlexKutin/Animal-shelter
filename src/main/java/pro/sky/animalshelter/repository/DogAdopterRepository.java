@@ -15,4 +15,5 @@ public interface DogAdopterRepository extends JpaRepository<DogAdopter, Integer>
     boolean isPresentDogAdopterByUserAndDog(Integer userId, Integer dogId);
 
     DogAdopter findDogAdopterByUserAndAdopterStatus(UserDogShelter userDogShelter, AdopterStatus adopterStatus);
+    DogAdopter findAdopterIdByChatId(Long chatId);
 }
