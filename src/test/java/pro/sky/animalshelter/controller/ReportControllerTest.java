@@ -243,7 +243,7 @@ public class ReportControllerTest {
         ReportStatus reportStatus = ReportStatus.REPORT_NEW;
         ReportAnimalDTO expectedReport = new ReportAnimalDTO();
 
-        when(reportService.editStatusReport(eq(ShelterType.CAT_SHELTER), eq(reportId), eq(reportStatus)))
+        when(reportService.editCatShelterStatusReport(eq(reportId), eq(reportStatus)))
                 .thenReturn(expectedReport);
 
         // Act
@@ -251,7 +251,7 @@ public class ReportControllerTest {
                 reportController.processReportCatShelter(reportId, reportStatus);
 
         // Assert
-        verify(reportService).editStatusReport(eq(ShelterType.CAT_SHELTER), eq(reportId), eq(reportStatus));
+        verify(reportService).editCatShelterStatusReport(eq(reportId), eq(reportStatus));
         verifyNoMoreInteractions(reportService);
 
         assertEquals(expectedReport, responseEntity.getBody());
@@ -264,7 +264,7 @@ public class ReportControllerTest {
         Integer reportId = 1;
         ReportStatus reportStatus = ReportStatus.REPORT_NEW;
 
-        when(reportService.editStatusReport(eq(ShelterType.CAT_SHELTER), eq(reportId), eq(reportStatus)))
+        when(reportService.editCatShelterStatusReport(eq(reportId), eq(reportStatus)))
                 .thenThrow(new AdopterNotFoundException("Adopter not found"));
 
         // Act
@@ -272,7 +272,7 @@ public class ReportControllerTest {
                 reportController.processReportCatShelter(reportId, reportStatus);
 
         // Assert
-        verify(reportService).editStatusReport(eq(ShelterType.CAT_SHELTER), eq(reportId), eq(reportStatus));
+        verify(reportService).editCatShelterStatusReport(eq(reportId), eq(reportStatus));
         verifyNoMoreInteractions(reportService);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
@@ -284,7 +284,7 @@ public class ReportControllerTest {
         Integer reportId = 1;
         ReportStatus reportStatus = ReportStatus.REPORT_NEW;
 
-        when(reportService.editStatusReport(eq(ShelterType.CAT_SHELTER), eq(reportId), eq(reportStatus)))
+        when(reportService.editCatShelterStatusReport(eq(reportId), eq(reportStatus)))
                 .thenThrow(new ShelterNotFoundException("Shelter not found"));
 
         // Act
@@ -292,7 +292,7 @@ public class ReportControllerTest {
                 reportController.processReportCatShelter(reportId, reportStatus);
 
         // Assert
-        verify(reportService).editStatusReport(eq(ShelterType.CAT_SHELTER), eq(reportId), eq(reportStatus));
+        verify(reportService).editCatShelterStatusReport(eq(reportId), eq(reportStatus));
         verifyNoMoreInteractions(reportService);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
@@ -304,7 +304,7 @@ public class ReportControllerTest {
         Integer reportId = 1;
         ReportStatus reportStatus = ReportStatus.REPORT_NEW;
 
-        when(reportService.editStatusReport(eq(ShelterType.CAT_SHELTER), eq(reportId), eq(reportStatus)))
+        when(reportService.editCatShelterStatusReport(eq(reportId), eq(reportStatus)))
                 .thenThrow(new ReportNotFoundException("Report not found"));
 
         // Act
@@ -312,7 +312,7 @@ public class ReportControllerTest {
                 reportController.processReportCatShelter(reportId, reportStatus);
 
         // Assert
-        verify(reportService).editStatusReport(eq(ShelterType.CAT_SHELTER), eq(reportId), eq(reportStatus));
+        verify(reportService).editCatShelterStatusReport(eq(reportId), eq(reportStatus));
         verifyNoMoreInteractions(reportService);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
@@ -324,7 +324,7 @@ public class ReportControllerTest {
         ReportStatus reportStatus = ReportStatus.REPORT_NEW;
         ReportAnimalDTO expectedReport = new ReportAnimalDTO();
 
-        when(reportService.editStatusReport(eq(ShelterType.DOG_SHELTER), eq(reportId), eq(reportStatus)))
+        when(reportService.editDogShelterStatusReport(eq(reportId), eq(reportStatus)))
                 .thenReturn(expectedReport);
 
         // Act
@@ -332,7 +332,7 @@ public class ReportControllerTest {
                 reportController.processReportDogShelter(reportId, reportStatus);
 
         // Assert
-        verify(reportService).editStatusReport(eq(ShelterType.DOG_SHELTER), eq(reportId), eq(reportStatus));
+        verify(reportService).editDogShelterStatusReport(eq(reportId), eq(reportStatus));
         verifyNoMoreInteractions(reportService);
 
         assertEquals(expectedReport, responseEntity.getBody());
@@ -345,7 +345,7 @@ public class ReportControllerTest {
         Integer reportId = 1;
         ReportStatus reportStatus = ReportStatus.REPORT_NEW;
 
-        when(reportService.editStatusReport(eq(ShelterType.DOG_SHELTER), eq(reportId), eq(reportStatus)))
+        when(reportService.editDogShelterStatusReport(eq(reportId), eq(reportStatus)))
                 .thenThrow(new AdopterNotFoundException("Adopter not found"));
 
         // Act
@@ -353,7 +353,7 @@ public class ReportControllerTest {
                 reportController.processReportDogShelter(reportId, reportStatus);
 
         // Assert
-        verify(reportService).editStatusReport(eq(ShelterType.DOG_SHELTER), eq(reportId), eq(reportStatus));
+        verify(reportService).editDogShelterStatusReport(eq(reportId), eq(reportStatus));
         verifyNoMoreInteractions(reportService);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
@@ -365,7 +365,7 @@ public class ReportControllerTest {
         Integer reportId = 1;
         ReportStatus reportStatus = ReportStatus.REPORT_NEW;
 
-        when(reportService.editStatusReport(eq(ShelterType.DOG_SHELTER), eq(reportId), eq(reportStatus)))
+        when(reportService.editDogShelterStatusReport(eq(reportId), eq(reportStatus)))
                 .thenThrow(new ShelterNotFoundException("Shelter not found"));
 
         // Act
@@ -373,7 +373,7 @@ public class ReportControllerTest {
                 reportController.processReportDogShelter(reportId, reportStatus);
 
         // Assert
-        verify(reportService).editStatusReport(eq(ShelterType.DOG_SHELTER), eq(reportId), eq(reportStatus));
+        verify(reportService).editDogShelterStatusReport(eq(reportId), eq(reportStatus));
         verifyNoMoreInteractions(reportService);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
@@ -385,7 +385,7 @@ public class ReportControllerTest {
         Integer reportId = 1;
         ReportStatus reportStatus = ReportStatus.REPORT_NEW;
 
-        when(reportService.editStatusReport(eq(ShelterType.DOG_SHELTER), eq(reportId), eq(reportStatus)))
+        when(reportService.editDogShelterStatusReport(eq(reportId), eq(reportStatus)))
                 .thenThrow(new ReportNotFoundException("Report not found"));
 
         // Act
@@ -393,7 +393,7 @@ public class ReportControllerTest {
                 reportController.processReportDogShelter(reportId, reportStatus);
 
         // Assert
-        verify(reportService).editStatusReport(eq(ShelterType.DOG_SHELTER), eq(reportId), eq(reportStatus));
+        verify(reportService).editDogShelterStatusReport(eq(reportId), eq(reportStatus));
         verifyNoMoreInteractions(reportService);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
