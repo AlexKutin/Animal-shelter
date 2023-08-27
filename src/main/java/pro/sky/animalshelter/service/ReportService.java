@@ -105,8 +105,8 @@ public class ReportService {
             reportDogShelter.setDogAdopter(dogAdopter);
 
             // Передача бинарных данных изображения и имя файла
-            reportDogShelter.setPhotoData(reportAnimalDTO.getPhotoData());
-            reportDogShelter.setPhotoFilename(reportAnimalDTO.getPhotoFilename());
+//            reportDogShelter.setPhotoData(reportAnimalDTO.getPhotoData());
+//            reportDogShelter.setPhotoFilename(reportAnimalDTO.getPhotoFilename());
 
             reportDogShelter = reportDogShelterRepository.save(reportDogShelter);
             resultAnimalDTO = reportDogShelter.toDTO();
@@ -124,8 +124,8 @@ public class ReportService {
             reportCatShelter.setCatAdopter(catAdopter);
 
             // Передача бинарных данных изображения и имя файла
-            reportCatShelter.setPhotoData(reportAnimalDTO.getPhotoData());
-            reportCatShelter.setPhotoFilename(reportAnimalDTO.getPhotoFilename());
+//            reportCatShelter.setPhotoData(reportAnimalDTO.getPhotoData());
+//            reportCatShelter.setPhotoFilename(reportAnimalDTO.getPhotoFilename());
 
             reportCatShelter = reportCatShelterRepository.save(reportCatShelter);
             resultAnimalDTO = reportCatShelter.toDTO();

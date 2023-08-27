@@ -29,13 +29,15 @@ public class ReportAnimalDTO {
     @Schema(description = "Текстовая часть отчета")
     private String description;
 
-    //    @Schema(description = "Путь к фотографии отчета")
-//    private String photo;
-    @Schema(description = "Имя файла изображения отчета")
-    private String photoFilename; // Изменили название поля
+    @Schema(description = "Путь к файлу фотографии в отчете")
+    private String filePath;
 
-    @Schema(description = "Бинарные данные изображения отчета")
-    private byte[] photoData;
+    @Schema(description = "Размер файла фотографии")
+    private long fileSize;
+
+    @Schema(description = "Тип файла фотографии")
+    private String mediaType;
+
     @Schema(description = "Дата получения отчета")
     private LocalDate dateReport;
 
@@ -79,14 +81,6 @@ public class ReportAnimalDTO {
         this.description = description;
     }
 
-//    public String getPhoto() {
-//        return photo;
-//    }
-
-//    public void setPhoto(String photo) {
-//        this.photo = photo;
-//    }
-
     public LocalDate getDateReport() {
         return dateReport;
     }
@@ -103,20 +97,28 @@ public class ReportAnimalDTO {
         this.reportStatus = reportStatus;
     }
 
-    public String getPhotoFilename() {
-        return photoFilename;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public void setPhotoFilename(String photoFilename) {
-        this.photoFilename = photoFilename;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
-    public byte[] getPhotoData() {
-        return photoData;
+    public long getFileSize() {
+        return fileSize;
     }
 
-    public void setPhotoData(byte[] photoData) {
-        this.photoData = photoData;
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
     }
 
     @Override
@@ -128,7 +130,9 @@ public class ReportAnimalDTO {
                 ", chatId=" + chatId +
                 ", adopterId=" + adopterId +
                 ", description='" + description + '\'' +
-                ", photoFilename='" + photoFilename + '\'' +
+                ", filePath='" + filePath + '\'' +
+                ", fileSize=" + fileSize +
+                ", mediaType='" + mediaType + '\'' +
                 ", dateReport=" + dateReport +
                 '}';
     }

@@ -1,6 +1,5 @@
 package pro.sky.animalshelter.model;
 
-import org.hibernate.annotations.Type;
 import pro.sky.animalshelter.dto.ReportAnimalDTO;
 
 import javax.persistence.*;
@@ -15,20 +14,20 @@ public abstract class ReportAnimal {
 
     @Column(name = "description")
     private String description;
-//    private String photo;
 
     @Column(name = "date_report", nullable = false)
     private LocalDate dateReport;
     //    private Timestamp dateTimeReport;
 
-    @Lob // Добавляем аннотацию для бинарных данных (BLOB)
-    @Type(type = "org.hibernate.type.BinaryType")
-    @Column(name = "photo_data")
-    @Basic(fetch = FetchType.LAZY)
-    private byte[] photoData;
+    @Column(name = "file_path")
+    private String photoFilePath;
 
-    @Column(name = "photo_filename")
-    private String photoFilename;
+    @Column(name = "file_size")
+    private Long photoFileSize;
+
+    @Column(name = "media_type")
+    private String photoMediaType;
+
     @Column(name = "report_status")
     @Enumerated(EnumType.STRING)
     private ReportStatus reportStatus;
@@ -54,14 +53,6 @@ public abstract class ReportAnimal {
         this.description = description;
     }
 
-//    public String getPhoto() {
-//        return photo;
-//    }
-
-//    public void setPhoto(String photo) {
-//        this.photo = photo;
-//    }
-
 //    public Timestamp getDateTimeReport() {
 //        return dateTimeReport;
 //    }
@@ -70,20 +61,28 @@ public abstract class ReportAnimal {
 //        this.dateTimeReport = dateTimeReport;
 //    }
 
-    public byte[] getPhotoData() {
-        return photoData;
+    public String getPhotoFilePath() {
+        return photoFilePath;
     }
 
-    public void setPhotoData(byte[] photoData) {
-        this.photoData = photoData;
+    public void setPhotoFilePath(String photoFilePath) {
+        this.photoFilePath = photoFilePath;
     }
 
-    public String getPhotoFilename() {
-        return photoFilename;
+    public Long getPhotoFileSize() {
+        return photoFileSize;
     }
 
-    public void setPhotoFilename(String photoFilename) {
-        this.photoFilename = photoFilename;
+    public void setPhotoFileSize(Long photoFileSize) {
+        this.photoFileSize = photoFileSize;
+    }
+
+    public String getPhotoMediaType() {
+        return photoMediaType;
+    }
+
+    public void setPhotoMediaType(String photoMediaType) {
+        this.photoMediaType = photoMediaType;
     }
 
     public LocalDate getDateReport() {
@@ -107,11 +106,24 @@ public abstract class ReportAnimal {
         reportAnimalDTO.setReportId(this.getReportId());
         reportAnimalDTO.setAdopterId(this.getAdopter().getAdopterId());
         reportAnimalDTO.setDescription(this.getDescription());
-        reportAnimalDTO.setPhotoFilename(this.getPhotoFilename());
+        reportAnimalDTO.setFilePath(this.getPhotoFilePath());
+        reportAnimalDTO.setMediaType(this.getPhotoMediaType());
+        reportAnimalDTO.setFileSize(this.getPhotoFileSize());
         reportAnimalDTO.setDateReport(this.getDateReport());
         reportAnimalDTO.setReportStatus(this.getReportStatus());
-        reportAnimalDTO.setPhotoData(this.getPhotoData());
         reportAnimalDTO.setChatId(this.getAdopter().getChatId());
+
         return reportAnimalDTO;
+    }
+
+    protected void fillDataFromDTO(ReportAnimalDTO reportAnimalDTO) {
+        this.setDescription(reportAnimalDTO.getDescription());
+
+        this.setPhotoFilePath(reportAnimalDTO.getFilePath());
+        this.setPhotoFileSize(reportAnimalDTO.getFileSize());
+        this.setPhotoMediaType(reportAnimalDTO.getMediaType());
+
+        this.setDateReport(reportAnimalDTO.getDateReport());
+        this.setReportStatus(reportAnimalDTO.getReportStatus());
     }
 }

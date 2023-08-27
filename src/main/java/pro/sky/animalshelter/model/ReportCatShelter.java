@@ -30,11 +30,7 @@ public class ReportCatShelter extends ReportAnimal {
 
     public static ReportCatShelter fromDTO(ReportAnimalDTO reportAnimalDTO) {
         ReportCatShelter reportCatShelter = new ReportCatShelter();
-        reportCatShelter.setDescription(reportAnimalDTO.getDescription());
-        reportCatShelter.setPhotoData(reportAnimalDTO.getPhotoData());
-        reportCatShelter.setDateReport(reportAnimalDTO.getDateReport());
-        reportCatShelter.setReportStatus(reportAnimalDTO.getReportStatus());
-        reportCatShelter.setPhotoFilename(reportAnimalDTO.getPhotoFilename());
+        reportCatShelter.fillDataFromDTO(reportAnimalDTO);
         return reportCatShelter;
     }
 
@@ -42,10 +38,10 @@ public class ReportCatShelter extends ReportAnimal {
     public String toString() {
         return "ReportCatShelter{" +
                 "reportId=" + getReportId() +
-                ", adopter=" + getAdopter().getNotNullUserName() +
                 ", description='" + getDescription() + '\'' +
-//                ", photo='" + getPhotoData() + '\'' +
-                "photoFileName=" + getPhotoFilename()+
+                ", photoFilePath='" + getPhotoFilePath() + '\'' +
+                ", photoFileSize=" + getPhotoFileSize() +
+                ", photoMediaType='" + getPhotoMediaType() + '\'' +
                 ", dateReport=" + getDateReport() +
                 ", reportStatus=" + getReportStatus() +
                 '}';

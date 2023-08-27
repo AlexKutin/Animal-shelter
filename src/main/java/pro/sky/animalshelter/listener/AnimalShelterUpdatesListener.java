@@ -9,18 +9,16 @@ import com.pengrad.telegrambot.response.GetChatMemberResponse;
 import com.pengrad.telegrambot.response.GetFileResponse;
 import com.pengrad.telegrambot.response.SendResponse;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 import pro.sky.animalshelter.Constants.CallbackConstants;
 import pro.sky.animalshelter.Constants.TextConstants;
-import pro.sky.animalshelter.dto.ReportAnimalDTO;
-import pro.sky.animalshelter.dto.RulesDTO;
-import pro.sky.animalshelter.dto.ShelterDTO;
-import pro.sky.animalshelter.dto.UserShelterDTO;
+import pro.sky.animalshelter.dto.*;
 import pro.sky.animalshelter.exception.UserChatIdNotFoundException;
 import pro.sky.animalshelter.keyBoard.InlineKeyboardMarkupHelper;
 import pro.sky.animalshelter.model.*;
@@ -31,13 +29,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Component
-@ComponentScan(basePackages = {"pro.sky.animalshelter.service", "pro.sky.animalshelter.listener", "pro.sky.animalshelter.repository"})
+//@ComponentScan(basePackages = {"pro.sky.animalshelter.service", "pro.sky.animalshelter.listener", "pro.sky.animalshelter.repository"})
 public class AnimalShelterUpdatesListener implements UpdatesListener {
     private final Logger logger = LoggerFactory.getLogger(AnimalShelterUpdatesListener.class);
     private final Map<Long, ShelterType> userContactMap = new HashMap<>();
@@ -50,8 +51,10 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     private final AdopterService adopterService;
     private final Map<Long, ShelterType> chooseShelterType = new HashMap<>();
     private final Map<Long, ReportStage> reportStageMap = new HashMap<>();
-    private final Map<Long, byte[]> photoDataMap = new HashMap<>();
-    private final Map<Long, ShelterType> shelterTypeMap = new HashMap<>();
+    private final Map<Long, PhotoDataDTO> photoSizeMap = new HashMap<>();
+
+    @Value("${application.report.photo.folder}")
+    private String reportPhotoFolder;
 
     @Autowired
     public AnimalShelterUpdatesListener(TelegramBot animalShelterBot, ShelterService shelterService,
@@ -128,9 +131,10 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             ReportStage reportStage = reportStageMap.get(chatId);
             if (reportStage == ReportStage.AWAITING_PHOTO) {
                 if (message.photo() != null && message.photo().length > 0) {
-                    photoDataMap.put(chatId, getPhotoData(message.photo()[0].fileId()));
-                    shelterTypeMap.put(chatId, getShelterTypeByUserChatId(chatId));
+                    int indexPhoto = message.photo().length - 1;
+                    PhotoDataDTO photoDataDTO = savePhotoDataToFile(message.photo()[indexPhoto].fileId(), chatId);
 
+                    photoSizeMap.put(chatId, photoDataDTO);
                     reportStageMap.put(chatId, ReportStage.AWAITING_DESCRIPTION);
                     SendMessage requestTextMessage = new SendMessage(chatId, TextConstants.REPORT_MESSAGE_DESCRIPTION);
                     SendResponse requestTextResponse = animalShelterBot.execute(requestTextMessage);
@@ -139,12 +143,11 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
                     SendResponse requestPhotoResponse = animalShelterBot.execute(requestPhotoMessage);
                 }
             } else if (reportStage == ReportStage.AWAITING_DESCRIPTION) {
-                byte[] photoData = photoDataMap.get(chatId);
-                ShelterType shelterType = shelterTypeMap.get(chatId);
+                PhotoDataDTO photoDataDTO = photoSizeMap.get(chatId);
+                ShelterType shelterType = getShelterTypeByUserChatId(chatId);
 
-                if (photoData != null && shelterType != null) {
-                    saveReportToService(chatId, message.text(), photoData, shelterType);
-
+                if (photoDataDTO != null && shelterType != null) {
+                    saveReportToService(chatId, message.text(), photoDataDTO, shelterType);
                     reportStageMap.put(chatId, ReportStage.COMPLETED);
                     SendMessage sendResponse = new SendMessage(chatId, TextConstants.REPORT_MESSAGE_SUCCESSFULLY);
                     SendResponse response = animalShelterBot.execute(sendResponse);
@@ -153,7 +156,6 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         } else {
             sendInvalidMessage(chatId);
         }
-
     }
 
     private void handleCallbackQuery(CallbackQuery callbackQuery) {
@@ -480,32 +482,32 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             sendMessage(chatId, TextConstants.SEND_REPORT_MESSAGE_ERROR + volunteerService.findAvailableVolunteerTelegram(chooseShelterType));
         } else {
             sendMessage(chatId, TextConstants.REPORT_MESSAGE);
-//            ShelterType shelterType = getShelterTypeByUserChatId(chatId);
             reportStageMap.put(chatId, ReportStage.AWAITING_PHOTO);
         }
     }
-    // Метод сохранения отчета в сервисе
-
-    private void saveReportToService(Long chatId, String description, byte[] photoData, ShelterType shelterType) {
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
-        String photoFilename = shelterType + "_" + timestamp + ".jpg";
+    // Формирование отчета о животном (создание DTO) для сохранения в сервисе
+    private void saveReportToService(Long chatId, String description, PhotoDataDTO photoDataDTO, ShelterType shelterType) {
         // Создаем DTO для сохранения в сервисе
         ReportAnimalDTO reportAnimalDTO = new ReportAnimalDTO();
         reportAnimalDTO.setShelterType(shelterType);
         reportAnimalDTO.setChatId(chatId);
         reportAnimalDTO.setDescription(description);
-        reportAnimalDTO.setPhotoFilename(photoFilename);
-        reportAnimalDTO.setPhotoData(photoData);
+        reportAnimalDTO.setFilePath(photoDataDTO.getFilePath());
+        reportAnimalDTO.setFileSize(photoDataDTO.getFileSize());
+        reportAnimalDTO.setMediaType(photoDataDTO.getMediaType());
         reportAnimalDTO.setDateReport(LocalDate.now());
         reportAnimalDTO.setReportStatus(ReportStatus.REPORT_NEW);
 
         reportService.saveReport(reportAnimalDTO);
     }
 
-    private byte[] getPhotoData(String fileId) {
+    private PhotoDataDTO savePhotoDataToFile(String fileId, long chatId) {
         GetFile getFile = new GetFile(fileId);
         GetFileResponse file = animalShelterBot.execute(getFile);
         String filePath = file.file().fileId();
+
+        String fileName = file.file().filePath();
+        long fileSize = file.file().fileSize();
 
         GetFile fileDataRequest = new GetFile(filePath);
         GetFileResponse imgFile = animalShelterBot.execute(fileDataRequest);
@@ -513,14 +515,28 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             logger.error("imgFile is null");
             return null;
         }
-        logger.info("id: {}", fileId);
-        logger.info("imgFile: {}", imgFile);
-        logger.info("filePath: {}", filePath);
-        // Получаем InputStream фотографии и конвертируем в массив байтов
+
+        String photoExtension = FilenameUtils.getExtension(fileName);
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        ShelterType shelterType = getShelterTypeByUserChatId(chatId);
+        String photoFilename = shelterType + "_" + chatId + "_" + timestamp;
+
+        Path photoFilePath = Path.of(reportPhotoFolder, photoFilename + "." + photoExtension);
+
+        // Получаем InputStream фотографии и сохраняем в виде файла на сервер
         try (InputStream inputStream = new URL(animalShelterBot.getFullFilePath(imgFile.file())).openStream()) {
-            return IOUtils.toByteArray(inputStream);
+            Files.createDirectories(photoFilePath.getParent());
+            Files.deleteIfExists(photoFilePath);
+            Files.copy(inputStream, photoFilePath, StandardCopyOption.REPLACE_EXISTING);
+            PhotoDataDTO photoDataDTO = new PhotoDataDTO();
+            photoDataDTO.setFilePath(photoFilePath.toString());
+            photoDataDTO.setFileSize(fileSize);
+            photoDataDTO.setMediaType(Files.probeContentType(photoFilePath));
+            logger.info("Photo file saved: " + photoDataDTO.getFilePath());
+
+            return photoDataDTO;
         } catch (IOException e) {
-            logger.error("Error converting photo data to bytes: {}", e.getMessage());
+            logger.error("Error with saving the photo data to file: {}", e.getMessage());
             return null;
         }
     }

@@ -9,17 +9,21 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import pro.sky.animalshelter.dto.ReportAnimalDTO;
 import pro.sky.animalshelter.exception.AdopterNotFoundException;
 import pro.sky.animalshelter.exception.ReportNotFoundException;
 import pro.sky.animalshelter.exception.ShelterNotFoundException;
-import pro.sky.animalshelter.model.ReportStatus;
-import pro.sky.animalshelter.model.ShelterType;
+import pro.sky.animalshelter.model.*;
 import pro.sky.animalshelter.service.ReportService;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 
@@ -61,6 +65,19 @@ public class ReportController {
             logger.warn(e.getMessage());
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @Operation(
+            summary = "Просмотр фото из отчетов усыновителей приюта для кошек",
+            description = "Просмотр фото из отчетов усыновителей приюта для кошек по id отчета"
+    )
+    @ResponseBody
+    @GetMapping(value = "/cat_shelter_report_photo")
+    public void getReportPhotoByCatShelterAdopter(
+            @RequestParam() @Parameter(description = "Id отчета") Integer reportId,
+            HttpServletResponse response) throws IOException {
+        ReportCatShelter report = reportService.getReportCatShelterById(reportId);
+        copyPhotoToResponse(response, report);
     }
 
     @Operation(
@@ -146,5 +163,36 @@ public class ReportController {
             logger.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @Operation(
+            summary = "Просмотр фото из отчетов усыновителей приюта для собак",
+            description = "Просмотр фото из отчетов усыновителей приюта для собак по id отчета"
+    )
+    @ResponseBody
+    @GetMapping(value = "/dog_shelter_report_photo")
+    public void getReportPhotoByDogShelterAdopter(
+            @RequestParam() @Parameter(description = "Id отчета") Integer reportId,
+            HttpServletResponse response) throws IOException {
+        ReportDogShelter report = reportService.getReportDogShelterById(reportId);
+        copyPhotoToResponse(response, report);
+    }
+
+    private static void copyPhotoToResponse(HttpServletResponse response, ReportAnimal report) throws IOException {
+        Path photoPath = Path.of(report.getPhotoFilePath());
+        try (InputStream is = Files.newInputStream(photoPath);
+             OutputStream os = response.getOutputStream()
+        ) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType(report.getPhotoMediaType());
+            response.setContentLengthLong(report.getPhotoFileSize());
+            is.transferTo(os);
+        }
+    }
+
+    @ExceptionHandler(IOException.class)  // 400
+    public ResponseEntity<?> handleIOException(IOException e) {
+        logger.error(e.getMessage());
+        return ResponseEntity.badRequest().build();
     }
 }

@@ -32,22 +32,18 @@ public class ReportDogShelter extends ReportAnimal {
     public String toString() {
         return "ReportDogShelter{" +
                 "reportId=" + getReportId() +
-                ", adopter=" + getAdopter().getNotNullUserName() +
                 ", description='" + getDescription() + '\'' +
-                ", photoFilename='" + getPhotoFilename() + '\'' +
+                ", photoFilePath='" + getPhotoFilePath() + '\'' +
+                ", photoFileSize=" + getPhotoFileSize() +
+                ", photoMediaType='" + getPhotoMediaType() + '\'' +
                 ", dateReport=" + getDateReport() +
                 ", reportStatus=" + getReportStatus() +
-//                "Photo" + getPhotoData() +
                 '}';
     }
 
     public static ReportDogShelter fromDTO(ReportAnimalDTO reportAnimalDTO) {
         ReportDogShelter reportDogShelter = new ReportDogShelter();
-        reportDogShelter.setDescription(reportAnimalDTO.getDescription());
-        reportDogShelter.setPhotoFilename(reportAnimalDTO.getPhotoFilename());
-        reportDogShelter.setDateReport(reportAnimalDTO.getDateReport());
-        reportDogShelter.setReportStatus(reportAnimalDTO.getReportStatus());
-        reportDogShelter.setPhotoData(reportAnimalDTO.getPhotoData());
+        reportDogShelter.fillDataFromDTO(reportAnimalDTO);
         return reportDogShelter;
 
     }

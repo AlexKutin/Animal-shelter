@@ -35,3 +35,19 @@ ALTER TABLE report_dog_shelter ADD COLUMN photo_filename VARCHAR(100);
 
 -- changeset AlexKutin:5
 ALTER TABLE report_dog_shelter ALTER COLUMN description DROP NOT NULL;
+
+-- changeset AlexKutin:6
+-- Добавление столбца file_path для хранения пути к файлу изображения
+ALTER TABLE report_dog_shelter ADD COLUMN IF NOT EXISTS file_path VARCHAR(255);
+
+-- Добавление столбца file_size для хранения размера файла изображения
+ALTER TABLE report_dog_shelter ADD COLUMN IF NOT EXISTS file_size int8;
+
+-- Добавление столбца media_type для хранения типа файла изображения
+ALTER TABLE report_dog_shelter ADD COLUMN IF NOT EXISTS media_type VARCHAR(25);
+
+-- changeset AlexKutin:7
+-- Удаление лишних столбцов
+ALTER TABLE report_dog_shelter DROP COLUMN IF EXISTS photo_data;
+
+ALTER TABLE report_dog_shelter DROP COLUMN IF EXISTS photo_filename;
