@@ -21,12 +21,14 @@ public class ReportService {
     private final ReportDogShelterRepository reportDogShelterRepository;
     private final ReportCatShelterRepository reportCatShelterRepository;
     private final AdopterService adopterService;
+    private final NotificationTaskService notificationTaskService;
 
     public ReportService(ReportDogShelterRepository reportDogShelterRepository, ReportCatShelterRepository reportCatShelterRepository,
-                         AdopterService adopterService) {
+                         AdopterService adopterService, NotificationTaskService notificationTaskService) {
         this.reportDogShelterRepository = reportDogShelterRepository;
         this.reportCatShelterRepository = reportCatShelterRepository;
         this.adopterService = adopterService;
+        this.notificationTaskService = notificationTaskService;
     }
 
     public List<ReportAnimalDTO> getReportsDogSheltersByAdopterAndStatus(Integer adopterId, Collection<ReportStatus> reportStatuses) {
@@ -103,11 +105,6 @@ public class ReportService {
                 dogAdopter = adopterService.findDogAdopterById(adopterId);
             }
             reportDogShelter.setDogAdopter(dogAdopter);
-
-            // Передача бинарных данных изображения и имя файла
-//            reportDogShelter.setPhotoData(reportAnimalDTO.getPhotoData());
-//            reportDogShelter.setPhotoFilename(reportAnimalDTO.getPhotoFilename());
-
             reportDogShelter = reportDogShelterRepository.save(reportDogShelter);
             resultAnimalDTO = reportDogShelter.toDTO();
             logger.info("Report saved successfully: {}", resultAnimalDTO);
@@ -122,11 +119,6 @@ public class ReportService {
                 catAdopter = adopterService.findCatAdopterById(adopterId);
             }
             reportCatShelter.setCatAdopter(catAdopter);
-
-            // Передача бинарных данных изображения и имя файла
-//            reportCatShelter.setPhotoData(reportAnimalDTO.getPhotoData());
-//            reportCatShelter.setPhotoFilename(reportAnimalDTO.getPhotoFilename());
-
             reportCatShelter = reportCatShelterRepository.save(reportCatShelter);
             resultAnimalDTO = reportCatShelter.toDTO();
 
@@ -137,28 +129,31 @@ public class ReportService {
         throw new ShelterNotFoundException(String.format("Shelter type: %s not supported yet", shelterType));
     }
 
-    public ReportAnimalDTO editStatusReport(ShelterType shelterType, Integer reportId, ReportStatus reportStatus) {
+    public ReportAnimalDTO editDogShelterStatusReport(Integer reportId, ReportStatus reportStatus) {
         ReportAnimalDTO reportAnimalDTO;
-        if (shelterType == ShelterType.DOG_SHELTER) {
-            ReportDogShelter reportDogShelter = getReportDogShelterById(reportId);
-            reportDogShelter.setReportStatus(reportStatus);
-            reportDogShelter = reportDogShelterRepository.save(reportDogShelter);
-            reportAnimalDTO = reportDogShelter.toDTO();
-            logger.info("Report status {} saved successful for report: {}", reportStatus, reportAnimalDTO);
-            return reportDogShelter.toDTO();
-        } else if (shelterType == ShelterType.CAT_SHELTER) {
-            ReportCatShelter reportCatShelter = getReportCatShelterById(reportId);
-            reportCatShelter.setReportStatus(reportStatus);
-
-            reportCatShelter = reportCatShelterRepository.save(reportCatShelter);
-            reportAnimalDTO = reportCatShelter.toDTO();
-            logger.info("Report status {} saved successful for report: {}", reportStatus, reportAnimalDTO);
-            return reportAnimalDTO;
+        ReportDogShelter reportDogShelter = getReportDogShelterById(reportId);
+        reportDogShelter.setReportStatus(reportStatus);
+        reportDogShelter = reportDogShelterRepository.save(reportDogShelter);
+        if (reportStatus == ReportStatus.REPORT_WARNING) {
+            notificationTaskService.reportWarningNotification(reportDogShelter.getAdopter(), ShelterType.DOG_SHELTER);
         }
-        logger.error("Shelter type {} not supported. Report can not be saved", shelterType);
-        throw new ShelterNotFoundException(String.format("Shelter type: %s not supported yet", shelterType));
+        reportAnimalDTO = reportDogShelter.toDTO();
+        logger.info("Report status \"{}\" saved successful for report: {}", reportStatus, reportAnimalDTO);
+        return reportDogShelter.toDTO();
     }
 
+    public ReportAnimalDTO editCatShelterStatusReport(Integer reportId, ReportStatus reportStatus) {
+        ReportAnimalDTO reportAnimalDTO;
+        ReportCatShelter reportCatShelter = getReportCatShelterById(reportId);
+        reportCatShelter.setReportStatus(reportStatus);
+        reportCatShelter = reportCatShelterRepository.save(reportCatShelter);
+        if (reportStatus == ReportStatus.REPORT_WARNING) {
+            notificationTaskService.reportWarningNotification(reportCatShelter.getAdopter(), ShelterType.CAT_SHELTER);
+        }
+        reportAnimalDTO = reportCatShelter.toDTO();
+        logger.info("Report status \"{}\" saved successful for report: {}", reportStatus, reportAnimalDTO);
+        return reportAnimalDTO;
+    }
 
     public ReportCatShelter getReportCatShelterById(Integer reportId) {
         return reportCatShelterRepository.findById(reportId)

@@ -26,6 +26,10 @@ public class NotificationTaskService {
     private static final String PROBATION_REJECT_MESSAGE =
             "Дорогой усыновитель, мы сожалеем, но Вы не выдержали испытательный срок. Мы вынуждены забрать у Вас животное. " +
                     "Мы просим Вас внимательнее ознакомиться с нашими рекомендациями и попробовать снова через месяц";
+    private static final String REPORT_WARNING_MESSAGE =
+            "Дорогой усыновитель, мы заметили, что ты заполняешь отчет не так подробно, как необходимо. " +
+                    "Пожалуйста, подойди ответственнее к этому занятию. " +
+                    "В противном случае волонтеры приюта будут обязаны самолично проверять условия содержания животного";
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
@@ -71,6 +75,10 @@ public class NotificationTaskService {
 
     public void probationRejectNotification(Adopter adopter, ShelterType shelterType) {
         saveNotificationTaskNow(adopter.getChatId(), PROBATION_REJECT_MESSAGE, shelterType);
+    }
+
+    public void reportWarningNotification(Adopter adopter, ShelterType shelterType) {
+        saveNotificationTaskNow(adopter.getChatId(), REPORT_WARNING_MESSAGE, shelterType);
     }
 
 }

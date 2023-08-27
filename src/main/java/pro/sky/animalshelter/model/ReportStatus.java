@@ -1,13 +1,30 @@
 package pro.sky.animalshelter.model;
 
+import static pro.sky.animalshelter.Constants.TextConstants.REPORT_ACCEPTED_MESSAGE;
+import static pro.sky.animalshelter.Constants.TextConstants.REPORT_WARNING_MESSAGE;
+
 /**
  * Статусы для отчетов усыновителя
  */
 public enum ReportStatus {
-    REPORT_NEW,             // Новый отчет (подлежит рассмотрению)
-    REPORT_ACCEPTED,        // Отчет принят
-    REPORT_NEED_PHOTO,      // Отчет не содержит фото
-    REPORT_NEED_TEXT,       // Отчет не содержит описание
-    REPORT_WARNING_NEED,    // Отчет заполнен плохо (предупреждение пользователя)
-    REPORT_WARNING_SEND     // Отчет заполнен плохо (предупреждение отправлено)
+    REPORT_NEW("Новый отчет"),             // Новый отчет (подлежит рассмотрению)
+    REPORT_ACCEPTED(REPORT_ACCEPTED_MESSAGE),        // Отчет принят
+//    REPORT_NEED_PHOTO,      // Отчет не содержит фото
+//    REPORT_NEED_TEXT,       // Отчет не содержит описание
+    REPORT_WARNING(REPORT_WARNING_MESSAGE);    // Отчет заполнен плохо (предупреждение пользователя)
+
+    private final String text;
+
+    ReportStatus(String text) {
+        this.text = text;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    @Override
+    public String toString() {
+        return text;
+    }
 }

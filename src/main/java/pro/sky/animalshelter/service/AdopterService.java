@@ -73,21 +73,21 @@ public class AdopterService {
         return 0;
     }
 
-    public AnimalAdopterDTO processProbationStatusForDogAdopter(Integer adopterId, PROBATION_STATUS probationStatus) {
+    public AnimalAdopterDTO processProbationStatusForDogAdopter(Integer adopterId, ProbationStatus probationStatus) {
         DogAdopter dogAdopter = findDogAdopterById(adopterId);
         processProbationStatusForAdopter(dogAdopter, probationStatus, ShelterType.DOG_SHELTER);
         dogAdopter = dogAdopterRepository.save(dogAdopter);
         return dogAdopter.toDTO();
     }
 
-    public AnimalAdopterDTO processProbationStatusForCatAdopter(Integer adopterId, PROBATION_STATUS probationStatus) {
+    public AnimalAdopterDTO processProbationStatusForCatAdopter(Integer adopterId, ProbationStatus probationStatus) {
         CatAdopter catAdopter = findCatAdopterById(adopterId);
         processProbationStatusForAdopter(catAdopter, probationStatus, ShelterType.CAT_SHELTER);
         catAdopter = catAdopterRepository.save(catAdopter);
         return catAdopter.toDTO();
     }
 
-    private void processProbationStatusForAdopter(Adopter adopter, PROBATION_STATUS probationStatus, ShelterType shelterType) {
+    private void processProbationStatusForAdopter(Adopter adopter, ProbationStatus probationStatus, ShelterType shelterType) {
         switch (probationStatus) {
             case PROBATION_ACTIVE:
                 adopter.setAdopterStatus(AdopterStatus.PROBATION_ACTIVE);

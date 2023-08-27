@@ -27,6 +27,9 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 
+import static pro.sky.animalshelter.Constants.TextConstants.REPORT_ACCEPTED_MESSAGE;
+import static pro.sky.animalshelter.Constants.TextConstants.REPORT_WARNING_MESSAGE;
+
 @Tag(name = "Отчеты усыновителей", description = "Просмотр и обработка волонтерами отчетов усыновителей ")
 @RestController
 @RequestMapping("/reports")
@@ -127,9 +130,14 @@ public class ReportController {
     @PutMapping("process_cat_shelter_report")
     public ResponseEntity<ReportAnimalDTO> processReportCatShelter(
             @RequestParam @Parameter(description = "Id Отчета") Integer reportId,
-            @RequestParam @Parameter(description = "Статус отчета после обработки волонтером") ReportStatus reportStatus) {
+            @RequestParam @Parameter(
+                    description = "Статус отчета после обработки волонтером",
+                    schema = @Schema(
+                            type = "string", allowableValues = {REPORT_ACCEPTED_MESSAGE, REPORT_WARNING_MESSAGE}
+                    )
+            ) ReportStatus reportStatus) {
         try {
-            ReportAnimalDTO reportAnimalDTO = reportService.editStatusReport(ShelterType.CAT_SHELTER, reportId, reportStatus);
+            ReportAnimalDTO reportAnimalDTO = reportService.editCatShelterStatusReport(reportId, reportStatus);
             return ResponseEntity.ok(reportAnimalDTO);
         } catch (AdopterNotFoundException | ShelterNotFoundException | ReportNotFoundException e) {
             logger.error(e.getMessage());
@@ -155,9 +163,14 @@ public class ReportController {
     @PutMapping("process_dog_shelter_report")
     public ResponseEntity<ReportAnimalDTO> processReportDogShelter(
             @RequestParam @Parameter(description = "Id Отчета") Integer reportId,
-            @RequestParam @Parameter(description = "Статус отчета после обработки волонтером") ReportStatus reportStatus) {
+            @RequestParam @Parameter(
+                    description = "Статус отчета после обработки волонтером",
+                    schema = @Schema(
+                            type = "string", allowableValues = {REPORT_ACCEPTED_MESSAGE, REPORT_WARNING_MESSAGE}
+                    )
+            ) ReportStatus reportStatus) {
         try {
-            ReportAnimalDTO reportAnimalDTO = reportService.editStatusReport(ShelterType.DOG_SHELTER, reportId, reportStatus);
+            ReportAnimalDTO reportAnimalDTO = reportService.editDogShelterStatusReport(reportId, reportStatus);
             return ResponseEntity.ok(reportAnimalDTO);
         } catch (AdopterNotFoundException | ShelterNotFoundException | ReportNotFoundException e) {
             logger.error(e.getMessage());

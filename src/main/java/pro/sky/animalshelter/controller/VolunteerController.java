@@ -172,7 +172,7 @@ public class VolunteerController {
             @RequestParam @Parameter(description = "id усыновителя") Integer adopterId,
             @RequestParam @Parameter(
                     description = "Статус испытательного срока усыновителя",
-                    schema = @Schema(implementation = PROBATION_STATUS.class)) PROBATION_STATUS probationStatus) {
+                    schema = @Schema(implementation = ProbationStatus.class)) ProbationStatus probationStatus) {
         AnimalAdopterDTO dogAdopterDTO = adopterService.processProbationStatusForDogAdopter(adopterId, probationStatus);
         logger.info("Для усыновителя id: {}, userName: {}, собака: {} установлен статус: {}",
                 adopterId, dogAdopterDTO.getUserName(), dogAdopterDTO.getAnimalName(), probationStatus);
@@ -222,7 +222,7 @@ public class VolunteerController {
             @RequestParam @Parameter(description = "id усыновителя") Integer adopterId,
             @RequestParam @Parameter(
                     description = "Статус испытательного срока усыновителя",
-                    schema = @Schema(implementation = PROBATION_STATUS.class)) PROBATION_STATUS probationStatus) {
+                    schema = @Schema(implementation = ProbationStatus.class)) ProbationStatus probationStatus) {
         AnimalAdopterDTO catAdopterDTO = adopterService.processProbationStatusForCatAdopter(adopterId, probationStatus);
         logger.info("Для усыновителя id: {}, userName: {}, кошка: {}  установлен статус: {}",
                 adopterId, catAdopterDTO.getUserName(), catAdopterDTO.getAnimalName(), probationStatus);

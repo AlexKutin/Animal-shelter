@@ -66,4 +66,7 @@ public class TextConstants {
     public static final String MAIN_MENU_MESSAGE = "Вы вернулись в главное меню. Выберите приют для каких животных вас интересует: ";
     public static final String SEND_LEAVE_CONTACTS_SUCCESSFULLY = "Спасибо! Ваши контакты сохранены. Наши волонтеры свяжутся с вами в ближайшее время.";
     public static final String SEND_LEAVE_CONTACTS_CANCEL=  "Вы отменили ввод контактов.";
+
+    public static final String REPORT_ACCEPTED_MESSAGE = "Отчет принят";
+    public static final String REPORT_WARNING_MESSAGE = "Отчет заполнен плохо";
 }
