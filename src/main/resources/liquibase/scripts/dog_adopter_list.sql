@@ -22,3 +22,6 @@ ALTER TABLE dog_adopter_list RENAME COLUMN adoption_id TO adopter_id;
 ALTER TABLE dog_adopter_list RENAME TO dog_adopters
 -- changeset BM:5
 ALTER TABLE dog_adopters ADD COLUMN chat_id BIGINT UNIQUE;
+
+-- changeset AlexKutin:6
+ALTER TABLE dog_adopters DROP CONSTRAINT dog_adopters_chat_id_key;

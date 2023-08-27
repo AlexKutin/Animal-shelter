@@ -68,6 +68,8 @@ public abstract class Adopter {
         this.chatId = chatId;
     }
 
+    public abstract Animal getAnimal();
+
     public AnimalAdopterDTO toDTO() {
         AnimalAdopterDTO animalAdopterDTO = new AnimalAdopterDTO();
 

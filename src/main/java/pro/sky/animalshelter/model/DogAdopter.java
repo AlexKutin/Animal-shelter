@@ -23,7 +23,8 @@ public class DogAdopter extends Adopter {
         this.user = userDogShelter;
     }
 
-    public Dog getDog() {
+    @Override
+    public Dog getAnimal() {
         return dog;
     }
 
@@ -34,8 +35,8 @@ public class DogAdopter extends Adopter {
     public AnimalAdopterDTO toDTO() {
         AnimalAdopterDTO animalAdopterDTO = super.toDTO();
         animalAdopterDTO.setShelterType(ShelterType.DOG_SHELTER);
-        animalAdopterDTO.setAnimalId(this.getDog().getDogId());
-        animalAdopterDTO.setAnimalName(this.getDog().getDogName());
+        animalAdopterDTO.setAnimalId(this.getAnimal().getDogId());
+        animalAdopterDTO.setAnimalName(this.getAnimal().getName());
 
         return animalAdopterDTO;
     }

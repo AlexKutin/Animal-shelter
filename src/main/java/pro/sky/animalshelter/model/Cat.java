@@ -7,12 +7,12 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "cats_list")
-public class Cat {
+public class Cat extends Animal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cat_id")
     private Integer catId;
-    @Column(name = "catName")
+    @Column(name = "cat_name")
     private String catName;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shelter_id")
@@ -44,7 +44,8 @@ public class Cat {
         this.catId = catId;
     }
 
-    public String getCatName() {
+    @Override
+    public String getName() {
         return catName;
     }
 

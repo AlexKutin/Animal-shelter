@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "dogs_list")
-public class Dog {
+public class Dog extends Animal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "dog_id")
@@ -43,7 +43,8 @@ public class Dog {
         this.dogId = dogId;
     }
 
-    public String getDogName() {
+    @Override
+    public String getName() {
         return dogName;
     }
 

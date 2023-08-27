@@ -25,8 +25,11 @@ public class AnimalService {
     private final ShelterRepository shelterRepository;
     private final DogAdopterRepository dogAdopterRepository;
     private final CatAdopterRepository catAdopterRepository;
+    private final NotificationTaskService notificationTaskService;
 
-    public AnimalService(ShelterService shelterService, UserShelterService userShelterService, DogsRepository dogsRepository, CatsRepository catsRepository, ShelterRepository shelterRepository, DogAdopterRepository dogAdopterRepository, CatAdopterRepository catAdopterRepository) {
+    public AnimalService(ShelterService shelterService, UserShelterService userShelterService, DogsRepository dogsRepository,
+                         CatsRepository catsRepository, ShelterRepository shelterRepository, DogAdopterRepository dogAdopterRepository,
+                         CatAdopterRepository catAdopterRepository, NotificationTaskService notificationTaskService) {
         this.shelterService = shelterService;
         this.userShelterService = userShelterService;
         this.dogsRepository = dogsRepository;
@@ -34,6 +37,7 @@ public class AnimalService {
         this.shelterRepository = shelterRepository;
         this.dogAdopterRepository = dogAdopterRepository;
         this.catAdopterRepository = catAdopterRepository;
+        this.notificationTaskService = notificationTaskService;
     }
 
     public DogDTO saveDogToDb(DogDTO dogDTO) {
@@ -69,40 +73,47 @@ public class AnimalService {
     public AnimalAdopterDTO saveDogAdopter(AnimalAdopterDTO animalAdopterDTO) {
         Integer userId = animalAdopterDTO.getUserId();
         Integer dogId = animalAdopterDTO.getAnimalId();
-        Long chatId = animalAdopterDTO.getChatId();
+//        Long chatId = animalAdopterDTO.getChatId();
         if (dogAdopterRepository.isPresentDogAdopterByUserAndDog(userId, dogId)) {
             logger.warn("Dog Shelter: Adopter duplication error: userId = {} and catId = {} already present", userId, dogId);
             throw new DuplicateAdopterException(
                     String.format("Dog Shelter: Adopter duplication error: userId = %d and dogId = %d already present", userId, dogId));
         }
+        UserDogShelter user = userShelterService.findUserDogShelterById(userId);
         DogAdopter dogAdopter = new DogAdopter();
         dogAdopter.setDog(findDogById(dogId));
-        dogAdopter.setChatId(chatId);
-        dogAdopter.setUser(userShelterService.findUserDogShelterById(userId));
+        dogAdopter.setUser(user);
+        dogAdopter.setChatId(user.getChatId());
         dogAdopter.setAdoptionDate(LocalDateTime.now());
         dogAdopter.setAdopterStatus(animalAdopterDTO.getAdopterStatus());
         dogAdopter.setEndProbationDate(LocalDateTime.now().plusMonths(1));
         dogAdopter = dogAdopterRepository.save(dogAdopter);
+
+        notificationTaskService.probationActiveNotification(dogAdopter, ShelterType.DOG_SHELTER);
+
         return dogAdopter.toDTO();
     }
 
     public AnimalAdopterDTO saveCatAdopter(AnimalAdopterDTO animalAdopterDTO) {
         Integer userId = animalAdopterDTO.getUserId();
         Integer catId = animalAdopterDTO.getAnimalId();
-        Long chatId = animalAdopterDTO.getChatId();
+//        Long chatId = animalAdopterDTO.getChatId();
         if (catAdopterRepository.isPresentCatAdopterByUserAndCat(userId, catId)) {
             logger.warn("Cat Shelter: Adopter duplication error: userId = {} and catId = {} already present", userId, catId);
             throw new DuplicateAdopterException(
                     String.format("Cat Shelter: Adopter duplication error: userId = %d and catId = %d already present", userId, catId));
         }
+        UserCatShelter user = userShelterService.findUserCatShelterById(userId);
         CatAdopter catAdopter = new CatAdopter();
         catAdopter.setCat(findCatById(catId));
-        catAdopter.setChatId(chatId);
-        catAdopter.setUser(userShelterService.findUserCatShelterById(userId));
+        catAdopter.setUser(user);
+        catAdopter.setChatId(user.getChatId());
         catAdopter.setAdoptionDate(LocalDateTime.now());
         catAdopter.setAdopterStatus(animalAdopterDTO.getAdopterStatus());
         catAdopter.setEndProbationDate(LocalDateTime.now().plusMonths(1));
         catAdopter = catAdopterRepository.save(catAdopter);
+
+        notificationTaskService.probationActiveNotification(catAdopter, ShelterType.CAT_SHELTER);
 
         return catAdopter.toDTO();
     }
