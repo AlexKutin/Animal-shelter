@@ -24,10 +24,9 @@ public class NotificationTaskTimer {
         this.telegramBot = telegramBot;
     }
 
-    @Scheduled(cron = "${interval-in-cron}")
-    public void task() {
+    @Scheduled(cron = "${interval-in-cron_notification}")
+    public void notificationTask() {
         List<NotificationTask> tasks = notificationTaskRepository.findAllByIsProcessedIsFalse();
-//                LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
         tasks.forEach(notificationTask -> {
             SendMessage sendMessage = new SendMessage(notificationTask.getChatId(), notificationTask.getMessage());
             SendResponse sendResponse = telegramBot.execute(sendMessage);

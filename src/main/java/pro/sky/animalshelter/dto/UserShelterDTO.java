@@ -3,7 +3,6 @@ package pro.sky.animalshelter.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import pro.sky.animalshelter.model.ShelterType;
-import pro.sky.animalshelter.model.UserShelter;
 
 @Schema(description = "Зрегистрированный пользователь приюта")
 public class UserShelterDTO {
@@ -111,29 +110,4 @@ public class UserShelterDTO {
                 ", userContacts='" + userContacts + '\'' +
                 '}';
     }
-
-    /*public static UserShelterDTO fromUserShelter(UserShelter userShelter) {
-        UserShelterDTO userShelterDTO = new UserShelterDTO();
-        userShelterDTO.setUserId(userShelter.getUserId());
-        userShelterDTO.setTelegramId(userShelter.getTelegramId());
-        userShelterDTO.setChatId(userShelter.getChatId());
-        userShelterDTO.setUserName(userShelter.getUserName());
-        userShelterDTO.setShelterType(userShelter.getShelter().getShelterType());
-        userShelterDTO.setFirstName(userShelter.getFirstName());
-        userShelterDTO.setLastName(userShelter.getLastName());
-        userShelterDTO.setUserContacts(userShelter.getUserContacts());
-
-        return userShelterDTO;
-    }*/
-
-    /*public UserShelter fillUserInfoFromDTO(UserShelter userShelter) {
-        userShelter.setUserId(this.getUserId());
-        userShelter.setTelegramId(this.getTelegramId());
-        userShelter.setChatId(this.getChatId());
-        userShelter.setUserName(this.getUserName());
-        userShelter.setFirstName(this.getFirstName());
-        userShelter.setLastName(this.getLastName());
-        userShelter.setUserContacts(this.getUserContacts());
-        return userShelter;
-    }*/
 }

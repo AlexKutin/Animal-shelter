@@ -100,11 +100,16 @@ public class ReportService {
             ReportDogShelter reportDogShelter = ReportDogShelter.fromDTO(reportAnimalDTO);
             DogAdopter dogAdopter;
             if (chatId != null) {
-                dogAdopter = adopterService.findDogAdopterByChatIdAndStatus(chatId, AdopterStatus.PROBATION_ACTIVE);
+                dogAdopter = adopterService.findDogAdopterByChatIdAndStatus(chatId,
+                        List.of(AdopterStatus.PROBATION_ACTIVE, AdopterStatus.WAITING_REPORT));
             } else {
                 dogAdopter = adopterService.findDogAdopterById(adopterId);
             }
             reportDogShelter.setDogAdopter(dogAdopter);
+            Adopter adopter = reportDogShelter.getAdopter();
+            if (adopter.getAdopterStatus() == AdopterStatus.WAITING_REPORT) {
+                adopter.setAdopterStatus(AdopterStatus.PROBATION_ACTIVE);
+            }
             reportDogShelter = reportDogShelterRepository.save(reportDogShelter);
             resultAnimalDTO = reportDogShelter.toDTO();
             logger.info("Report saved successfully: {}", resultAnimalDTO);

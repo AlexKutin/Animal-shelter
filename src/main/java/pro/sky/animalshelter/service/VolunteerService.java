@@ -9,6 +9,8 @@ import pro.sky.animalshelter.model.Volunteer;
 import pro.sky.animalshelter.repository.VolunteerRepository;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VolunteerService {
@@ -47,6 +49,13 @@ public class VolunteerService {
         }
 
         return null; // Если нет доступных волонтеров
+    }
+
+    public List<Long> findAvailableVolunteerChatId(ShelterType shelterType) {
+        return volunteerRepository.findAllByIsActiveTrueAndShelter_ShelterType(shelterType)
+                .stream()
+                .map(Volunteer::getChatId)
+                .collect(Collectors.toList());
     }
 }
 

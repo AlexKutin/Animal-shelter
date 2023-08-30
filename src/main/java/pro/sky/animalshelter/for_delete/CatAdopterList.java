@@ -1,7 +1,5 @@
 package pro.sky.animalshelter.for_delete;
 
-import pro.sky.animalshelter.dto.AnimalAdopterDTO;
-import pro.sky.animalshelter.dto.CatAdopterListDTO;
 import pro.sky.animalshelter.model.Adopter;
 import pro.sky.animalshelter.model.Cat;
 import pro.sky.animalshelter.model.UserCatShelter;

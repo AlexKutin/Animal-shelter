@@ -129,12 +129,11 @@ public abstract class UserShelter implements Comparable<UserShelter> {
         return Objects.hash(telegramId, chatId);
     }
 
-    public void fillUserInfo(UserShelterDTO userShelterDTO/*, Shelter shelter*/) {
+    public void fillUserInfo(UserShelterDTO userShelterDTO) {
         this.userName = userShelterDTO.getUserName();
         this.firstName = userShelterDTO.getFirstName();
         this.lastName = userShelterDTO.getLastName();
         this.userContacts = userShelterDTO.getUserContacts();
-//        this.shelter = shelter;
     }
 
     @Override

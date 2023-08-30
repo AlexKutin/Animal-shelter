@@ -1,20 +1,20 @@
 package pro.sky.animalshelter.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import pro.sky.animalshelter.model.AdopterStatus;
 import pro.sky.animalshelter.model.CatAdopter;
-import pro.sky.animalshelter.model.UserCatShelter;
 
-import java.util.Collection;
 import java.util.List;
 
-public interface CatAdopterRepository extends JpaRepository<CatAdopter, Integer> {
-    List<CatAdopter> findAllByAdopterStatusOrderByUser(AdopterStatus adopterStatus);
+public interface CatAdopterRepository extends AdopterRepository<CatAdopter> {
 
     @Query(value = "SELECT EXISTS (SELECT adopter_id FROM cat_adopters WHERE user_id = :userId and cat_id = :catId)", nativeQuery = true)
     boolean isPresentCatAdopterByUserAndCat(Integer userId, Integer catId);
 
-    CatAdopter findCatAdopterByUserAndAdopterStatusIn(UserCatShelter userCatShelter, Collection<AdopterStatus> adopterStatuses);
-    CatAdopter findAdopterIdByChatId(Long chatId);
+
+    @Query(value = "select adopter_id from "+
+            "(select rcs.adopter_id, max(date_report) as last_date_report from report_cat_shelter rcs " +
+            "join cat_adopters ca " +
+            "on rcs.adopter_id = ca.adopter_id where ca.adopter_status in (?1, ?2) group by rcs.adopter_id) t " +
+            "where last_date_report < (CURRENT_DATE - ?3) ", nativeQuery = true)
+    List<Integer> getAdoptersChatIdWhoNotSendReport(String adopterStatuses1, String adopterStatuses2, int skippedDays);
 }

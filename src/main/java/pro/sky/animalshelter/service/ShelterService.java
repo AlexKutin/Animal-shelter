@@ -107,6 +107,11 @@ public class ShelterService {
         return VolunteerDTO.fromVolunteer(volunteer);
     }
 
+    /**
+     * Добавляет приют по указанному типу
+     * @param shelterType Тип приюта
+     * @return Возвращает экземпляр класса <b>Shelter</b> соответствующий указанному типу приюта
+     */
     public Shelter findShelterByShelterType(ShelterType shelterType) {
         return shelterRepository.findSheltersByShelterType(shelterType)
                 .stream()

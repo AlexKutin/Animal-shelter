@@ -12,7 +12,6 @@ import pro.sky.animalshelter.repository.UserCatShelterRepository;
 import pro.sky.animalshelter.repository.UserDogShelterRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,7 +33,7 @@ public class UserShelterService {
         ShelterType shelterType = userShelterDTO.getShelterType();
         Shelter shelter = shelterService.findShelterByShelterType(shelterType);
         if (shelterType == ShelterType.DOG_SHELTER) {
-            UserDogShelter userDogShelter = userDogShelterRepository.findUserDogShelterByTelegramId(userShelterDTO.getTelegramId());
+            UserDogShelter userDogShelter = userDogShelterRepository.findByTelegramId(userShelterDTO.getTelegramId());
             if (userDogShelter == null) {
                 userDogShelter = UserDogShelter.fromDTO(userShelterDTO);
                 userDogShelter.setShelter(shelter);
@@ -43,7 +42,7 @@ public class UserShelterService {
             }
             userDogShelterRepository.save(userDogShelter);
         } else if (shelterType == ShelterType.CAT_SHELTER) {
-            UserCatShelter userCatShelter = userCatShelterRepository.findUserCatShelterByTelegramId(userShelterDTO.getTelegramId());
+            UserCatShelter userCatShelter = userCatShelterRepository.findByTelegramId(userShelterDTO.getTelegramId());
             if (userCatShelter == null) {
                 userCatShelter = UserCatShelter.fromDTO(userShelterDTO);
                 userCatShelter.setShelter(shelter);
@@ -82,11 +81,11 @@ public class UserShelterService {
                         String.format("User with userId = %d not found in Cat users database", userId)));
     }
 
-    public UserCatShelter findUserCatShelterByChatId(Long chatId) {
-        return Optional.ofNullable(userCatShelterRepository.findUserCatShelterByChatId(chatId))
+ /*   public UserCatShelter findUserCatShelterByChatId(Long chatId) {
+        return Optional.ofNullable(userCatShelterRepository.findByChatId(chatId))
                 .orElseThrow (() -> new UserNotFoundException(
                         String.format("User with chatId = %d not found in Cat users database", chatId)));
-    }
+    }*/
 
     public UserDogShelter findUserDogShelterById(Integer userId) {
         return userDogShelterRepository.findById(userId)
@@ -94,9 +93,9 @@ public class UserShelterService {
                         String.format("User with userId = %d not found in Dog users database", userId)));
     }
 
-    public UserDogShelter findUserDogShelterByChatId(Long chatId) {
-        return Optional.ofNullable(userDogShelterRepository.findUserDogShelterByChatId(chatId))
+  /*  public UserDogShelter findUserDogShelterByChatId(Long chatId) {
+        return Optional.ofNullable(userDogShelterRepository.findByChatId(chatId))
                 .orElseThrow (() -> new UserNotFoundException(
                         String.format("User with chatId = %d not found in Dog users database", chatId)));
-    }
+    }*/
 }

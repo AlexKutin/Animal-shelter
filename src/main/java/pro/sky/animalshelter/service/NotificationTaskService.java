@@ -30,6 +30,12 @@ public class NotificationTaskService {
             "Дорогой усыновитель, мы заметили, что ты заполняешь отчет не так подробно, как необходимо. " +
                     "Пожалуйста, подойди ответственнее к этому занятию. " +
                     "В противном случае волонтеры приюта будут обязаны самолично проверять условия содержания животного";
+    private static final String REPORT_SKIPPED_WARNING_MESSAGE = "Дорогой усыновитель, мы заметили, что ты забыл предоставить отчет о животном за прошлый день!. " +
+            "Пожалуйста, подойди ответственнее к этому занятию и направь нам отчет о животном в кратчайшее время. " +
+            "В противном случае волонтеры приюта будут обязаны самолично проверять условия содержания животного";
+    private static final String REPORT_SKIPPED_VOLUNTEER_MESSAGE = "Уважаемый волонтер, мы заметили, что усыновитель: " +
+            "%s, взявший животное: %s из приюта не предоставил отчеты уже %d (или более) дней. " +
+            "Необходимо срочно связаться с данным усыновителем и выяснить, что происходит";
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
@@ -81,4 +87,14 @@ public class NotificationTaskService {
         saveNotificationTaskNow(adopter.getChatId(), REPORT_WARNING_MESSAGE, shelterType);
     }
 
+    public void reportSkippedWarningAdopterNotification(Adopter adopter, ShelterType shelterType) {
+        saveNotificationTaskNow(adopter.getChatId(), REPORT_SKIPPED_WARNING_MESSAGE, shelterType);
+    }
+
+    public void reportSkippedWarningVolunteerNotification(Long chatId, Adopter adopter, int skippedDays, ShelterType shelterType) {
+        saveNotificationTaskNow(
+                chatId,
+                String.format(REPORT_SKIPPED_VOLUNTEER_MESSAGE, adopter.getNotNullUserName(), adopter.getAnimal().getName(), skippedDays),
+                shelterType);
+    }
 }

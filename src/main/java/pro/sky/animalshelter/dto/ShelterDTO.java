@@ -138,19 +138,4 @@ public class ShelterDTO {
 
         return shelterDTO;
     }
-
-//    public Shelter toShelter() {
-//        Shelter shelter = new Shelter();
-//        shelter.setId(this.getId());
-//        shelter.setShelterType(this.getShelterType());
-//        shelter.setShelterName(this.getShelterName());
-//        shelter.setShelterDescription(this.getShelterDescription());
-//        shelter.setShelterAddress(this.getShelterAddress());
-//        shelter.setShelterContacts(this.getShelterContacts());
-//        shelter.setSecurityContacts(this.getSecurityContacts());
-//        shelter.setSafetyInfo(this.getSafetyInfo());
-//        shelter.setDrivingDirection(this.getDrivingDirection());
-//
-//        return shelter;
-//    }
 }

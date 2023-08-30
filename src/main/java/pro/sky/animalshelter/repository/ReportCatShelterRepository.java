@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.List;
 
 public interface ReportCatShelterRepository extends JpaRepository<ReportCatShelter, Integer> {
-    List<ReportCatShelter> findByCatAdopterAndReportStatus(CatAdopter catAdopter, ReportStatus reportStatus);
 
     List<ReportCatShelter> findByCatAdopter(CatAdopter catAdopter);
 

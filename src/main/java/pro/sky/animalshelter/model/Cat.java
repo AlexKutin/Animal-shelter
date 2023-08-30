@@ -1,7 +1,6 @@
 package pro.sky.animalshelter.model;
 
 import pro.sky.animalshelter.dto.CatDTO;
-import pro.sky.animalshelter.dto.DogDTO;
 
 import javax.persistence.*;
 
