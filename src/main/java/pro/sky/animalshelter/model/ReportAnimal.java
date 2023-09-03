@@ -17,7 +17,6 @@ public abstract class ReportAnimal {
 
     @Column(name = "date_report", nullable = false)
     private LocalDate dateReport;
-    //    private Timestamp dateTimeReport;
 
     @Column(name = "file_path")
     private String photoFilePath;
@@ -52,14 +51,6 @@ public abstract class ReportAnimal {
     public void setDescription(String description) {
         this.description = description;
     }
-
-//    public Timestamp getDateTimeReport() {
-//        return dateTimeReport;
-//    }
-//
-//    public void setDateTimeReport(Timestamp dateTimeReport) {
-//        this.dateTimeReport = dateTimeReport;
-//    }
 
     public String getPhotoFilePath() {
         return photoFilePath;

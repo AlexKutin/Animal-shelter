@@ -1,6 +1,8 @@
 package pro.sky.animalshelter.model;
 
 
+import kotlin.collections.ArrayDeque;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -38,7 +40,7 @@ public class Shelter {
     private String safetyInfo;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "shelter")
-    private List<Volunteer> volunteers;
+    private List<Volunteer> volunteers = new ArrayDeque<>();
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_rules", referencedColumnName = "id_rules", nullable = false)

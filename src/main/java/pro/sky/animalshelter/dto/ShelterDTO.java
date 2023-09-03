@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import pro.sky.animalshelter.model.Shelter;
 import pro.sky.animalshelter.model.ShelterType;
 
+import java.util.Objects;
+
 @Schema(description = "Приют")
 public class ShelterDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -137,5 +139,18 @@ public class ShelterDTO {
         shelterDTO.setDrivingDirection(shelterDTO.getDrivingDirection());
 
         return shelterDTO;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ShelterDTO)) return false;
+        ShelterDTO that = (ShelterDTO) o;
+        return Objects.equals(id, that.id) && shelterType == that.shelterType && Objects.equals(shelterName, that.shelterName) && Objects.equals(shelterDescription, that.shelterDescription) && Objects.equals(shelterAddress, that.shelterAddress) && Objects.equals(drivingDirection, that.drivingDirection) && Objects.equals(shelterContacts, that.shelterContacts) && Objects.equals(securityContacts, that.securityContacts) && Objects.equals(safetyInfo, that.safetyInfo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, shelterType, shelterName, shelterDescription, shelterAddress, drivingDirection, shelterContacts, securityContacts, safetyInfo);
     }
 }

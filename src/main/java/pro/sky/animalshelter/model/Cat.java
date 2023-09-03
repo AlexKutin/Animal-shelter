@@ -3,6 +3,7 @@ package pro.sky.animalshelter.model;
 import pro.sky.animalshelter.dto.CatDTO;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "cats_list")
@@ -95,5 +96,18 @@ public class Cat extends Animal {
 
     public CatDTO toDTO() {
         return new CatDTO(this.catId, this.catName,this.age, this.gender, this.breed);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Cat)) return false;
+        Cat cat = (Cat) o;
+        return catId.equals(cat.catId) && catName.equals(cat.catName) && age.equals(cat.age) && Objects.equals(gender, cat.gender) && Objects.equals(breed, cat.breed);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(catId, catName, age, gender, breed);
     }
 }

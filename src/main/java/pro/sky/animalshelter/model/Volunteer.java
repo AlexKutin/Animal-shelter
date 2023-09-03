@@ -40,6 +40,16 @@ public class Volunteer implements Cloneable {
     @JoinColumn(name = "shelter_id")
     private Shelter shelter;
 
+    public Volunteer() {
+    }
+
+    public Volunteer(Integer id, String name, Boolean isActive, Long chatId) {
+        this.id = id;
+        this.name = name;
+        this.isActive = isActive;
+        this.chatId = chatId;
+    }
+
     public Integer getId() {
         return id;
     }

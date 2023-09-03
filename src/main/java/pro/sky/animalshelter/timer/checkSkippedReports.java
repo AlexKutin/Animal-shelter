@@ -7,8 +7,8 @@ import pro.sky.animalshelter.service.AdopterService;
 
 @Component
 public class checkSkippedReports {
-    private static final int SKIPPED_DAYS_WARNING = 1;
-    private static final int SKIPPED_DAYS_SIGNAL_VOLUNTEER = 3;
+    public static final int SKIPPED_DAYS_WARNING = 1;
+    public static final int SKIPPED_DAYS_SIGNAL_VOLUNTEER = 3;
 
     private final AdopterService adopterService;
 

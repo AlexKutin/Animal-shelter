@@ -37,12 +37,6 @@ public class FileService {
         return new File(shelter.getDrivingDirection());
     }
 
-   /* public void saveDirectoryToRepository(ShelterType shelterType) {
-        Shelter shelter = shelterService.findShelterByShelterType(shelterType);
-        shelter.setDrivingDirection(dataFilePath + "/" + shelter.getShelterName() + "_" + dataFileName);
-        shelterRepository.save(shelter);
-    }*/
-
     /**
      * Сохраняет путь до файла в таблицу shelters.
      * <p>

@@ -3,6 +3,7 @@ package pro.sky.animalshelter.model;
 import pro.sky.animalshelter.dto.AnimalAdopterDTO;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "cat_adopters")
@@ -40,5 +41,19 @@ public class CatAdopter extends Adopter {
         animalAdopterDTO.setAnimalName(this.getAnimal().getName());
 
         return animalAdopterDTO;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CatAdopter)) return false;
+        if (!super.equals(o)) return false;
+        CatAdopter that = (CatAdopter) o;
+        return user.equals(that.user) && cat.equals(that.cat);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), user, cat);
     }
 }

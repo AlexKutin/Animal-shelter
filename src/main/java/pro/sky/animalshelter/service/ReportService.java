@@ -100,7 +100,7 @@ public class ReportService {
             ReportDogShelter reportDogShelter = ReportDogShelter.fromDTO(reportAnimalDTO);
             DogAdopter dogAdopter;
             if (chatId != null) {
-                dogAdopter = adopterService.findDogAdopterByChatIdAndStatus(chatId,
+                dogAdopter = adopterService.findDogAdopterByChatIdAndStatuses(chatId,
                         List.of(AdopterStatus.PROBATION_ACTIVE, AdopterStatus.WAITING_REPORT));
             } else {
                 dogAdopter = adopterService.findDogAdopterById(adopterId);

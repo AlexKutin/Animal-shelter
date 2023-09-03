@@ -45,6 +45,5 @@ public class ReportDogShelter extends ReportAnimal {
         ReportDogShelter reportDogShelter = new ReportDogShelter();
         reportDogShelter.fillDataFromDTO(reportAnimalDTO);
         return reportDogShelter;
-
     }
 }

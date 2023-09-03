@@ -16,6 +16,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import static pro.sky.animalshelter.Constants.TextConstants.*;
+
 @Service
 @Transactional
 public class AdopterService {
@@ -40,39 +42,40 @@ public class AdopterService {
     public CatAdopter findCatAdopterById(Integer adopterId) {
         return catAdopterRepository.findById(adopterId)
                 .orElseThrow(() -> new AdopterNotFoundException(
-                        String.format("Adopter with id = %d not found in Cat Shelter database", adopterId)));
+                        String.format(CAT_ADOPTER_BY_ID_NOT_FOUND, adopterId)));
     }
 
     public DogAdopter findDogAdopterById(Integer adopterId) {
         return dogAdopterRepository.findById(adopterId)
                 .orElseThrow(() -> new AdopterNotFoundException(
-                        String.format("Adopter with id = %d not found in Dog Shelter database", adopterId)));
+                        String.format(DOG_ADOPTER_BY_ID_NOT_FOUND, adopterId)));
     }
 
-    public DogAdopter findDogAdopterByChatIdAndStatus(Long chatId, Collection<AdopterStatus> adopterStatuses) {
+    public DogAdopter findDogAdopterByChatIdAndStatuses(Long chatId, Collection<AdopterStatus> adopterStatuses) {
         return Optional.ofNullable(dogAdopterRepository.findByChatIdAndAdopterStatusIn(chatId, adopterStatuses))
                 .orElseThrow(() -> new AdopterNotFoundException(
-                        String.format("Adopter with chatId = %d and status = %s not found in Dog Shelter database", chatId, adopterStatuses)));
+                        String.format(DOG_ADOPTER_BY_CHAT_ID_AND_STATUS_NOT_FOUND, chatId, adopterStatuses)));
     }
 
     public CatAdopter findCatAdopterByChatIdAndStatuses(Long chatId, Collection<AdopterStatus> adopterStatuses) {
-//        UserCatShelter userCatShelter = userShelterService.findUserCatShelterByChatId(chatId);
         return Optional.ofNullable(catAdopterRepository.findByChatIdAndAdopterStatusIn(chatId, adopterStatuses))
                 .orElseThrow(() -> new AdopterNotFoundException(
-                        String.format("Adopter with chatId = %d and status = %s not found in Cat Shelter database", chatId, adopterStatuses)));
+                        String.format(CAT_ADOPTER_BY_CHAT_ID_AND_STATUS_NOT_FOUND, chatId, adopterStatuses)));
     }
 
     public Integer getAdopterIdByChatId(Long chatId, ShelterType chooseShelterType) {
         if (chooseShelterType == ShelterType.DOG_SHELTER) {
             DogAdopter dogAdopter = dogAdopterRepository.findAdopterIdByChatId(chatId);
-            if (dogAdopter != null) {
-                return dogAdopter.getAdopterId();
-            }
+            return Optional.ofNullable(dogAdopter)
+                    .orElseThrow(() -> new AdopterNotFoundException(
+                            String.format(DOG_ADOPTER_BY_CHAT_ID_NOT_FOUND, chatId)))
+                    .getAdopterId();
         } else if (chooseShelterType == ShelterType.CAT_SHELTER) {
             CatAdopter catAdopter = catAdopterRepository.findAdopterIdByChatId(chatId);
-            if (catAdopter != null) {
-                return catAdopter.getAdopterId();
-            }
+            return Optional.ofNullable(catAdopter)
+                    .orElseThrow(() -> new AdopterNotFoundException(
+                            String.format(CAT_ADOPTER_BY_CHAT_ID_NOT_FOUND, chatId)))
+                    .getAdopterId();
         }
         logger.error("Shelter type {} not supported. The checking reports not been performed", chooseShelterType);
         throw new ShelterNotFoundException(String.format("Shelter type: %s not supported yet", chooseShelterType));

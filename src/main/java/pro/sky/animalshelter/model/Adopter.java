@@ -5,6 +5,7 @@ import pro.sky.animalshelter.dto.AnimalAdopterDTO;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.Optional;
 
 @MappedSuperclass
@@ -94,9 +95,16 @@ public abstract class Adopter {
                 .orElse(userShelter.getFirstName() + " " + userShelter.getLastName());
     }
 
-//    protected AnimalAdopterDTO fillUserInfo(UserShelter userShelter, AnimalAdopterDTO animalAdopterDTO) {
-//        animalAdopterDTO.setUserId(userShelter.getUserId());
-//        animalAdopterDTO.setUserName(Optional.of(userShelter.getUserName())
-//                .orElse(userShelter.getFirstName() + " " + userShelter.getLastName()));
-//    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Adopter)) return false;
+        Adopter adopter = (Adopter) o;
+        return adopterId.equals(adopter.adopterId) && chatId.equals(adopter.chatId) && adoptionDate.equals(adopter.adoptionDate) && adopterStatus == adopter.adopterStatus && endProbationDate.equals(adopter.endProbationDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(adopterId, chatId, adoptionDate, adopterStatus, endProbationDate);
+    }
 }

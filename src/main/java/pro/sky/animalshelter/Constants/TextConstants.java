@@ -69,4 +69,14 @@ public class TextConstants {
 
     public static final String REPORT_ACCEPTED_MESSAGE = "Отчет принят";
     public static final String REPORT_WARNING_MESSAGE = "Отчет заполнен плохо";
+
+    public static final String DOG_ADOPTER_BY_ID_NOT_FOUND = "Adopter with id = %d not found in Dog Shelter database";
+    public static final String CAT_ADOPTER_BY_ID_NOT_FOUND = "Adopter with id = %d not found in Cat Shelter database";
+
+    public static final String DOG_ADOPTER_BY_CHAT_ID_NOT_FOUND = "Adopter with chatId = %d not found in Dog Shelter database";
+    public static final String CAT_ADOPTER_BY_CHAT_ID_NOT_FOUND = "Adopter with chatId = %d not found in Cat Shelter database";
+
+    public static final String DOG_ADOPTER_BY_CHAT_ID_AND_STATUS_NOT_FOUND = "Adopter with chatId = %d and status = %s not found in Dog Shelter database";
+    public static final String CAT_ADOPTER_BY_CHAT_ID_AND_STATUS_NOT_FOUND = "Adopter with chatId = %d and status = %s not found in Cat Shelter database";
+
 }
