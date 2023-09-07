@@ -599,7 +599,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         animalShelterBot.execute(request);
     }
 
-    private ShelterType getShelterTypeByUserChatId(Long chatId) {
+    public ShelterType getShelterTypeByUserChatId(Long chatId) {
         if (chooseShelterType.containsKey(chatId)) {
             return chooseShelterType.get(chatId);
         }
