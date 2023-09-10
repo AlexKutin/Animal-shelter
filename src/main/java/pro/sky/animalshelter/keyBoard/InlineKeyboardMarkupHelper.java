@@ -2,6 +2,7 @@ package pro.sky.animalshelter.keyBoard;
 
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
+import pro.sky.animalshelter.Constants.CallbackConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +11,8 @@ public class InlineKeyboardMarkupHelper {
 
     public static InlineKeyboardMarkup createInlineKeyboard() {
         List<InlineKeyboardButton> rowInline = new ArrayList<>();
-        rowInline.add(new InlineKeyboardButton("Приют кошек\uD83D\uDC31").callbackData("Приют кошек\uD83D\uDC31"));
-        rowInline.add(new InlineKeyboardButton("Приют собак\uD83D\uDC36").callbackData("Приют собак\uD83D\uDC36"));
+        rowInline.add(new InlineKeyboardButton("Приют кошек\uD83D\uDC31").callbackData(CallbackConstants.SHELTER_CAT));
+        rowInline.add(new InlineKeyboardButton("Приют собак\uD83D\uDC36").callbackData(CallbackConstants.SHELTER_DOG));
         InlineKeyboardButton[] buttonsArray = rowInline.toArray(new InlineKeyboardButton[0]);
         return new InlineKeyboardMarkup(buttonsArray);
 
