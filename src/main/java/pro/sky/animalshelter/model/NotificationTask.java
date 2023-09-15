@@ -86,4 +86,14 @@ public class NotificationTask {
                 ", shelterType=" + shelterType +
                 '}';
     }
+
+    public static NotificationTask createNewTask(Long chatId, String notificationText, ShelterType shelterType, LocalDateTime notificationDateTime) {
+        NotificationTask notificationTask = new NotificationTask();
+        notificationTask.setChatId(chatId);
+        notificationTask.setMessage(notificationText);
+        notificationTask.setNotificationDateTime(notificationDateTime);
+        notificationTask.setProcessed(Boolean.FALSE);
+        notificationTask.setShelterType(shelterType);
+        return notificationTask;
+    }
 }

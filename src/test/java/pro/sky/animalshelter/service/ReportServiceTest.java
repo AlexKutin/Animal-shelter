@@ -18,15 +18,12 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {
     public static final Integer CAT_ADOPTER_PRESENT_ID = 1;
     public static final Integer DOG_ADOPTER_PRESENT_ID = 2;
-    public static final Integer CAT_ADOPTER_NOT_PRESENT_ID = 10;
-    public static final Integer DOG_ADOPTER_NOT_PRESENT_ID = 15;
 
     public static final Integer USER_CAT_SHELTER_PRESENT_ID = 5;
     public static final String USER_CAT_SHELTER_NAME = "Cat user 1";
@@ -42,11 +39,6 @@ class ReportServiceTest {
 
     public static final Integer DOG_SHELTER_REPORT_ID = 21;
     public static final Integer CAT_SHELTER_REPORT_ID = 84;
-
-   /* public static final Long DOG_ADOPTER_PRESENT_CHAT_ID = 812818905L;
-    public static final Long DOG_ADOPTER_NOT_PRESENT_CHAT_ID = 123456789L;
-    public static final Long CAT_ADOPTER_PRESENT_CHAT_ID = 812818900L;
-    public static final Long CAT_ADOPTER_NOT_PRESENT_CHAT_ID = 123456780L;*/
 
     @Mock
     private ReportDogShelterRepository reportDogShelterRepository;
@@ -215,7 +207,7 @@ class ReportServiceTest {
     }
 
     @Test
-    public void editDogShelterStatusReport_Warning() throws CloneNotSupportedException {
+    public void editDogShelterStatusReport_Warning() {
         when(reportDogShelterRepository.findById(DOG_SHELTER_REPORT_ID)).thenReturn(Optional.of(reportDogShelter));
         when(reportDogShelterRepository.save(reportDogShelter)).thenReturn(reportDogShelter);
         reportService.editDogShelterStatusReport(DOG_SHELTER_REPORT_ID, ReportStatus.REPORT_WARNING);
@@ -237,7 +229,9 @@ class ReportServiceTest {
 
         Mockito.verify(reportCatShelterRepository, times(1)).findById(CAT_SHELTER_REPORT_ID);
         Mockito.verify(reportCatShelterRepository, times(1)).save(reportCatShelter);
-        assertEquals(reportCatShelter.getReportStatus(), ReportStatus.REPORT_ACCEPTED);
+        Mockito.verify(notificationTaskService, times(1)).reportWarningNotification(
+                reportCatShelter.getAdopter(), ShelterType.CAT_SHELTER);
+        assertEquals(reportCatShelter.getReportStatus(), ReportStatus.REPORT_WARNING);
         Mockito.verifyNoMoreInteractions(reportDogShelterRepository, reportCatShelterRepository,
                 adopterService, notificationTaskService);
     }
