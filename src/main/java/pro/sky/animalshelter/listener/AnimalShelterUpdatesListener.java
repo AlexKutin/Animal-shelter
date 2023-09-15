@@ -276,10 +276,10 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
                 logger.error("Error while sending photo: {}", e.getMessage());
             }
         } else {
-            logger.error("Image file not found: {}", imageFileName);
+            logger.error("Image AnimalShelterUpdatesListener.java:256file not found: {}", imageFileName);
         }
 
-        SendMessage responseShelterInfoAddress = new SendMessage(chatId, shelterDTO.getShelterAddress() + "\nДля удобного проезда к нам, пожалуйста, используйте представленную выше схему.");
+        SendMessage responseShelterInfoAddress = new SendMessage(chatId, shelterDTO.getShelterAddress() + "\n" + TextConstants.SHELTER_INFO_ADDRESS);
         InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
         responseShelterInfoAddress.replyMarkup(BackShelterInfoKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoAddress);
@@ -288,7 +288,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
 
     private void sendShelterContacts(Long chatId) {
         ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
-        SendMessage responseShelterInfoContacts = new SendMessage(chatId, "Контакты для связи с нами:\nТел:" + shelterDTO.getShelterContacts());
+        SendMessage responseShelterInfoContacts = new SendMessage(chatId, TextConstants.SHELTER_INFO_CONTACTS + shelterDTO.getShelterContacts());
         InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
         responseShelterInfoContacts.replyMarkup(BackShelterInfoKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoContacts);
@@ -297,7 +297,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
 
     private void sendShelterSecurityContacts(Long chatId) {
         ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
-        SendMessage responseShelterInfoContacts = new SendMessage(chatId, "Контакты охраны для получения пропуска:\nТел:" + shelterDTO.getSecurityContacts());
+        SendMessage responseShelterInfoContacts = new SendMessage(chatId, TextConstants.SHELTER_INFO_SECURITY_CONTACTS + shelterDTO.getSecurityContacts());
         InlineKeyboardMarkup BackShelterInfoKeyboard = InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard();
         responseShelterInfoContacts.replyMarkup(BackShelterInfoKeyboard);
         SendResponse sendResponse = animalShelterBot.execute(responseShelterInfoContacts);

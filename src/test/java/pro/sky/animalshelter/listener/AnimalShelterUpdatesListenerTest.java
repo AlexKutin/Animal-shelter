@@ -1,11 +1,9 @@
 package pro.sky.animalshelter.listener;
 
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.model.CallbackQuery;
-import com.pengrad.telegrambot.model.Chat;
-import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.*;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.response.SendResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +11,10 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pro.sky.animalshelter.Constants.CallbackConstants;
 import pro.sky.animalshelter.Constants.TextConstants;
+import pro.sky.animalshelter.dto.RulesDTO;
+import pro.sky.animalshelter.dto.ShelterDTO;
 import pro.sky.animalshelter.keyBoard.InlineKeyboardMarkupHelper;
+import pro.sky.animalshelter.service.RulesService;
 import pro.sky.animalshelter.service.ShelterService;
 
 import java.util.List;
@@ -29,6 +30,10 @@ public class AnimalShelterUpdatesListenerTest {
     private TelegramBot animalShelterBot;
     @Mock
     ShelterService shelterService;
+    @Mock
+    RulesService rulesService;
+//    @Mock
+//    UserShelterService userShelterService;
 
     @Captor
     ArgumentCaptor<SendMessage> captor;
@@ -129,53 +134,236 @@ public class AnimalShelterUpdatesListenerTest {
         assertEquals(value.getParameters().get("text"), CallbackConstants.SHELTER_CAT + " " + TextConstants.SHELTER_INFO_MESSAGE);
         assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createMainMenuInlineKeyboard());
     }
-//    @Test
-//    void sendShelterInfoAboutTest() {
-//        var upd = mock(Update.class);
-//        var callback = mock(CallbackQuery.class);
-//        var message = mock(Message.class);
-//        var chat = mock(Chat.class);
-//        var shelterService = mock(ShelterService.class);
-//        when(chat.id()).thenReturn(1L);
-//        when(upd.callbackQuery()).thenReturn(callback);
-//        when(callback.data()).thenReturn(CallbackConstants.SHELTER_CAT);
-//        verify(updatesListener.chooseShelterType.put(1L, ShelterType.CAT_SHELTER));
-//        updatesListener.process(List.of(upd));
-//        when(callback.data()).thenReturn(CallbackConstants.SHELTER_INFO_ABOUT);
-//        when(callback.message()).thenReturn(message);
-//        when(message.chat()).thenReturn(chat);
-//        updatesListener.process(List.of(upd));
-//
-//        verify(animalShelterBot).execute(captor.capture());
-//
-//        var value = captor.getValue();
-////        ShelterDTO shelterDTO = shelterService.getShelterByShelterType(updatesListener.getShelterTypeByUserChatId(826249875L));
-////        assertEquals(value.getParameters().get("chat_id"), 826249875L);
-//        assertEquals(value.getParameters().get("text"), "Приют называется " + shelterService.getCatShelter().getShelterName() + ". " + shelterService.getCatShelter().getShelterDescription());
-//        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard());
-//    }
 @Test
-void sendShelterLeaveContactsTest() {
+void sendShelterInfoAboutTest() {
     var upd = mock(Update.class);
     var callback = mock(CallbackQuery.class);
     var message = mock(Message.class);
     var chat = mock(Chat.class);
+    when(chat.id()).thenReturn(1L);
     when(upd.callbackQuery()).thenReturn(callback);
-    when(callback.data()).thenReturn(CallbackConstants.SHELTER_INFO_LEAVE_CONTACTS);
     when(callback.message()).thenReturn(message);
     when(message.chat()).thenReturn(chat);
-    when(chat.id()).thenReturn(1L);
+
+    var responseMock = mock(SendResponse.class); // добавил мок ответа, так как в метод у него вызывается метод isOk()
+    when(responseMock.isOk()).thenReturn(true);
+    when(animalShelterBot.execute(any())).thenReturn(responseMock);
+
+    ShelterDTO dto = new ShelterDTO(); // добавил ДТО, и замокал сервис, чтобы он возвращал ДТО при вызове метода getShelterByShelterType
+    // мок у тебя тут до этого был, но ты создал его внутри этого метода, он был как локальная переменная.
+    dto.setShelterName("test_name");
+    dto.setShelterDescription("test_description");
+
+    when(shelterService.getShelterByShelterType(any())).thenReturn(dto);
+    when(callback.data()).thenReturn(CallbackConstants.SHELTER_CAT);
 
     updatesListener.process(List.of(upd));
 
-    verify(animalShelterBot).execute(captor.capture());
+    when(callback.data()).thenReturn(CallbackConstants.SHELTER_INFO_ABOUT);
+    updatesListener.process(List.of(upd));
+
+    verify(animalShelterBot, times(2)).execute(captor.capture()); // тут добавил проверку, что метод вызывается 2 раза, оно так и есть по сути
 
     var value = captor.getValue();
-
-    assertEquals(value.getParameters().get("chat_id"), 1L);
-    assertEquals(value.getParameters().get("text"), TextConstants.SHELTER_LEAVE_CONTACTS);
-    assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createCancelContactInputInlineKeyboard());
+    assertEquals(value.getParameters().get("text"), "Приют называется " + dto.getShelterName() + ". " + dto.getShelterDescription());
+    assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard());
 }
+//    @Test
+//    void sendShelterInfoAddressTest() {
+//        var upd = mock(Update.class);
+//        var callback = mock(CallbackQuery.class);
+//        var message = mock(Message.class);
+//        var chat = mock(Chat.class);
+//        when(chat.id()).thenReturn(1L);
+//        when(upd.callbackQuery()).thenReturn(callback);
+//        when(callback.message()).thenReturn(message);
+//        when(message.chat()).thenReturn(chat);
+//
+//        var responseMock = mock(SendResponse.class);
+//        when(responseMock.isOk()).thenReturn(true);
+//        when(animalShelterBot.execute(any(SendPhoto.class))).thenReturn(responseMock); // Изменение этой строки
+////        when(animalShelterBot.execute(any())).thenReturn(responseMock);
+//
+//        ShelterDTO dto = new ShelterDTO();
+//        dto.setShelterAddress("test_address");
+////        dto.setShelterDescription("test_description");
+//
+//        when(shelterService.getShelterByShelterType(any())).thenReturn(dto);
+//        when(callback.data()).thenReturn(CallbackConstants.SHELTER_CAT);
+//
+//        updatesListener.process(List.of(upd));
+//
+//        when(callback.data()).thenReturn(CallbackConstants.SHELTER_INFO_ADDRESS);
+//        updatesListener.process(List.of(upd));
+//
+//        verify(animalShelterBot, times(2)).execute(captor.capture());
+//
+//        var value = captor.getValue();
+//        assertEquals(value.getParameters().get("text"), dto.getShelterAddress() + "\n" + TextConstants.SHELTER_INFO_ADDRESS);
+//        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard());
+//    }
+    @Test
+    void sendShelterContactsTest() {
+        var upd = mock(Update.class);
+        var callback = mock(CallbackQuery.class);
+        var message = mock(Message.class);
+        var chat = mock(Chat.class);
+        when(chat.id()).thenReturn(1L);
+        when(upd.callbackQuery()).thenReturn(callback);
+        when(callback.message()).thenReturn(message);
+        when(message.chat()).thenReturn(chat);
+
+        var responseMock = mock(SendResponse.class);
+        when(responseMock.isOk()).thenReturn(true);
+        when(animalShelterBot.execute(any())).thenReturn(responseMock);
+
+        ShelterDTO dto = new ShelterDTO();
+        dto.setShelterName("test_name");
+        dto.setShelterDescription("test_description");
+
+        when(shelterService.getShelterByShelterType(any())).thenReturn(dto);
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_CAT);
+
+        updatesListener.process(List.of(upd));
+
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_INFO_CONTACTS);
+        updatesListener.process(List.of(upd));
+
+        verify(animalShelterBot, times(2)).execute(captor.capture());
+
+        var value = captor.getValue();
+        assertEquals(value.getParameters().get("text"), TextConstants.SHELTER_INFO_CONTACTS + dto.getShelterContacts());
+        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard());
+    }
+    @Test
+    void sendShelterSecurityContactsTest() {
+        var upd = mock(Update.class);
+        var callback = mock(CallbackQuery.class);
+        var message = mock(Message.class);
+        var chat = mock(Chat.class);
+        when(chat.id()).thenReturn(1L);
+        when(upd.callbackQuery()).thenReturn(callback);
+        when(callback.message()).thenReturn(message);
+        when(message.chat()).thenReturn(chat);
+
+        var responseMock = mock(SendResponse.class);
+        when(responseMock.isOk()).thenReturn(true);
+        when(animalShelterBot.execute(any())).thenReturn(responseMock);
+
+        ShelterDTO dto = new ShelterDTO();
+        dto.setShelterName("test_name");
+        dto.setShelterDescription("test_description");
+
+        when(shelterService.getShelterByShelterType(any())).thenReturn(dto);
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_CAT);
+
+        updatesListener.process(List.of(upd));
+
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_INFO_SECURITY_CONTACTS);
+        updatesListener.process(List.of(upd));
+
+        verify(animalShelterBot, times(2)).execute(captor.capture());
+
+        var value = captor.getValue();
+        assertEquals(value.getParameters().get("text"), TextConstants.SHELTER_INFO_SECURITY_CONTACTS + dto.getSecurityContacts());
+        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard());
+    }
+
+    @Test
+    void sendShelterSafetyTipsTest() {
+        var upd = mock(Update.class);
+        var callback = mock(CallbackQuery.class);
+        var message = mock(Message.class);
+        var chat = mock(Chat.class);
+        when(chat.id()).thenReturn(1L);
+        when(upd.callbackQuery()).thenReturn(callback);
+        when(callback.message()).thenReturn(message);
+        when(message.chat()).thenReturn(chat);
+
+        var responseMock = mock(SendResponse.class);
+        when(responseMock.isOk()).thenReturn(true);
+        when(animalShelterBot.execute(any())).thenReturn(responseMock);
+
+        ShelterDTO dto = new ShelterDTO();
+        dto.setShelterName("test_name");
+        dto.setShelterDescription("test_description");
+
+        when(shelterService.getShelterByShelterType(any())).thenReturn(dto);
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_CAT);
+
+        updatesListener.process(List.of(upd));
+
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_INFO_SAFETY_TIPS);
+        updatesListener.process(List.of(upd));
+
+        verify(animalShelterBot, times(2)).execute(captor.capture());
+
+        var value = captor.getValue();
+        assertEquals(value.getParameters().get("text"), dto.getSafetyInfo());
+        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createBackToShelterInfoInlineKeyboard());
+    }
+    @Test
+    void sendShelterLeaveContactsTest() {
+        var upd = mock(Update.class);
+        var callback = mock(CallbackQuery.class);
+        var message = mock(Message.class);
+        var chat = mock(Chat.class);
+        when(upd.callbackQuery()).thenReturn(callback);
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_INFO_LEAVE_CONTACTS);
+        when(callback.message()).thenReturn(message);
+        when(message.chat()).thenReturn(chat);
+        when(chat.id()).thenReturn(1L);
+
+        updatesListener.process(List.of(upd));
+
+        verify(animalShelterBot).execute(captor.capture());
+
+        var value = captor.getValue();
+
+        assertEquals(value.getParameters().get("chat_id"), 1L);
+        assertEquals(value.getParameters().get("text"), TextConstants.SHELTER_LEAVE_CONTACTS);
+        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createCancelContactInputInlineKeyboard());
+    }
+//    @Test
+//    void saveContactsTest() {
+//        // Создаем моки для необходимых объектов и настраиваем их
+//        var message = mock(Message.class);
+//        var chat = mock(Chat.class);
+//        var from = mock(User.class);
+//
+//        when(message.chat()).thenReturn(chat);
+//        when(message.from()).thenReturn(from);
+//        when(chat.id()).thenReturn(1L);
+//        when(from.id()).thenReturn(12345L); // Пример Telegram ID
+//        when(from.username()).thenReturn("testuser");
+//        when(from.firstName()).thenReturn("John");
+//        when(from.lastName()).thenReturn("Doe");
+//        when(message.text()).thenReturn("123456"); // Пример контактных данных
+//
+//        // Создаем ожидаемый объект UserShelterDTO
+//        ShelterType expectedShelterType = ShelterType.CAT_SHELTER;
+//        UserShelterDTO expectedUserShelterDTO = new UserShelterDTO();
+//        expectedUserShelterDTO.setShelterType(expectedShelterType);
+//        expectedUserShelterDTO.setChatId(1L);
+//        expectedUserShelterDTO.setTelegramId(12345L);
+//        expectedUserShelterDTO.setUserName("testuser");
+//        expectedUserShelterDTO.setFirstName("John");
+//        expectedUserShelterDTO.setLastName("Doe");
+//        expectedUserShelterDTO.setUserContacts("123456");
+//
+//        // Моки и настройки для сервиса userShelterService
+//        when(userShelterService.saveUserContacts(any())).thenReturn("ok");
+//        when(message.text()).thenReturn(CallbackConstants.SHELTER_CAT);
+//
+//        // Создаем объект, который вы хотите протестировать
+//        AnimalShelterUpdatesListener yourClass = new AnimalShelterUpdatesListener(userShelterService);
+//
+//        // Вызываем метод, который вы хотите протестировать
+//        yourClass.saveContacts(message);
+//
+//        // Проверяем, что метод userShelterService.saveUserContacts был вызван с ожидаемыми аргументами
+//        verify(userShelterService).saveUserContacts(expectedUserShelterDTO);
+//    }
     @Test
     void backMainMenuTest() {
         var upd = mock(Update.class);
@@ -199,6 +387,169 @@ void sendShelterLeaveContactsTest() {
         assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createMainMenuInlineKeyboard());
     }
     @Test
+    void sendAdoptionRulesTest() {
+        var upd = mock(Update.class);
+        var callback = mock(CallbackQuery.class);
+        var message = mock(Message.class);
+        var chat = mock(Chat.class);
+        when(chat.id()).thenReturn(1L);
+        when(upd.callbackQuery()).thenReturn(callback);
+        when(callback.message()).thenReturn(message);
+        when(message.chat()).thenReturn(chat);
+
+        var responseMock = mock(SendResponse.class);
+        when(responseMock.isOk()).thenReturn(true);
+        when(animalShelterBot.execute(any())).thenReturn(responseMock);
+
+        ShelterDTO dto = new ShelterDTO();
+        dto.setShelterName("test_name");
+        dto.setShelterDescription("test_description");
+
+        when(shelterService.getShelterByShelterType(any())).thenReturn(dto);
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_CAT);
+
+        updatesListener.process(List.of(upd));
+
+        when(callback.data()).thenReturn(CallbackConstants.ADOPTIONS_RULES);
+        updatesListener.process(List.of(upd));
+
+        verify(animalShelterBot, times(2)).execute(captor.capture());
+
+        var value = captor.getValue();
+        assertEquals(value.getParameters().get("text"), TextConstants.ADOPTION_RULES_FOR_CAT);
+        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createAdoptionRulesInlineKeyboard());
+    }
+    @Test
+    void sendAdoptionRulesIntroductionTest() {
+        var upd = mock(Update.class);
+        var callback = mock(CallbackQuery.class);
+        var message = mock(Message.class);
+        var chat = mock(Chat.class);
+        when(chat.id()).thenReturn(1L);
+        when(upd.callbackQuery()).thenReturn(callback);
+        when(callback.message()).thenReturn(message);
+        when(message.chat()).thenReturn(chat);
+
+        var responseMock = mock(SendResponse.class);
+        when(responseMock.isOk()).thenReturn(true);
+        when(animalShelterBot.execute(any())).thenReturn(responseMock);
+
+        RulesDTO dto = new RulesDTO();
+        dto.setRilesMeeting("test_rules_meeting");
+
+        when(rulesService.getRulesByShelterType(any())).thenReturn(dto);
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_CAT);
+
+        updatesListener.process(List.of(upd));
+
+        when(callback.data()).thenReturn(CallbackConstants.ADOPTIONS_RULES_INTRODUCTION);
+        updatesListener.process(List.of(upd));
+
+        verify(animalShelterBot, times(2)).execute(captor.capture());
+
+        var value = captor.getValue();
+        assertEquals(value.getParameters().get("text"),dto.getRilesMeeting());
+        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createBackToAdoptionRulesInlineKeyboard());
+    }
+    @Test
+    void sendAdoptionRulesDogTest() {
+        var upd = mock(Update.class);
+        var callback = mock(CallbackQuery.class);
+        var message = mock(Message.class);
+        var chat = mock(Chat.class);
+        when(chat.id()).thenReturn(1L);
+        when(upd.callbackQuery()).thenReturn(callback);
+        when(callback.message()).thenReturn(message);
+        when(message.chat()).thenReturn(chat);
+
+        var responseMock = mock(SendResponse.class);
+        when(responseMock.isOk()).thenReturn(true);
+        when(animalShelterBot.execute(any())).thenReturn(responseMock);
+
+        ShelterDTO dto = new ShelterDTO();
+        dto.setShelterName("test_name");
+        dto.setShelterDescription("test_description");
+
+        when(shelterService.getShelterByShelterType(any())).thenReturn(dto);
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_DOG);
+
+        updatesListener.process(List.of(upd));
+
+        when(callback.data()).thenReturn(CallbackConstants.ADOPTIONS_RULES);
+        updatesListener.process(List.of(upd));
+
+        verify(animalShelterBot, times(2)).execute(captor.capture());
+
+        var value = captor.getValue();
+        assertEquals(value.getParameters().get("text"), TextConstants.ADOPTION_RULES_FOR_DOG);
+        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createAdoptionRulesForDogInlineKeyboard());
+    }
+    @Test
+    void sendListDocForTakePetTest() {
+        var upd = mock(Update.class);
+        var callback = mock(CallbackQuery.class);
+        var message = mock(Message.class);
+        var chat = mock(Chat.class);
+        when(chat.id()).thenReturn(1L);
+        when(upd.callbackQuery()).thenReturn(callback);
+        when(callback.message()).thenReturn(message);
+        when(message.chat()).thenReturn(chat);
+
+        var responseMock = mock(SendResponse.class);
+        when(responseMock.isOk()).thenReturn(true);
+        when(animalShelterBot.execute(any())).thenReturn(responseMock);
+
+        RulesDTO rulesDTO = new RulesDTO();
+        rulesDTO.setListDocForTakePet("test_list");
+
+        when(rulesService.getRulesByShelterType(any())).thenReturn(rulesDTO);
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_CAT);
+
+        updatesListener.process(List.of(upd));
+
+        when(callback.data()).thenReturn(CallbackConstants.ADOPTIONS_RULES_DOCUMENTS);
+        updatesListener.process(List.of(upd));
+
+        verify(animalShelterBot, times(2)).execute(captor.capture());
+
+        var value = captor.getValue();
+        assertEquals(value.getParameters().get("text"),rulesDTO.getListDocForTakePet());
+        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createBackToAdoptionRulesInlineKeyboard());
+    }
+    @Test
+    void sendRulesTransportTest() {
+        var upd = mock(Update.class);
+        var callback = mock(CallbackQuery.class);
+        var message = mock(Message.class);
+        var chat = mock(Chat.class);
+        when(chat.id()).thenReturn(1L);
+        when(upd.callbackQuery()).thenReturn(callback);
+        when(callback.message()).thenReturn(message);
+        when(message.chat()).thenReturn(chat);
+
+        var responseMock = mock(SendResponse.class);
+        when(responseMock.isOk()).thenReturn(true);
+        when(animalShelterBot.execute(any())).thenReturn(responseMock);
+
+        RulesDTO rulesDTO = new RulesDTO();
+        rulesDTO.setRulesTransportation("test_transport");
+
+        when(rulesService.getRulesByShelterType(any())).thenReturn(rulesDTO);
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_CAT);
+
+        updatesListener.process(List.of(upd));
+
+        when(callback.data()).thenReturn(CallbackConstants.ADOPTIONS_RULES_TRANSPORT);
+        updatesListener.process(List.of(upd));
+
+        verify(animalShelterBot, times(2)).execute(captor.capture());
+
+        var value = captor.getValue();
+        assertEquals(value.getParameters().get("text"),rulesDTO.getRulesTransportation());
+        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createBackToAdoptionRulesInlineKeyboard());
+    }
+
+    @Test
     void sendRulesHouseTest() {
         var upd = mock(Update.class);
         var callback = mock(CallbackQuery.class);
@@ -221,6 +572,102 @@ void sendShelterLeaveContactsTest() {
         assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createPetHouseSelectionKeyBoard());
     }
     @Test
+    void sendRulesHouseSetupForChildTest() {
+        var upd = mock(Update.class);
+        var callback = mock(CallbackQuery.class);
+        var message = mock(Message.class);
+        var chat = mock(Chat.class);
+        when(chat.id()).thenReturn(1L);
+        when(upd.callbackQuery()).thenReturn(callback);
+        when(callback.message()).thenReturn(message);
+        when(message.chat()).thenReturn(chat);
+
+        var responseMock = mock(SendResponse.class);
+        when(responseMock.isOk()).thenReturn(true);
+        when(animalShelterBot.execute(any())).thenReturn(responseMock);
+
+        RulesDTO rulesDTO = new RulesDTO();
+        rulesDTO.setRulesGHForChildPet("test_house");
+
+        when(rulesService.getRulesByShelterType(any())).thenReturn(rulesDTO);
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_CAT);
+
+        updatesListener.process(List.of(upd));
+
+        when(callback.data()).thenReturn(CallbackConstants.ADOPTIONS_RULES_HOUSE_SETUP_PUPPY_KITTEN);
+        updatesListener.process(List.of(upd));
+
+        verify(animalShelterBot, times(2)).execute(captor.capture());
+
+        var value = captor.getValue();
+        assertEquals(value.getParameters().get("text"),rulesDTO.getRulesGHForChildPet());
+        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createBackToPetHouseSelectionKeyBoard());
+    }
+    @Test
+    void sendRulesHouseSetupForAdultTest() {
+        var upd = mock(Update.class);
+        var callback = mock(CallbackQuery.class);
+        var message = mock(Message.class);
+        var chat = mock(Chat.class);
+        when(chat.id()).thenReturn(1L);
+        when(upd.callbackQuery()).thenReturn(callback);
+        when(callback.message()).thenReturn(message);
+        when(message.chat()).thenReturn(chat);
+
+        var responseMock = mock(SendResponse.class);
+        when(responseMock.isOk()).thenReturn(true);
+        when(animalShelterBot.execute(any())).thenReturn(responseMock);
+
+        RulesDTO rulesDTO = new RulesDTO();
+        rulesDTO.setRulesGHForAdultPet("test_house");
+
+        when(rulesService.getRulesByShelterType(any())).thenReturn(rulesDTO);
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_CAT);
+
+        updatesListener.process(List.of(upd));
+
+        when(callback.data()).thenReturn(CallbackConstants.ADOPTIONS_RULES_HOUSE_SETUP_ADULT);
+        updatesListener.process(List.of(upd));
+
+        verify(animalShelterBot, times(2)).execute(captor.capture());
+
+        var value = captor.getValue();
+        assertEquals(value.getParameters().get("text"),rulesDTO.getRulesGHForAdultPet());
+        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createBackToPetHouseSelectionKeyBoard());
+    }
+    @Test
+    void sendRulesHouseSetupForSpecialTest() {
+        var upd = mock(Update.class);
+        var callback = mock(CallbackQuery.class);
+        var message = mock(Message.class);
+        var chat = mock(Chat.class);
+        when(chat.id()).thenReturn(1L);
+        when(upd.callbackQuery()).thenReturn(callback);
+        when(callback.message()).thenReturn(message);
+        when(message.chat()).thenReturn(chat);
+
+        var responseMock = mock(SendResponse.class);
+        when(responseMock.isOk()).thenReturn(true);
+        when(animalShelterBot.execute(any())).thenReturn(responseMock);
+
+        RulesDTO rulesDTO = new RulesDTO();
+        rulesDTO.setRulesGHForSpecialPet("test_house");
+
+        when(rulesService.getRulesByShelterType(any())).thenReturn(rulesDTO);
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_CAT);
+
+        updatesListener.process(List.of(upd));
+
+        when(callback.data()).thenReturn(CallbackConstants.ADOPTIONS_RULES_HOUSE_SETUP_SPECIAL_NEEDS);
+        updatesListener.process(List.of(upd));
+
+        verify(animalShelterBot, times(2)).execute(captor.capture());
+
+        var value = captor.getValue();
+        assertEquals(value.getParameters().get("text"),rulesDTO.getRulesGHForSpecialPet());
+        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createBackToPetHouseSelectionKeyBoard());
+    }
+    @Test
     void sendCynologistTest() {
         var upd = mock(Update.class);
         var callback = mock(CallbackQuery.class);
@@ -241,6 +688,102 @@ void sendShelterLeaveContactsTest() {
         assertEquals(value.getParameters().get("chat_id"), 1L);
         assertEquals(value.getParameters().get("text"), TextConstants.CYNOLOGIST);
         assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createCynologistKeyBoard());
+    }
+    @Test
+    void sendAdviceFromCynologistTest() {
+        var upd = mock(Update.class);
+        var callback = mock(CallbackQuery.class);
+        var message = mock(Message.class);
+        var chat = mock(Chat.class);
+        when(chat.id()).thenReturn(1L);
+        when(upd.callbackQuery()).thenReturn(callback);
+        when(callback.message()).thenReturn(message);
+        when(message.chat()).thenReturn(chat);
+
+        var responseMock = mock(SendResponse.class);
+        when(responseMock.isOk()).thenReturn(true);
+        when(animalShelterBot.execute(any())).thenReturn(responseMock);
+
+        RulesDTO rulesDTO = new RulesDTO();
+        rulesDTO.setAdviceFromCynologist("test_advice");
+
+        when(rulesService.getRulesByShelterType(any())).thenReturn(rulesDTO);
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_CAT);
+
+        updatesListener.process(List.of(upd));
+
+        when(callback.data()).thenReturn(CallbackConstants.ADVICE_FROM_CYNOLOGIST);
+        updatesListener.process(List.of(upd));
+
+        verify(animalShelterBot, times(2)).execute(captor.capture());
+
+        var value = captor.getValue();
+        assertEquals(value.getParameters().get("text"),rulesDTO.getAdviceFromCynologist());
+        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createBackToCynologist());
+    }
+    @Test
+    void sendReasonsRefusalTest() {
+        var upd = mock(Update.class);
+        var callback = mock(CallbackQuery.class);
+        var message = mock(Message.class);
+        var chat = mock(Chat.class);
+        when(chat.id()).thenReturn(1L);
+        when(upd.callbackQuery()).thenReturn(callback);
+        when(callback.message()).thenReturn(message);
+        when(message.chat()).thenReturn(chat);
+
+        var responseMock = mock(SendResponse.class);
+        when(responseMock.isOk()).thenReturn(true);
+        when(animalShelterBot.execute(any())).thenReturn(responseMock);
+
+        RulesDTO rulesDTO = new RulesDTO();
+        rulesDTO.setReasonsRefusal("test_reasons");
+
+        when(rulesService.getRulesByShelterType(any())).thenReturn(rulesDTO);
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_CAT);
+
+        updatesListener.process(List.of(upd));
+
+        when(callback.data()).thenReturn(CallbackConstants.ADOPTION_RULES_REJECTION_REASONS);
+        updatesListener.process(List.of(upd));
+
+        verify(animalShelterBot, times(2)).execute(captor.capture());
+
+        var value = captor.getValue();
+        assertEquals(value.getParameters().get("text"),rulesDTO.getReasonsRefusal());
+        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createBackToAdoptionRulesInlineKeyboard());
+    }
+    @Test
+    void sendListCynologistTest() {
+        var upd = mock(Update.class);
+        var callback = mock(CallbackQuery.class);
+        var message = mock(Message.class);
+        var chat = mock(Chat.class);
+        when(chat.id()).thenReturn(1L);
+        when(upd.callbackQuery()).thenReturn(callback);
+        when(callback.message()).thenReturn(message);
+        when(message.chat()).thenReturn(chat);
+
+        var responseMock = mock(SendResponse.class);
+        when(responseMock.isOk()).thenReturn(true);
+        when(animalShelterBot.execute(any())).thenReturn(responseMock);
+
+        RulesDTO rulesDTO = new RulesDTO();
+        rulesDTO.setListCynologist("test_list");
+
+        when(rulesService.getRulesByShelterType(any())).thenReturn(rulesDTO);
+        when(callback.data()).thenReturn(CallbackConstants.SHELTER_CAT);
+
+        updatesListener.process(List.of(upd));
+
+        when(callback.data()).thenReturn(CallbackConstants.LIST_CYNOLOGIST);
+        updatesListener.process(List.of(upd));
+
+        verify(animalShelterBot, times(2)).execute(captor.capture());
+
+        var value = captor.getValue();
+        assertEquals(value.getParameters().get("text"),rulesDTO.getListCynologist());
+        assertEquals(value.getParameters().get("reply_markup"), InlineKeyboardMarkupHelper.createBackToCynologist());
     }
     @Test
     void sendMainMenuMessage() {

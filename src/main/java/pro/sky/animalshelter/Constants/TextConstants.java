@@ -19,7 +19,10 @@ public class TextConstants {
             "3. \uD83D\uDCDD Отправить отчет о животном\n" +
             "4. \uD83E\uDDE1 Позвать волонтера\n" +
             "⬅ Назад";
-    public static final String SHELTER_INFO_ERROR_MESSAGE = "\uD83D\uDEAB Ошибка в выборе приюта.";
+//    public static final String SHELTER_INFO_ERROR_MESSAGE = "\uD83D\uDEAB Ошибка в выборе приюта.";
+    public static final String SHELTER_INFO_ADDRESS = "\nДля удобного проезда к нам, пожалуйста, используйте представленную выше схему.";
+    public static final String SHELTER_INFO_CONTACTS = "Контакты для связи с нами:\nТел:";
+    public static final String SHELTER_INFO_SECURITY_CONTACTS = "Контакты охраны для получения пропуска:\nТел:";
     public static final String SHELTER_LEAVE_CONTACTS = "Оставьте нам свои контакты и мы с вами свяжемся";
     public static final String BACK_MAIN_MENU = "Вы вернулись в главное меню приюта. Выберите, что вас интересует:\n" +
             "1. \uD83C\uDFE0 Информация о приюте\n" +
