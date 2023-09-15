@@ -4,9 +4,10 @@ import pro.sky.animalshelter.dto.ReportAnimalDTO;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @MappedSuperclass
-public abstract class ReportAnimal {
+public abstract class ReportAnimal implements Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_report")
@@ -90,6 +91,24 @@ public abstract class ReportAnimal {
 
     public void setReportStatus(ReportStatus reportStatus) {
         this.reportStatus = reportStatus;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ReportAnimal)) return false;
+        ReportAnimal that = (ReportAnimal) o;
+        return Objects.equals(reportId, that.reportId) && Objects.equals(description, that.description) && Objects.equals(dateReport, that.dateReport) && Objects.equals(photoFilePath, that.photoFilePath) && Objects.equals(photoFileSize, that.photoFileSize) && Objects.equals(photoMediaType, that.photoMediaType) && reportStatus == that.reportStatus;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(reportId, description, dateReport, photoFilePath, photoFileSize, photoMediaType, reportStatus);
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
     public ReportAnimalDTO toDTO() {

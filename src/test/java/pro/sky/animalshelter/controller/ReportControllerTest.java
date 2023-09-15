@@ -14,7 +14,6 @@ import pro.sky.animalshelter.exception.ShelterNotFoundException;
 import pro.sky.animalshelter.model.ReportCatShelter;
 import pro.sky.animalshelter.model.ReportDogShelter;
 import pro.sky.animalshelter.model.ReportStatus;
-import pro.sky.animalshelter.model.ShelterType;
 import pro.sky.animalshelter.service.ReportService;
 
 import java.io.IOException;
@@ -183,7 +182,7 @@ public class ReportControllerTest {
         Integer adopterId = 1;
         List<ReportAnimalDTO> expectedReports = Collections.singletonList(new ReportAnimalDTO());
 
-        when(reportService.getReportsDogSheltersByAdopterAndStatus(eq(adopterId), any()))
+        when(reportService.getReportsDogShelterByAdopterAndStatus(eq(adopterId), any()))
                 .thenReturn(expectedReports);
 
         // Act
@@ -191,7 +190,7 @@ public class ReportControllerTest {
                 reportController.getReportsByDogShelterAdopter(adopterId, null);
 
         // Assert
-        verify(reportService).getReportsDogSheltersByAdopterAndStatus(adopterId, null);
+        verify(reportService).getReportsDogShelterByAdopterAndStatus(adopterId, null);
         verifyNoMoreInteractions(reportService);
 
         assertEquals(expectedReports, responseEntity.getBody());
@@ -203,7 +202,7 @@ public class ReportControllerTest {
         // Arrange
         Integer adopterId = 1;
 
-        when(reportService.getReportsDogSheltersByAdopterAndStatus(eq(adopterId), any()))
+        when(reportService.getReportsDogShelterByAdopterAndStatus(eq(adopterId), any()))
                 .thenThrow(new ReportNotFoundException("Report not found"));
 
         // Act
@@ -211,7 +210,7 @@ public class ReportControllerTest {
                 reportController.getReportsByDogShelterAdopter(adopterId, null);
 
         // Assert
-        verify(reportService).getReportsDogSheltersByAdopterAndStatus(adopterId, null);
+        verify(reportService).getReportsDogShelterByAdopterAndStatus(adopterId, null);
         verifyNoMoreInteractions(reportService);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
@@ -222,7 +221,7 @@ public class ReportControllerTest {
         // Arrange
         Integer adopterId = 1;
 
-        when(reportService.getReportsDogSheltersByAdopterAndStatus(eq(adopterId), any()))
+        when(reportService.getReportsDogShelterByAdopterAndStatus(eq(adopterId), any()))
                 .thenThrow(new AdopterNotFoundException("Adopter not found"));
 
         // Act
@@ -230,7 +229,7 @@ public class ReportControllerTest {
                 reportController.getReportsByDogShelterAdopter(adopterId, null);
 
         // Assert
-        verify(reportService).getReportsDogSheltersByAdopterAndStatus(adopterId, null);
+        verify(reportService).getReportsDogShelterByAdopterAndStatus(adopterId, null);
         verifyNoMoreInteractions(reportService);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
