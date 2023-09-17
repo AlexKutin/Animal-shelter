@@ -39,6 +39,7 @@ public class VolunteerService {
     public Collection<Volunteer> findVolunteersByShelterType(ShelterType shelterType) {
         return volunteerRepository.findVolunteersByShelter_ShelterType(shelterType);
     }
+
     public String findAvailableVolunteerTelegram(ShelterType shelterType) {
         Collection<Volunteer> volunteers = volunteerRepository.findVolunteersByShelter_ShelterType(shelterType);
 

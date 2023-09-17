@@ -73,6 +73,9 @@ public class TextConstants {
     public static final String REPORT_ACCEPTED_MESSAGE = "Отчет принят";
     public static final String REPORT_WARNING_MESSAGE = "Отчет заполнен плохо";
 
+    public static final String CAT_SHELTER_USER_BY_ID_NOT_FOUND_MESSAGE = "User with userId = %d not found in Cat users database";
+    public static final String DOG_SHELTER_USER_BY_ID_NOT_FOUND_MESSAGE = "User with userId = %d not found in Dog users database";
+
     public static final String DOG_ADOPTER_BY_ID_NOT_FOUND = "Adopter with id = %d not found in Dog Shelter database";
     public static final String CAT_ADOPTER_BY_ID_NOT_FOUND = "Adopter with id = %d not found in Cat Shelter database";
 
@@ -81,5 +84,8 @@ public class TextConstants {
 
     public static final String DOG_ADOPTER_BY_CHAT_ID_AND_STATUS_NOT_FOUND = "Adopter with chatId = %d and status = %s not found in Dog Shelter database";
     public static final String CAT_ADOPTER_BY_CHAT_ID_AND_STATUS_NOT_FOUND = "Adopter with chatId = %d and status = %s not found in Cat Shelter database";
+
+    public static final String DOG_ADOPTER_DUPLICATION_MESSAGE = "Dog Shelter: Adopter duplication error: userId = %d and dogId = %d already present";
+    public static final String CAT_ADOPTER_DUPLICATION_MESSAGE = "Cat Shelter: Adopter duplication error: userId = %d and catId = %d already present";
 
 }

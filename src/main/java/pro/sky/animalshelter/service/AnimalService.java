@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static pro.sky.animalshelter.Constants.TextConstants.CAT_ADOPTER_DUPLICATION_MESSAGE;
+import static pro.sky.animalshelter.Constants.TextConstants.DOG_ADOPTER_DUPLICATION_MESSAGE;
+
 @Service
 public class AnimalService {
     private  final Logger logger = LoggerFactory.getLogger(AnimalService.class);
@@ -22,19 +25,17 @@ public class AnimalService {
 
     private final DogsRepository dogsRepository;
     private final CatsRepository catsRepository;
-    private final ShelterRepository shelterRepository;
     private final DogAdopterRepository dogAdopterRepository;
     private final CatAdopterRepository catAdopterRepository;
     private final NotificationTaskService notificationTaskService;
 
     public AnimalService(ShelterService shelterService, UserShelterService userShelterService, DogsRepository dogsRepository,
-                         CatsRepository catsRepository, ShelterRepository shelterRepository, DogAdopterRepository dogAdopterRepository,
+                         CatsRepository catsRepository, DogAdopterRepository dogAdopterRepository,
                          CatAdopterRepository catAdopterRepository, NotificationTaskService notificationTaskService) {
         this.shelterService = shelterService;
         this.userShelterService = userShelterService;
         this.dogsRepository = dogsRepository;
         this.catsRepository = catsRepository;
-        this.shelterRepository = shelterRepository;
         this.dogAdopterRepository = dogAdopterRepository;
         this.catAdopterRepository = catAdopterRepository;
         this.notificationTaskService = notificationTaskService;
@@ -64,8 +65,8 @@ public class AnimalService {
 
     public CatDTO saveCatToDb(CatDTO catDTO) {
         Cat cat = Cat.fromDTO(catDTO);
-        List<Shelter> list = shelterRepository.findSheltersByShelterType(ShelterType.CAT_SHELTER);
-        cat.setShelterId(list.get(0));
+        Shelter catShelter = shelterService.findShelterByShelterType(ShelterType.CAT_SHELTER);
+        cat.setShelter(catShelter);
         cat = catsRepository.save(cat);
         return cat.toDTO();
     }
@@ -73,11 +74,9 @@ public class AnimalService {
     public AnimalAdopterDTO saveDogAdopter(AnimalAdopterDTO animalAdopterDTO) {
         Integer userId = animalAdopterDTO.getUserId();
         Integer dogId = animalAdopterDTO.getAnimalId();
-//        Long chatId = animalAdopterDTO.getChatId();
         if (dogAdopterRepository.isPresentDogAdopterByUserAndDog(userId, dogId)) {
             logger.warn("Dog Shelter: Adopter duplication error: userId = {} and catId = {} already present", userId, dogId);
-            throw new DuplicateAdopterException(
-                    String.format("Dog Shelter: Adopter duplication error: userId = %d and dogId = %d already present", userId, dogId));
+            throw new DuplicateAdopterException(String.format(DOG_ADOPTER_DUPLICATION_MESSAGE, userId, dogId));
         }
         UserDogShelter user = userShelterService.findUserDogShelterById(userId);
         DogAdopter dogAdopter = new DogAdopter();
@@ -97,11 +96,9 @@ public class AnimalService {
     public AnimalAdopterDTO saveCatAdopter(AnimalAdopterDTO animalAdopterDTO) {
         Integer userId = animalAdopterDTO.getUserId();
         Integer catId = animalAdopterDTO.getAnimalId();
-//        Long chatId = animalAdopterDTO.getChatId();
         if (catAdopterRepository.isPresentCatAdopterByUserAndCat(userId, catId)) {
             logger.warn("Cat Shelter: Adopter duplication error: userId = {} and catId = {} already present", userId, catId);
-            throw new DuplicateAdopterException(
-                    String.format("Cat Shelter: Adopter duplication error: userId = %d and catId = %d already present", userId, catId));
+            throw new DuplicateAdopterException(String.format(CAT_ADOPTER_DUPLICATION_MESSAGE, userId, catId));
         }
         UserCatShelter user = userShelterService.findUserCatShelterById(userId);
         CatAdopter catAdopter = new CatAdopter();
