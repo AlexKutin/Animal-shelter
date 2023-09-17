@@ -39,7 +39,7 @@ import java.util.*;
 @Component
 public class AnimalShelterUpdatesListener implements UpdatesListener {
     private final Logger logger = LoggerFactory.getLogger(AnimalShelterUpdatesListener.class);
-    private final Map<Long, ShelterType> userContactMap = new HashMap<>();
+    public final Map<Long, ShelterType> userContactMap = new HashMap<>();
     private TelegramBot animalShelterBot;
     private final ShelterService shelterService;
     private final RulesService rulesService;
@@ -47,7 +47,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
     private final VolunteerService volunteerService;
     private final ReportService reportService;
     private final AdopterService adopterService;
-    private final Map<Long, ShelterType> chooseShelterType = new HashMap<>();
+    public final Map<Long, ShelterType> chooseShelterType = new HashMap<>();
     private final Map<Long, ReportStage> reportStageMap = new HashMap<>();
     private final Map<Long, PhotoDataDTO> photoSizeMap = new HashMap<>();
 
@@ -225,11 +225,11 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         }
 
         ShelterDTO shelterDTO = shelterService.getShelterByShelterType(getShelterTypeByUserChatId(chatId));
-            SendMessage response = new SendMessage(chatId, data + " "  + TextConstants.SHELTER_INFO_MESSAGE);
-            InlineKeyboardMarkup menuKeyboard = InlineKeyboardMarkupHelper.createMainMenuInlineKeyboard();
-            response.replyMarkup(menuKeyboard);
-            SendResponse sendResponse = animalShelterBot.execute(response);
-            logger.info("Message sent status: {}", sendResponse.isOk());
+        SendMessage response = new SendMessage(chatId, data + " " + TextConstants.SHELTER_INFO_MESSAGE);
+        InlineKeyboardMarkup menuKeyboard = InlineKeyboardMarkupHelper.createMainMenuInlineKeyboard();
+        response.replyMarkup(menuKeyboard);
+        SendResponse sendResponse = animalShelterBot.execute(response);
+        logger.info("Message sent status: {}", sendResponse.isOk());
     }
 
     private void sendShelterInfoOptions(Long chatId) {
@@ -322,6 +322,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         ShelterType shelterType = getShelterTypeByUserChatId(chatId);
         userContactMap.put(chatId, shelterType);
     }
+
     private void saveContacts(Message message) {
         Long chatId = message.chat().id();
         String userContacts = message.text();
@@ -480,6 +481,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             reportStageMap.put(chatId, ReportStage.AWAITING_PHOTO);
         }
     }
+
     private void saveReportToService(Long chatId, String description, PhotoDataDTO photoDataDTO, ShelterType shelterType) {
         ReportAnimalDTO reportAnimalDTO = new ReportAnimalDTO();
         reportAnimalDTO.setShelterType(shelterType);
