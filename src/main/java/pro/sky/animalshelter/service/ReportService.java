@@ -31,7 +31,7 @@ public class ReportService {
         this.notificationTaskService = notificationTaskService;
     }
 
-    public List<ReportAnimalDTO> getReportsDogSheltersByAdopterAndStatus(Integer adopterId, Collection<ReportStatus> reportStatuses) {
+    public List<ReportAnimalDTO> getReportsDogShelterByAdopterAndStatus(Integer adopterId, Collection<ReportStatus> reportStatuses) {
         List<ReportDogShelter> dogAdopterReports;
         if (adopterId == null && (reportStatuses == null || reportStatuses.isEmpty())) {
             dogAdopterReports = reportDogShelterRepository.findAll();

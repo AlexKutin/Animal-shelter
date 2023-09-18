@@ -52,6 +52,7 @@ public class Dog extends Animal {
         this.dogName = dogName;
     }
 
+    @Override
     public Shelter getShelter() {
         return shelter;
     }

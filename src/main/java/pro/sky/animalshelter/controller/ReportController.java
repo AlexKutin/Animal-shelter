@@ -104,7 +104,7 @@ public class ReportController {
             @RequestParam(required = false) @Parameter(description = "Статус отчета",
                     array = @ArraySchema(schema = @Schema(implementation = ReportStatus.class))) Collection<ReportStatus> reportStatuses) {
         try {
-            List<ReportAnimalDTO> reportAnimalDTOList = reportService.getReportsDogSheltersByAdopterAndStatus(adopterId, reportStatuses);
+            List<ReportAnimalDTO> reportAnimalDTOList = reportService.getReportsDogShelterByAdopterAndStatus(adopterId, reportStatuses);
             return ResponseEntity.ok(reportAnimalDTOList);
         } catch (ReportNotFoundException | AdopterNotFoundException e) {
             logger.warn(e.getMessage());

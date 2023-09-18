@@ -16,7 +16,7 @@ public class Cat extends Animal {
     private String catName;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shelter_id")
-    private Shelter shelterId;
+    private Shelter shelter;
     @Column(name = "age")
     private Integer age;
     @Column(name = "gender")
@@ -24,10 +24,10 @@ public class Cat extends Animal {
     @Column(name = "breed")
     private String breed;
 
-    public Cat(Integer catId, String catName, Shelter shelterId, Integer age, String gender, String breed) {
+    public Cat(Integer catId, String catName, Shelter shelter, Integer age, String gender, String breed) {
         this.catId = catId;
         this.catName = catName;
-        this.shelterId = shelterId;
+        this.shelter = shelter;
         this.age = age;
         this.gender = gender;
         this.breed = breed;
@@ -53,12 +53,13 @@ public class Cat extends Animal {
         this.catName = catName;
     }
 
-    public Shelter getShelterId() {
-        return shelterId;
+    @Override
+    public Shelter getShelter() {
+        return shelter;
     }
 
-    public void setShelterId(Shelter shelterId) {
-        this.shelterId = shelterId;
+    public void setShelter(Shelter shelterId) {
+        this.shelter = shelterId;
     }
 
     public Integer getAge() {
