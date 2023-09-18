@@ -185,7 +185,7 @@ class UserShelterServiceTest {
 
         UserNotFoundException thrown = Assertions.assertThrows(
                 UserNotFoundException.class, () -> userShelterService.findUserDogShelterById(USER_DOG_SHELTER_NOT_PRESENT_ID));
-//        Mockito.verify(userDogShelterRepository, times(1)).findById(USER_DOG_SHELTER_NOT_PRESENT_ID);
+        Mockito.verify(userDogShelterRepository, times(1)).findById(USER_DOG_SHELTER_NOT_PRESENT_ID);
         assertEquals(thrown.getMessage(), String.format(DOG_SHELTER_USER_BY_ID_NOT_FOUND_MESSAGE, USER_DOG_SHELTER_NOT_PRESENT_ID));
         Mockito.verifyNoMoreInteractions(userDogShelterRepository);
     }

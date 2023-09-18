@@ -12,6 +12,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static pro.sky.animalshelter.Constants.TextConstants.VOLUNTEER_BY_ID_NOT_FOUND_MESSAGE;
+
 @Service
 public class VolunteerService {
     private final VolunteerRepository volunteerRepository;
@@ -32,7 +34,7 @@ public class VolunteerService {
     private VolunteerDTO manageVolunteerEnabled(Integer volunteerId, Boolean isActive) {
         Volunteer volunteer = volunteerRepository
                 .findById(volunteerId)
-                .orElseThrow(() -> new VolunteerNotFoundException(volunteerId + " not found in database"));
+                .orElseThrow(() -> new VolunteerNotFoundException(String.format(VOLUNTEER_BY_ID_NOT_FOUND_MESSAGE, volunteerId)));
         volunteer.setActive(isActive);
         return VolunteerDTO.fromVolunteer(volunteerRepository.save(volunteer));
     }

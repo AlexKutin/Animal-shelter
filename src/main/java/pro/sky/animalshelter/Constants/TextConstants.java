@@ -88,4 +88,6 @@ public class TextConstants {
     public static final String DOG_ADOPTER_DUPLICATION_MESSAGE = "Dog Shelter: Adopter duplication error: userId = %d and dogId = %d already present";
     public static final String CAT_ADOPTER_DUPLICATION_MESSAGE = "Cat Shelter: Adopter duplication error: userId = %d and catId = %d already present";
 
+    public static final String VOLUNTEER_BY_ID_NOT_FOUND_MESSAGE = "Volunteer with Id = %d not found in database";
+
 }
