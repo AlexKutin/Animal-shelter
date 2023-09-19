@@ -90,4 +90,5 @@ public class TextConstants {
 
     public static final String VOLUNTEER_BY_ID_NOT_FOUND_MESSAGE = "Volunteer with Id = %d not found in database";
 
+    public static final String SHELTER_TYPE_NOT_SUPPORTED_MESSAGE = "Shelter type: %s not supported yet";
 }

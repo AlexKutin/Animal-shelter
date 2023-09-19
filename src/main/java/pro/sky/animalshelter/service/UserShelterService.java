@@ -14,8 +14,7 @@ import pro.sky.animalshelter.repository.UserDogShelterRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static pro.sky.animalshelter.Constants.TextConstants.CAT_SHELTER_USER_BY_ID_NOT_FOUND_MESSAGE;
-import static pro.sky.animalshelter.Constants.TextConstants.DOG_SHELTER_USER_BY_ID_NOT_FOUND_MESSAGE;
+import static pro.sky.animalshelter.Constants.TextConstants.*;
 
 @Service
 public class UserShelterService {
@@ -75,7 +74,7 @@ public class UserShelterService {
             return userShelterDTOList;
         }
         logger.error("Shelter type {} not supported. The list users can not be created", shelterType);
-        throw new ShelterNotFoundException(String.format("Shelter type: %s not supported yet", shelterType));
+        throw new ShelterNotFoundException(String.format(SHELTER_TYPE_NOT_SUPPORTED_MESSAGE, shelterType));
     }
 
     public UserCatShelter findUserCatShelterById(Integer userId) {

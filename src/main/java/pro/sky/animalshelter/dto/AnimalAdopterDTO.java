@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import pro.sky.animalshelter.model.AdopterStatus;
 import pro.sky.animalshelter.model.ShelterType;
 
+import java.util.Objects;
+
 @Schema(description = "Усыновитель животного")
 public class AnimalAdopterDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -136,4 +138,16 @@ public class AnimalAdopterDTO {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AnimalAdopterDTO)) return false;
+        AnimalAdopterDTO that = (AnimalAdopterDTO) o;
+        return shelterType == that.shelterType && Objects.equals(adopterId, that.adopterId) && Objects.equals(userId, that.userId) && Objects.equals(chatId, that.chatId) && Objects.equals(userName, that.userName) && Objects.equals(animalId, that.animalId) && Objects.equals(animalName, that.animalName) && Objects.equals(adoptionDate, that.adoptionDate) && adopterStatus == that.adopterStatus && Objects.equals(endProbationDate, that.endProbationDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(shelterType, adopterId, userId, chatId, userName, animalId, animalName, adoptionDate, adopterStatus, endProbationDate);
+    }
 }
