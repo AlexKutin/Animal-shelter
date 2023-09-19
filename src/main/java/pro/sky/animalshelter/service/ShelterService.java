@@ -13,6 +13,8 @@ import pro.sky.animalshelter.repository.VolunteerRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static pro.sky.animalshelter.Constants.TextConstants.SHELTER_TYPE_NOT_FOUND_MESSAGE;
+
 @Service
 public class ShelterService {
     private final ShelterRepository shelterRepository;
@@ -108,7 +110,7 @@ public class ShelterService {
     }
 
     /**
-     * Добавляет приют по указанному типу
+     * Поиск приюта в БД по указанному типу
      * @param shelterType Тип приюта
      * @return Возвращает экземпляр класса <b>Shelter</b> соответствующий указанному типу приюта
      */
@@ -116,6 +118,6 @@ public class ShelterService {
         return shelterRepository.findSheltersByShelterType(shelterType)
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new ShelterNotFoundException(shelterType + " not found in database"));
+                .orElseThrow(() -> new ShelterNotFoundException(String.format(SHELTER_TYPE_NOT_FOUND_MESSAGE, shelterType)));
     }
 }
