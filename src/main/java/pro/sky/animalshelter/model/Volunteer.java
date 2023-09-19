@@ -21,7 +21,7 @@ public class Volunteer implements Cloneable {
     private String phone;
 
     @Column(name = "volunteer_active")
-    private boolean isActive;
+    private Boolean isActive;
     //Для получения идентификатора чата, волонтер должен отправить команду боту /getchatid,
     //после это значение необходимо добавить в таблицу в соответствующюю таблицу.
     // Отправка сообщений волонтерам о помощи реализуется на сновании идентификатора чата волонтера с ботом
@@ -39,6 +39,16 @@ public class Volunteer implements Cloneable {
     @ManyToOne
     @JoinColumn(name = "shelter_id")
     private Shelter shelter;
+
+    public Volunteer() {
+    }
+
+    public Volunteer(Integer id, String name, Boolean isActive, Long chatId) {
+        this.id = id;
+        this.name = name;
+        this.isActive = isActive;
+        this.chatId = chatId;
+    }
 
     public Integer getId() {
         return id;
@@ -72,7 +82,7 @@ public class Volunteer implements Cloneable {
         this.phone = phone;
     }
 
-    public boolean isActive() {
+    public Boolean isActive() {
         return isActive;
     }
 

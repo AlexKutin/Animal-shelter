@@ -3,13 +3,20 @@ package pro.sky.animalshelter.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import pro.sky.animalshelter.model.ShelterType;
-import pro.sky.animalshelter.model.UserShelter;
 
 @Schema(description = "Зрегистрированный пользователь приюта")
 public class UserShelterDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(description = "Id пользователя")
+    private Integer userId;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(description = "Telegram Id пользователя")
     private Long telegramId;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(description = "chat Id пользователя")
+    private Long chatId;
 
     @Schema(description = "Telegram Username пользователя")
     private String userName;
@@ -26,12 +33,28 @@ public class UserShelterDTO {
     @Schema(description = "Контакты пользователя")
     private String userContacts;
 
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
     public Long getTelegramId() {
         return telegramId;
     }
 
     public void setTelegramId(Long telegramId) {
         this.telegramId = telegramId;
+    }
+
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
     }
 
     public String getUserName() {
@@ -77,24 +100,14 @@ public class UserShelterDTO {
     @Override
     public String toString() {
         return "UserShelterDTO{" +
-                "telegramId=" + telegramId +
+                "userId=" + userId +
+                ", telegramId=" + telegramId +
+                ", chatId=" + chatId +
                 ", userName='" + userName + '\'' +
                 ", shelterType=" + shelterType +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", userContacts='" + userContacts + '\'' +
                 '}';
-    }
-
-    public static UserShelterDTO fromUserShelter(UserShelter userShelter) {
-        UserShelterDTO userShelterDTO = new UserShelterDTO();
-        userShelterDTO.setTelegramId(userShelter.getTelegramId());
-        userShelterDTO.setUserName(userShelter.getUserName());
-        userShelterDTO.setShelterType(userShelter.getShelter().getShelterType());
-        userShelterDTO.setFirstName(userShelter.getFirstName());
-        userShelterDTO.setLastName(userShelter.getLastName());
-        userShelterDTO.setUserContacts(userShelter.getUserContacts());
-
-        return userShelterDTO;
     }
 }

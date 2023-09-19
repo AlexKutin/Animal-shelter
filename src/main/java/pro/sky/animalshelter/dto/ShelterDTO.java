@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import pro.sky.animalshelter.model.Shelter;
 import pro.sky.animalshelter.model.ShelterType;
 
+import java.util.Objects;
+
 @Schema(description = "Приют")
 public class ShelterDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -31,17 +33,6 @@ public class ShelterDTO {
 
     @Schema(description = "Техника безопасности на территории приюта")
     private String safetyInfo;
-
-//    public ShelterDTO(Integer id, ShelterType shelterType, String shelterName, String shelterDescription, String shelterAddress, String drivingDirection, String shelterContacts, String securityContacts) {
-//        this.id = id;
-//        this.shelterType = shelterType;
-//        this.shelterName = shelterName;
-//        this.shelterDescription = shelterDescription;
-//        this.shelterAddress = shelterAddress;
-//        this.drivingDirection = drivingDirection;
-//        this.shelterContacts = shelterContacts;
-//        this.securityContacts = securityContacts;
-//    }
 
     public Integer getId() {
         return id;
@@ -150,18 +141,16 @@ public class ShelterDTO {
         return shelterDTO;
     }
 
-    public Shelter toShelter() {
-        Shelter shelter = new Shelter();
-        shelter.setId(this.getId());
-        shelter.setShelterType(this.getShelterType());
-        shelter.setShelterName(this.getShelterName());
-        shelter.setShelterDescription(this.getShelterDescription());
-        shelter.setShelterAddress(this.getShelterAddress());
-        shelter.setShelterContacts(this.getShelterContacts());
-        shelter.setSecurityContacts(this.getSecurityContacts());
-        shelter.setSafetyInfo(this.getSafetyInfo());
-        shelter.setDrivingDirection(this.getDrivingDirection());
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ShelterDTO)) return false;
+        ShelterDTO that = (ShelterDTO) o;
+        return Objects.equals(id, that.id) && shelterType == that.shelterType && Objects.equals(shelterName, that.shelterName) && Objects.equals(shelterDescription, that.shelterDescription) && Objects.equals(shelterAddress, that.shelterAddress) && Objects.equals(drivingDirection, that.drivingDirection) && Objects.equals(shelterContacts, that.shelterContacts) && Objects.equals(securityContacts, that.securityContacts) && Objects.equals(safetyInfo, that.safetyInfo);
+    }
 
-        return shelter;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, shelterType, shelterName, shelterDescription, shelterAddress, drivingDirection, shelterContacts, securityContacts, safetyInfo);
     }
 }

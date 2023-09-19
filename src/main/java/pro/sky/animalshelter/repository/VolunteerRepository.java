@@ -10,13 +10,10 @@ import java.util.Collection;
 public interface VolunteerRepository extends JpaRepository<Volunteer, Integer> {
 
     Collection<Volunteer> findVolunteersByShelter(Shelter shelter);
-    Collection<Volunteer> findVolunteersByShelter_ShelterType(ShelterType shelterType);
-}
 
-//    @Query(value = "UPDATE volunteers SET volunteer_active = false WHERE volunteer_id = :volunteerId", nativeQuery = true)
-//    void blockVolunteerById(Integer volunteerId);
-//
-//    @Query(value = "UPDATE volunteers SET volunteer_active = true WHERE volunteer_id = :volunteerId", nativeQuery = true)
-//    void unlockVolunteerById(Integer volunteerId);
+    Collection<Volunteer> findVolunteersByShelter_ShelterType(ShelterType shelterType);
+
+    Collection<Volunteer> findAllByIsActiveTrueAndShelter_ShelterType(ShelterType shelterType);
+}
 
 

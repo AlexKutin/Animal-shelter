@@ -1,9 +1,13 @@
 package pro.sky.animalshelter.model;
 
+import org.jetbrains.annotations.NotNull;
+import pro.sky.animalshelter.dto.UserShelterDTO;
+
 import javax.persistence.*;
+import java.util.Objects;
 
 @MappedSuperclass
-public abstract class UserShelter {
+public abstract class UserShelter implements Comparable<UserShelter> {
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -11,6 +15,9 @@ public abstract class UserShelter {
 
     @Column(name = "telegram_id", nullable = false, unique = true)
     protected Long telegramId;
+
+    @Column(name = "chat_id", unique = true)
+    private Long chatId;
 
     @Column(name = "user_name", length = 50)
     private String userName;
@@ -31,11 +38,6 @@ public abstract class UserShelter {
     public UserShelter() {
     }
 
-    public UserShelter(Long telegramId, String userName, String firstName, String lastName, String userContacts, Shelter shelter) {
-        this.telegramId = telegramId;
-        fillUserInfo(userName, firstName, lastName, userContacts, shelter);
-    }
-
     public Integer getUserId() {
         return userId;
     }
@@ -50,6 +52,14 @@ public abstract class UserShelter {
 
     public void setTelegramId(Long telegramId) {
         this.telegramId = telegramId;
+    }
+
+    public Long getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(Long chatId) {
+        this.chatId = chatId;
     }
 
     public String getUserName() {
@@ -97,6 +107,7 @@ public abstract class UserShelter {
         return "UserShelter{" +
                 "userId=" + userId +
                 ", telegramId=" + telegramId +
+                ", chatId=" + chatId +
                 ", userName='" + userName + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
@@ -105,11 +116,51 @@ public abstract class UserShelter {
                 '}';
     }
 
-    public void fillUserInfo(String userName, String firstName, String lastName, String userContacts, Shelter shelter) {
-        this.userName = userName;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.userContacts = userContacts;
-        this.shelter = shelter;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserShelter that = (UserShelter) o;
+        return Objects.equals(telegramId, that.telegramId) && Objects.equals(chatId, that.chatId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(telegramId, chatId);
+    }
+
+    public void fillUserInfo(UserShelterDTO userShelterDTO) {
+        this.userName = userShelterDTO.getUserName();
+        this.firstName = userShelterDTO.getFirstName();
+        this.lastName = userShelterDTO.getLastName();
+        this.userContacts = userShelterDTO.getUserContacts();
+    }
+
+    @Override
+    public int compareTo(@NotNull UserShelter o) {
+        return Integer.compare(this.getUserId(), o.getUserId());
+    }
+
+    public UserShelterDTO toDTO() {
+        UserShelterDTO userShelterDTO = new UserShelterDTO();
+        userShelterDTO.setUserId(this.getUserId());
+        userShelterDTO.setTelegramId(this.getTelegramId());
+        userShelterDTO.setChatId(this.getChatId());
+        userShelterDTO.setUserName(this.getUserName());
+        userShelterDTO.setFirstName(this.getFirstName());
+        userShelterDTO.setLastName(this.getLastName());
+        userShelterDTO.setUserContacts(this.getUserContacts());
+
+        return  userShelterDTO;
+    }
+
+    public void fillUserInfoFromDTO(UserShelterDTO userShelterDTO) {
+        setUserId(userShelterDTO.getUserId());
+        setTelegramId(userShelterDTO.getTelegramId());
+        setChatId(userShelterDTO.getChatId());
+        setUserName(userShelterDTO.getUserName());
+        setFirstName(userShelterDTO.getFirstName());
+        setLastName(userShelterDTO.getLastName());
+        setUserContacts(userShelterDTO.getUserContacts());
     }
 }
