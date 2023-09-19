@@ -1,5 +1,7 @@
 package pro.sky.animalshelter.model;
 
+import pro.sky.animalshelter.dto.UserShelterDTO;
+
 import javax.persistence.*;
 
 @Entity
@@ -8,7 +10,16 @@ public class UserCatShelter extends UserShelter {
     public UserCatShelter() {
     }
 
-    public UserCatShelter(Long telegramId, String userName, String firstName, String lastName, String userContacts, Shelter shelter) {
-        super(telegramId, userName, firstName, lastName, userContacts, shelter);
+    @Override
+    public UserShelterDTO toDTO() {
+        UserShelterDTO userShelterDTO = super.toDTO();
+        userShelterDTO.setShelterType(ShelterType.CAT_SHELTER);
+        return userShelterDTO;
+    }
+
+    public static UserCatShelter fromDTO(UserShelterDTO userShelterDTO) {
+        UserCatShelter userCatShelter = new UserCatShelter();
+        userCatShelter.fillUserInfoFromDTO(userShelterDTO);
+        return userCatShelter;
     }
 }

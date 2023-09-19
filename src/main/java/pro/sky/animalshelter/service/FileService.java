@@ -1,14 +1,20 @@
 package pro.sky.animalshelter.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import pro.sky.animalshelter.dto.ShelterDTO;
 import pro.sky.animalshelter.model.Shelter;
 import pro.sky.animalshelter.model.ShelterType;
 import pro.sky.animalshelter.repository.ShelterRepository;
 
 import java.io.File;
-import java.util.Optional;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 @Service
 public class FileService {
@@ -18,11 +24,17 @@ public class FileService {
     @Value("${name.of.data.shelter.file}")
     private String dataFileName;
 
-    @Autowired
-    private ShelterRepository shelterRepository;
+    private final ShelterRepository shelterRepository;
+    private final ShelterService shelterService;
 
-    public File getDataFile(String shelterName) {
-        return new File(dataFilePath + "/" + shelterName + dataFileName);
+    public FileService(ShelterRepository shelterRepository, ShelterService shelterService) {
+        this.shelterRepository = shelterRepository;
+        this.shelterService = shelterService;
+    }
+
+    public File getDataFile(ShelterType shelterType) {
+        Shelter shelter = shelterService.findShelterByShelterType(shelterType);
+        return new File(shelter.getDrivingDirection());
     }
 
     /**
@@ -30,9 +42,20 @@ public class FileService {
      * <p>
      * Путь сохраняется в строку соответствующую переданному id.
      */
-    public void saveDirectoryToRepository(Integer id, String shelterName) {
-        Shelter shelter = shelterRepository.findById(id).get();
-        shelter.setDrivingDirection(dataFilePath + "/" + shelterName + dataFileName);
-        shelterRepository.save(shelter);
+    public ShelterDTO saveDirectoryToRepository(ShelterType shelterType, MultipartFile file) throws IOException {
+        String fileExtension = FilenameUtils.getExtension(file.getOriginalFilename());
+        Path filePath = Path.of(dataFilePath, shelterType + "." + fileExtension);
+        Files.createDirectories(filePath.getParent());
+        Files.deleteIfExists(filePath);
+
+        try (InputStream is = file.getInputStream()) {
+            Files.copy(is, filePath, StandardCopyOption.REPLACE_EXISTING);
+        }
+        String pathToFile = filePath.toString();
+        Shelter shelter = shelterService.findShelterByShelterType(shelterType);
+        shelter.setDrivingDirection(pathToFile);
+        shelter = shelterRepository.save(shelter);
+
+        return ShelterDTO.fromShelter(shelter);
     }
 }
