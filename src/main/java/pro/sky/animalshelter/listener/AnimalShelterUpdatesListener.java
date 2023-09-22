@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import pro.sky.animalshelter.Constants.CallbackConstants;
 import pro.sky.animalshelter.Constants.TextConstants;
 import pro.sky.animalshelter.dto.*;
+import pro.sky.animalshelter.exception.AdopterNotFoundException;
 import pro.sky.animalshelter.exception.UserChatIdNotFoundException;
 import pro.sky.animalshelter.keyBoard.InlineKeyboardMarkupHelper;
 import pro.sky.animalshelter.model.*;
@@ -104,6 +105,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         } else if (userContactMap.containsKey(chatId)) {
             saveContacts(message);
             sendMessageLeaveContacts(chatId);
+            userContactMap.remove(chatId);
         } else if ("/getchatid".equals(text)) {
             getChatId(chatId);
         } else if (reportStageMap.containsKey(chatId)) {
@@ -201,7 +203,7 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
             sendCynologist(chatId);
         } else if (CallbackConstants.CANCEL_CONTACT_INPUT.equals(data)) {
             userContactMap.remove(chatId);
-            sendMessage(chatId, TextConstants.SEND_LEAVE_CONTACTS_CANCEL);
+            sendMessageCancelContactInput(chatId);
         }
     }
 
@@ -350,6 +352,13 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         SendResponse sendResponse = animalShelterBot.execute(response);
         logger.info("Message sent status: {}", sendResponse.isOk());
     }
+    private void sendMessageCancelContactInput(Long chatId) {
+        SendMessage response = new SendMessage(chatId, TextConstants.SEND_LEAVE_CONTACTS_CANCEL + "\n" + TextConstants.WELCOME_MESSAGE);
+        InlineKeyboardMarkup keyboardMarkup = InlineKeyboardMarkupHelper.createShelterInfoInlineKeyboard();
+        response.replyMarkup(keyboardMarkup);
+        SendResponse sendResponse = animalShelterBot.execute(response);
+        logger.info("Message sent status: {}", sendResponse.isOk());
+    }
 
     private void backMainMenu(Long chatId) {
         SendMessage response = new SendMessage(chatId, TextConstants.BACK_MAIN_MENU);
@@ -473,14 +482,19 @@ public class AnimalShelterUpdatesListener implements UpdatesListener {
         logger.info("Message sent status: {}", sendResponse.isOk());
     }
 
-    private void sendReportMessage(Long chatId, ShelterType chooseShelterType) {
-        if (adopterService.getAdopterIdByChatId(chatId, chooseShelterType) == 0) {
-            sendMessage(chatId, TextConstants.SEND_REPORT_MESSAGE_ERROR + volunteerService.findAvailableVolunteerTelegram(chooseShelterType));
-        } else {
+private void sendReportMessage(Long chatId, ShelterType chooseShelterType) {
+    try {
+        Integer adopterId = adopterService.getAdopterIdByChatId(chatId, chooseShelterType);
+        if (adopterId != null && adopterId != 0) {
             sendMessage(chatId, TextConstants.REPORT_MESSAGE);
             reportStageMap.put(chatId, ReportStage.AWAITING_PHOTO);
+        } else {
+            sendMessage(chatId, TextConstants.SEND_REPORT_MESSAGE_ERROR);
         }
+    } catch (AdopterNotFoundException e) {
+        sendMessage(chatId, TextConstants.SEND_REPORT_MESSAGE_ERROR + volunteerService.findAvailableVolunteerTelegram(chooseShelterType));
     }
+}
 
     private void saveReportToService(Long chatId, String description, PhotoDataDTO photoDataDTO, ShelterType shelterType) {
         ReportAnimalDTO reportAnimalDTO = new ReportAnimalDTO();

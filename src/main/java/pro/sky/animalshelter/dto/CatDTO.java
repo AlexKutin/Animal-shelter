@@ -1,10 +1,20 @@
 package pro.sky.animalshelter.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Кошка")
 public class CatDTO {
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(description = "Идентификатор кошки")
     private Integer catId;
+    @Schema(description = "Имя кошки")
     private String catName;
+    @Schema(description = "Возраст")
     private Integer age;
+    @Schema(description = "Пол")
     private String gender;
+    @Schema(description = "Порода")
     private String breed;
 
     public CatDTO(Integer catId, String catName, Integer age, String gender, String breed) {
