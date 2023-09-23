@@ -84,7 +84,7 @@ public class AnimalService {
         dogAdopter.setUser(user);
         dogAdopter.setChatId(user.getChatId());
         dogAdopter.setAdoptionDate(LocalDateTime.now());
-        dogAdopter.setAdopterStatus(animalAdopterDTO.getAdopterStatus());
+        dogAdopter.setAdopterStatus(AdopterStatus.PROBATION_ACTIVE);
         dogAdopter.setEndProbationDate(LocalDateTime.now().plusMonths(1));
         dogAdopter = dogAdopterRepository.save(dogAdopter);
 
@@ -106,7 +106,7 @@ public class AnimalService {
         catAdopter.setUser(user);
         catAdopter.setChatId(user.getChatId());
         catAdopter.setAdoptionDate(LocalDateTime.now());
-        catAdopter.setAdopterStatus(animalAdopterDTO.getAdopterStatus());
+        catAdopter.setAdopterStatus(AdopterStatus.PROBATION_ACTIVE);
         catAdopter.setEndProbationDate(LocalDateTime.now().plusMonths(1));
         catAdopter = catAdopterRepository.save(catAdopter);
 

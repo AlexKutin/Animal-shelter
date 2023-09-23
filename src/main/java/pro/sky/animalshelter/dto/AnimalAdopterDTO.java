@@ -19,6 +19,8 @@ public class AnimalAdopterDTO {
 
     @Schema(description = "Идентификатор пользователя")
     private Integer userId;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(description = "Идентификатор чата")
     private Long chatId;
 
@@ -37,9 +39,11 @@ public class AnimalAdopterDTO {
     @Schema(description = "Дата и время усыновления животного")
     private String adoptionDate;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(description = "Статус испытательного срока")
     private AdopterStatus adopterStatus;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(description = "Дата окончания испытательного срока")
     private String endProbationDate;
 

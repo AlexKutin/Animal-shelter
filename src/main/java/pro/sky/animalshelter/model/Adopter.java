@@ -14,6 +14,7 @@ public abstract class Adopter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "adopter_id")
     private Integer adopterId;
+
     @Column(name = "chat_id", unique = true)
     private Long chatId;
 

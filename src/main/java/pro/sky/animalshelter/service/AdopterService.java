@@ -65,13 +65,15 @@ public class AdopterService {
 
     public Integer getAdopterIdByChatId(Long chatId, ShelterType chooseShelterType) {
         if (chooseShelterType == ShelterType.DOG_SHELTER) {
-            DogAdopter dogAdopter = dogAdopterRepository.findAdopterIdByChatId(chatId);
+            DogAdopter dogAdopter = dogAdopterRepository.findByChatIdAndAdopterStatusIn(chatId,
+                    List.of(AdopterStatus.PROBATION_ACTIVE, AdopterStatus.WAITING_REPORT));
             return Optional.ofNullable(dogAdopter)
                     .orElseThrow(() -> new AdopterNotFoundException(
                             String.format(DOG_ADOPTER_BY_CHAT_ID_NOT_FOUND, chatId)))
                     .getAdopterId();
         } else if (chooseShelterType == ShelterType.CAT_SHELTER) {
-            CatAdopter catAdopter = catAdopterRepository.findAdopterIdByChatId(chatId);
+            CatAdopter catAdopter = catAdopterRepository.findByChatIdAndAdopterStatusIn(chatId,
+                    List.of(AdopterStatus.PROBATION_ACTIVE, AdopterStatus.WAITING_REPORT));
             return Optional.ofNullable(catAdopter)
                     .orElseThrow(() -> new AdopterNotFoundException(
                             String.format(CAT_ADOPTER_BY_CHAT_ID_NOT_FOUND, chatId)))
